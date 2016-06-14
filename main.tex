@@ -1,0 +1,65 @@
+\documentclass[11pt, a4paper, onecolumn, twoside,french,cleardoublepage=plain,openany]{report}
+\usepackage[english]{babel}
+\usepackage[a4paper]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{indentfirst} % Linéa sur les premiers paragraphes
+\usepackage[babel=true]{csquotes} % csquotes va utiliser la langue définie dans babel
+\usepackage{graphicx} % pour inclure les images
+\usepackage{amsmath} % pour certains signes mathématiques
+\usepackage{siunitx} % les unités SI
+\usepackage{amssymb} % pour le signe de convolution
+\usepackage{moreverb} % pour le code c, cpp...
+\usepackage[pdfusetitle]{hyperref} % Pour les liens cliquables
+\usepackage[english,boxed,lined,onelanguage]{algorithm2e}
+\SetAlCapSkip{1em} % Marge entre l'algo et le caption
+%\SetAlCapNameSty{textit} % style du texte du caption des algos
+\usepackage[toc,page]{appendix} % Annexes
+\usepackage{fancyhdr} % Pour \lhead, \rhead... 
+\usepackage[font={it}]{caption}
+\usepackage[backend=bibtex]{biblatex}
+\bibliography{bibliographie.bib}
+\usepackage{multirow} % Pour colonnes multiples des tableaux
+\usepackage{longtable} % Pour longs tableaux
+\usepackage{array} % Pour \texttt sur tout une colonne
+\usepackage{xcolor} % Pour éviter que footnote ne bug...
+\usepackage{footnote} % Pour les footnotes dans les tableaux
+\makesavenoteenv{tabular} % Pour les footnotes dans les tableaux
+\usepackage{tabularx}
+\usepackage{pdfpages} % Include des pdfs
+\usepackage[nottoc,numbib]{tocbibind} % Pour faire apparaitre la biblio. dans le sommaire
+\usepackage[]{minitoc} % Pour les sommaires intermédiaires
+\usepackage{etoolbox} % Pour le toggle (pour afficher les annexe ou non)
+\usepackage[acronym,toc,shortcuts]{glossaries}
+\usepackage[english]{cleveref} 
+\makeglossary
+\makeindex
+
+\newtoggle{skip_title_page}
+\toggletrue{skip_title_page}
+
+\input{mystyle.tex}
+\input{acronyms.tex}
+
+\author{Maël Valais}
+\date{Updated on \today}
+\title{Master's Thesis – Optimization of dictionaries structured in convolutional trees for sparse image representation}
+
+\begin{document}
+\iftoggle{skip_title_page}{}{
+\input{titlepage}
+}
+
+% Préparation pour les pages de corps
+%\pagestyle{empty}
+%\restoregeometry
+%\cleardoublepage % Blanc jusqu'à prochaîne page paire
+
+%\tableofcontents
+%{\let\clearpage\relax\listoffigures}
+%{\let\clearpage\relax\listoftables}
+%{\let\clearpage\relax\listofalgorithms}
+
+\include{body}
+
+\end{document}

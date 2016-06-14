@@ -1,0 +1,20 @@
+% \newacronymwithdescr{Label}{Court}{Long}{Description}
+\newcommand*{\newacronymwithdescr}[5][]{%
+  \newglossaryentry{main-#2}{name={#3},%
+  text={(\acs{#2}) #3\glsadd{#2}},%
+  description={#5},%
+  #1
+  }%
+  \newacronym{#2}{#3\glsadd{main-#2}}{#4}%
+}
+
+% Pas de point final pour les entrées glossaire ou acronymes
+\setacronymstyle{sm-short-long}
+%\newacronym{IMT}{IMT}{Institut de Mathématiques de Toulouse}
+\newacronymwithdescr{IMT}{IMT}{Institut de Mathématiques de Toulouse}{is the main laboratory in mathematics in Toulouse}
+\newglossaryentry{Blabla}{name=Blabla,description={is....}}
+
+% To use the glossary entries:
+% \acs{} (for short one)
+% \ac{} (for long one - only on first appearence)
+

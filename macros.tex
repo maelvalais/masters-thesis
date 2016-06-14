@@ -1,0 +1,104 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% MACROS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Couleurs pour les corrections
+\newcommand {\JY}[1] {\textcolor{red}{#1}}
+\newcommand {\FR}[1] {\textcolor[rgb]{0.0,0.3,0.0}{#1}}
+\newcommand {\OL}[1] {\textcolor{blue}{#1}}
+\newcommand {\HW}[1] {\textcolor[rgb]{0.3,0.2,0.0}{#1}}
+%\newcommand{\hilite}[1] {\emph{#1}}
+\newcommand{\hilite}[1] {\Req{#1}}
+\newcommand {\Req}[1] {\textcolor[rgb]{0.75,0.0,0.0}{#1}}
+\newcommand {\Geq}[1] {\textcolor[rgb]{0.0,0.5,0.0}{#1}}
+\newcommand {\Beq}[1] {\textcolor[rgb]{0.0,0.15,0.60}{#1}}
+\newcommand {\black}[1] {\textcolor{black}{#1}}
+
+% Espaces mathématiques
+\newcommand {\DPUN} {{\mathcal D}}
+\newcommand {\DTREE} {{\mathcal D}^e}
+\newcommand {\CC} {\mathbb C}
+\newcommand {\RR} {\mathbb R}
+\newcommand {\RP} {\mathbb R^{\mathcal P}}
+\newcommand {\RPE} {\mathbb R^{\mathcal P \times |\edges |}}
+\newcommand {\codeset} {\mathbb R^{\mathcal P \times \leaves}}
+\newcommand {\Dset} {\mathbb R^{\mathcal P \times (\mathcal P \#\leaves) }}
+\newcommand {\ZZ} {\mathbb Z}
+\newcommand {\NN} {\mathbb N}
+\newcommand {\PP} {{\mathcal P}}
+\newcommand {\HH} {{\mathbb H}}
+\newcommand {\II} {{\mathbb I}}
+\renewcommand {\SS} {{\mathcal S}} % applis supports
+\newcommand {\SA} {{\mathbb S}} % support accessible
+
+% Fonctions
+\newcommand {\f}[1] { {\mathcal F}\left( #1 \right) }
+\newcommand {\F}[1] { {\mathcal F^{-1}}\left( #1 \right) }
+\newcommand {\norm}[2] {\left\| #1 \right\| _{#2}}
+\newcommand {\defeq} {\triangleq}
+
+% Opérateurs
+\DeclareMathOperator {\sign} {sign}
+\DeclareMathOperator {\prox} {prox}
+\DeclareMathOperator {\argmin} {argmin}
+\DeclareMathOperator {\supp} {supp}
+\DeclareMathOperator {\rg} {rg}
+\DeclareMathOperator {\diag} {diag}
+\newcommand {\RG}[1] {\rg\left( #1 \right)}
+\newcommand {\SUPP}[1] {\supp\left( #1 \right)}
+\newcommand {\PS}[2] {\langle #1 , #2 \rangle}
+\newcommand {\PROBA}[1] {\mathbb P \left( #1 \right)}
+\newcommand {\one}[1] {\mathbbm{1}_{ #1 }}
+%\newcommand {\one}[1] {\chi_{ #1 }} %{\mathbbm{1}_{ #1 }}
+\newcommand {\oneinf}[1] {\chi_{ #1 }}
+%\newcommand {\oneinf}[1] {{\mathcal I}_{ #1 }} 
+
+% Acronymes
+\newcommand {\PSNR} { \textrm{PSNR}^* } 
+\newcommand {\NRE} { \textrm{NRE} }
+\newcommand {\CPR} { \textrm{RER} }
+\newcommand {\COST} { \textrm{G} } % ancien compression ratio
+
+% Raccourcis
+\newtheorem{prop}{Proposition}[section]
+
+\newcommand {\nodes} {\mathcal N}
+\newcommand {\edges} {\mathcal E}
+\newcommand {\leaves} {\mathcal F}
+\newcommand {\NL} {\#\leaves}
+\newcommand {\hall} {h^e _{e \in \edges}}
+%\newcommand {\multiconv}[1] { \bigstar_{\substack{#1}}\, }
+\newcommand {\multiconv}[1] { \mathbf h^{#1}\, }
+\newcommand {\tpath}[1] {\mathcal{C}(#1)}
+\newcommand {\code} {\mathbf x}
+\newcommand {\data} {\mathbf y}
+\newcommand {\dataex} {\mathbf b}
+\newcommand {\databis} {\mathbf y^e}
+\newcommand {\D} {\mathbf D}
+\newcommand {\Hs} {\mathbf A}
+\newcommand {\Ha} {\mathbf H}
+\newcommand {\Haf} {\hat{\mathbf H}}
+\newcommand {\Hab} {\bar{\mathbf H}}
+\newcommand {\res} {\mathbf r}
+
+\newcommand {\tree}{\mathcal T}
+\newcommand{\subtree}[1]{\tree^{#1}}
+
+\newcommand {\stopalgo}{\epsilon}
+
+% autres MACROS
+\newcommand {\hkall} {(h^k)_{1 \leq k \leq K}}
+\newcommand {\hkconv} {h^1 * \dots * h^K}
+\newcommand {\hkconvnorm} {\frac{h^1}{\norm{h^1}{2}} * \dots * \frac{h^K}{\norm{h^K}{2}}}
+\newcommand {\hkconvp} {g^{1} * \dots * g{K}}
+\newcommand {\hkconvs} {f^{1} * \dots * f^{K}}
+\newcommand {\fobj} {\| \code * h^1 * \dots * h^K - \data \|_2^2}
+\newcommand {\fobjlambda} {\| \lambda \code * h^1 * \dots * h^K - \data \|_2^2}
+
+% Macros added by Mael
+\newcommand{\fichier}{\texttt}
+\newcommand{\commande}{\texttt}
+\newcommand{\code}{\texttt}
+\newcommand{\codeLong}[1]{
+\begin{verbatim} #1 \end{verbatim}
+}
