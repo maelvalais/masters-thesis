@@ -4,42 +4,46 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{indentfirst} % Linéa sur les premiers paragraphes
-\usepackage[babel=true]{csquotes} % csquotes va utiliser la langue définie dans babel
+\usepackage[babel=true]{csquotes}
 \usepackage{graphicx} % pour inclure les images
-\usepackage{amsmath} % pour certains signes mathématiques
-\usepackage{siunitx} % les unités SI
-\usepackage{amssymb} % pour le signe de convolution
-\usepackage{moreverb} % pour le code c, cpp...
-\usepackage[pdfusetitle]{hyperref} % Pour les liens cliquables
-\usepackage[english,boxed,lined,onelanguage]{algorithm2e}
-\SetAlCapSkip{1em} % Marge entre l'algo et le caption
+\usepackage[fleqn]{amsmath} % fleqn = align blocs on the left
+\usepackage{siunitx} % SI units
+\usepackage{amssymb} % for convolution sign
+%\usepackage{moreverb} % for c, cpp snippets
+\usepackage[pdfusetitle]{hyperref} % for linkable refs and title in pdf meta
+
+%\usepackage[english,boxed,lined,onelanguage]{algorithm2e}
+%\SetAlCapSkip{1em} % Marge entre l'algo et le caption
 %\SetAlCapNameSty{textit} % style du texte du caption des algos
-\usepackage[toc,page]{appendix} % Annexes
+\usepackage{algpseudocode,algorithm,algorithmicx}
+
+%\usepackage[toc,page]{appendix} % Annexes
 \usepackage{fancyhdr} % Pour \lhead, \rhead... 
-\usepackage[font={it}]{caption}
+%\usepackage[font={it}]{caption}
 \usepackage[backend=bibtex]{biblatex}
-\bibliography{bibliographie.bib}
-\usepackage{multirow} % Pour colonnes multiples des tableaux
-\usepackage{longtable} % Pour longs tableaux
-\usepackage{array} % Pour \texttt sur tout une colonne
-\usepackage{xcolor} % Pour éviter que footnote ne bug...
-\usepackage{footnote} % Pour les footnotes dans les tableaux
-\makesavenoteenv{tabular} % Pour les footnotes dans les tableaux
-\usepackage{tabularx}
-\usepackage{pdfpages} % Include des pdfs
-\usepackage[nottoc,numbib]{tocbibind} % Pour faire apparaitre la biblio. dans le sommaire
+%\bibliography{bibliographie.bib}
+%\usepackage{multirow} % Pour colonnes multiples des tableaux
+%\usepackage{longtable} % Pour longs tableaux
+%\usepackage{array} % Pour \texttt sur tout une colonne
+%\usepackage{xcolor} % Pour éviter que footnote ne bug...
+%\usepackage{footnote} % Pour les footnotes dans les tableaux
+%\makesavenoteenv{tabular} % Pour les footnotes dans les tableaux
+%\usepackage{tabularx}
+%\usepackage{pdfpages} % Include des pdfs
+%\usepackage[nottoc,numbib]{tocbibind} % Pour faire apparaitre la biblio. dans le sommaire
 \usepackage[]{minitoc} % Pour les sommaires intermédiaires
 \usepackage{etoolbox} % Pour le toggle (pour afficher les annexe ou non)
 \usepackage[acronym,toc,shortcuts]{glossaries}
 \usepackage[english]{cleveref} 
-\makeglossary
-\makeindex
+%\makeglossary
+%\makeindex
 
 \newtoggle{skip_title_page}
 \toggletrue{skip_title_page}
 
 \input{mystyle.tex}
 \input{acronyms.tex}
+\input{macros.tex}
 
 \author{Maël Valais}
 \date{Updated on \today}

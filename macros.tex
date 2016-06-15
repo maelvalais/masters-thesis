@@ -96,9 +96,14 @@
 \newcommand {\fobjlambda} {\| \lambda \code * h^1 * \dots * h^K - \data \|_2^2}
 
 % Macros added by Mael
-\newcommand{\fichier}{\texttt}
-\newcommand{\commande}{\texttt}
-\newcommand{\code}{\texttt}
-\newcommand{\codeLong}[1]{
+\newcommand{\file}{\texttt}
+\newcommand{\dispCode}{\texttt}
+\newcommand{\dispCodeLong}[1]{
 \begin{verbatim} #1 \end{verbatim}
 }
+\DeclareMathOperator*{\argmax}{\arg\!\max}% http://tex.stackexchange.com/q/83169/5764
+
+\algnewcommand\algorithmicinput{\textbf{Input:}}
+\algnewcommand\Input{\item[\algorithmicinput]}
+\algnewcommand\algorithmicoutput{\textbf{Output:}}
+\algnewcommand\Output{\item[\algorithmicoutput]}
