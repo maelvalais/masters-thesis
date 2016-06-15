@@ -21,6 +21,8 @@ $$D\alpha=\hat{y} \approx y$$
 
 In this work, we will generally stay on the non-noisy case, leaving noisiness to further work.
 
+Algorithm PALMTREE: a Gauss-Seidel algorithm (in the sense that we 
+
 In dictionary learning, we call the columns of $D$ the \emph{atoms}.
 
 
@@ -34,7 +36,7 @@ This experiment aims to simulate the choice of an atom by the OMP algorithm. As 
     \State \textbf{Initialization} $R^{(0)} = x$
     \While{$i \leq k$}
       \State $l =  \argmax_{l = 1,\dots,l} |\left< g_l,R^{(i)} \right>|$ \label{omp_pick_correlation}
-        \Comment{finding the atom in dictionary $\mathcal{G}$ with maximum correlation with residual.}
+        \Comment{finding the atom in $\mathcal{G}$ with max correlation with residual.}
       \State $R^{(i+1)} = R{(i)}-a_l g_l^{(i)}$
       \State $\hat{x} = \hat{x}+\langle R^{(i)}, g_{l}^{(i)} \rangle g_{l}^{(i)}$
       \State $i = i + 1$
@@ -54,4 +56,13 @@ l =& \argmax \left|\left< g_l,R^{(i)} \right>\right| \\
 =& \argmax \left| \mathcal{G}^TR^{(i)}\right| \\
 =& \argmax \left| \mathcal{G}^T(\mathcal{G}\alpha - u)\right| \\
 \end{align*}
+So: does the partial gradient \ref{eq_partial_gradient} give 
+\begin{align*}
+\Phi((h^e)_{e \in \edges}) = \left\| \sum_{f\in\leaves} \code^f * h^{\CC(r,f)} \right\|^2
+\end{align*}
+
+\begin{align*}\label{eq_partial_gradient}
+\nabla_{h^{e'}}\Phi((h^e)_{e \in \edges}) = 2 \widetilde{H^{e'}} * (h^{e'}*H^{e'}-y^{e'})
+\end{align*}
+
 
