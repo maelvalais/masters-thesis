@@ -27,3 +27,13 @@ Institut de Mathématiques de Toulouse\\
 ENSEIHHT, Toulouse
 \end{center}
 \end{titlepage}
+
+% Préparation pour les pages de corps
+\pagestyle{empty}
+\restoregeometry
+\cleardoublepage % Blanc jusqu'à prochaîne page paire
+
+\tableofcontents
+{\let\clearpage\relax\listoffigures}
+{\let\clearpage\relax\listoftables}
+{\let\clearpage\relax\listofalgorithms}

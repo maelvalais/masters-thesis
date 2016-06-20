@@ -1,0 +1,48 @@
+\documentclass[11pt, a4paper, onecolumn, twoside,french,cleardoublepage=plain,openany]{report}
+\usepackage[english]{babel}
+\usepackage[a4paper]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{indentfirst} % alinea on paragraphs
+\usepackage[babel=true]{csquotes}
+\usepackage{graphicx}
+\usepackage[fleqn]{amsmath} % fleqn = align blocs on the left
+\usepackage{siunitx} % SI units
+\usepackage{amssymb} % for convolution sign
+%\usepackage{moreverb} % for c, cpp snippets
+\usepackage[pdfusetitle]{hyperref} % for linkable refs and title in pdf meta
+
+%\usepackage[english,boxed,lined,onelanguage]{algorithm2e}
+%\SetAlCapSkip{1em} % Margin between algo and caption
+%\SetAlCapNameSty{textit} % text style for  algo captions
+\usepackage{algpseudocode,algorithm,algorithmicx}
+
+%\usepackage[toc,page]{appendix}
+\usepackage{fancyhdr} % For titlepage \lhead, \rhead... 
+%\usepackage[font={it}]{caption}
+\usepackage[backend=bibtex]{biblatex}
+%\bibliography{bibliographie.bib}
+%\usepackage{multirow} % Pour colonnes multiples des tableaux
+%\usepackage{longtable} % Pour longs tableaux
+%\usepackage{array} % Pour \texttt sur tout une colonne
+%\usepackage{xcolor} % Pour éviter que footnote ne bug...
+%\usepackage{footnote} % Pour les footnotes dans les tableaux
+%\makesavenoteenv{tabular} % Pour les footnotes dans les tableaux
+%\usepackage{tabularx}
+%\usepackage{pdfpages} % Include des pdfs
+%\usepackage[nottoc,numbib]{tocbibind} % Pour faire apparaitre la biblio. dans le sommaire
+
+\usepackage{caption}
+\usepackage{subcaption}
+
+\usepackage[]{minitoc} % Intermediate 
+\usepackage{etoolbox} % For toggle function (to hide titlepage)
+\usepackage[acronym,toc,shortcuts]{glossaries}
+\usepackage[english]{cleveref} 
+%\makeglossary
+%\makeindex
+
+\input{mystyle.tex}
+\input{acronyms.tex}
+\input{macros.tex}
+

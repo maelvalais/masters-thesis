@@ -1,69 +1,124 @@
-\documentclass[11pt, a4paper, onecolumn, twoside,french,cleardoublepage=plain,openany]{report}
-\usepackage[english]{babel}
-\usepackage[a4paper]{geometry}
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage{indentfirst} % alinea on paragraphs
-\usepackage[babel=true]{csquotes}
-\usepackage{graphicx}
-\usepackage[fleqn]{amsmath} % fleqn = align blocs on the left
-\usepackage{siunitx} % SI units
-\usepackage{amssymb} % for convolution sign
-%\usepackage{moreverb} % for c, cpp snippets
-\usepackage[pdfusetitle]{hyperref} % for linkable refs and title in pdf meta
-
-%\usepackage[english,boxed,lined,onelanguage]{algorithm2e}
-%\SetAlCapSkip{1em} % Margin between algo and caption
-%\SetAlCapNameSty{textit} % text style for  algo captions
-\usepackage{algpseudocode,algorithm,algorithmicx}
-
-%\usepackage[toc,page]{appendix}
-\usepackage{fancyhdr} % For titlepage \lhead, \rhead... 
-%\usepackage[font={it}]{caption}
-\usepackage[backend=bibtex]{biblatex}
-%\bibliography{bibliographie.bib}
-%\usepackage{multirow} % Pour colonnes multiples des tableaux
-%\usepackage{longtable} % Pour longs tableaux
-%\usepackage{array} % Pour \texttt sur tout une colonne
-%\usepackage{xcolor} % Pour éviter que footnote ne bug...
-%\usepackage{footnote} % Pour les footnotes dans les tableaux
-%\makesavenoteenv{tabular} % Pour les footnotes dans les tableaux
-%\usepackage{tabularx}
-%\usepackage{pdfpages} % Include des pdfs
-%\usepackage[nottoc,numbib]{tocbibind} % Pour faire apparaitre la biblio. dans le sommaire
-\usepackage[]{minitoc} % Intermediate 
-\usepackage{etoolbox} % For toggle function (to hide titlepage)
-\usepackage[acronym,toc,shortcuts]{glossaries}
-\usepackage[english]{cleveref} 
-%\makeglossary
-%\makeindex
-
-\newtoggle{skip_title_page}
-\toggletrue{skip_title_page}
-
-\input{mystyle.tex}
-\input{acronyms.tex}
-\input{macros.tex}
-
+\input{packages_config.tex} % <-- all the \usepackages
+\usepackage{showframe}
 \author{Maël Valais}
 \date{Updated on \today}
 \title{Master's Thesis – Optimization of dictionaries structured in convolutional trees for sparse image representation}
-
 \begin{document}
-\iftoggle{skip_title_page}{}{
-\input{titlepage}
-}
+%\input{titlepage} % XXX Uncomment to show title page
 
-% Préparation pour les pages de corps
-%\pagestyle{empty}
-%\restoregeometry
-%\cleardoublepage % Blanc jusqu'à prochaîne page paire
+Many image processing techniques are based on... representing the signal ...
 
-%\tableofcontents
-%{\let\clearpage\relax\listoffigures}
-%{\let\clearpage\relax\listoftables}
-%{\let\clearpage\relax\listofalgorithms}
+We aim... 
 
-\include{body}
+Now that it has been proven that the objective function, although non-convex, actually allows to find local minimums that are close enough to the actual minimum.
+
+
+The idea behind dictionaries
+Say $y$ is a signal we want to ...
+We want to find a transform/dictionary D such that, when applied to a code (think of the "transformed" signal) will give an approximated signal $\hat{y}$:
+
+$$D\alpha=\hat{y} \approx y$$
+
+In this work, we will generally stay on the non-noisy case, leaving noisiness to further work.
+
+Algorithm PALMTREE: a Gauss-Seidel algorithm (in the sense that we 
+
+In dictionary learning, we call the columns of $D$ the \emph{atoms}.
+
+
+This experiment aims to simulate the choice of an atom by the OMP algorithm. As a short reminder, here is the step we are studying:
+\begin{algorithm}
+    \caption{OMP Algorithm}
+  \begin{algorithmic}[1]
+    \Require Decomposition of signal $x$
+    \Input signal $x \in \mathcal{R}^{m}$, Dictionary $\mathcal{G} \in \mathcal{R}^{m \times n}$, $\hat{x} = \emptyset$
+    \Output Decomposed signal $\hat{x}_{\text{est}}$ after $k$ iteration, Residual $R^{(k)}$
+    \State \textbf{Initialization} $R^{(0)} = x$
+    \While{$i \leq k$}
+      \State $l =  \argmax_{l = 1,\dots,l} |\left< g_l,R^{(i)} \right>|$ \label{omp_pick_correlation}
+        \Comment{finding the atom in $\mathcal{G}$ with max correlation with residual.}
+      \State $R^{(i+1)} = R{(i)}-a_l g_l^{(i)}$
+      \State $\hat{x} = \hat{x}+\langle R^{(i)}, g_{l}^{(i)} \rangle g_{l}^{(i)}$
+      \State $i = i + 1$
+    \EndWhile
+  \end{algorithmic}
+\end{algorithm}
+
+At \cref{omp_pick_correlation}, the algorithm chooses the column of the dictionary that matches the best the residual. This is where we thought this way of doing would serve our "add an element to one of the supports" algorithm.
+
+% XXX define PALMTREE
+Our goal is to, between two iterations of the PALMTREE algorithm, add a new element to one of the supports. That would lead to an optimization-driven construction of the kernels instead of designing them by hand.
+
+But we have been questioning ourselves on the fairness of choosing an element to be added based the mere partial gradient. We remind that the \ref{omp_pick_correlation} is actually computing a gradient:
+
+\begin{align*}
+l =& \argmax \left|\left< g_l,R^{(i)} \right>\right| \\
+=& \argmax \left| \mathcal{G}^TR^{(i)}\right| \\
+=& \argmax \left| \mathcal{G}^T(\mathcal{G}\alpha - u)\right| \\
+\end{align*}
+So: does the partial gradient \ref{eq_partial_gradient} give 
+\begin{align*}
+\Phi((h^e)_{e \in \edges}) = \left\| \sum_{f\in\leaves} \code^f * h^{\CC(r,f)} \right\|^2
+\end{align*}
+\begin{align*} 
+\nabla_{h^{e'}}\Phi((h^e)_{e \in \edges}) = 2 \widetilde{H^{e'}} * (h^{e'}*H^{e'}-y^{e'})
+\end{align*} \label{eq_partial_gradient}
+
+------------------------------------------
+
+
+
+
+\begin{figure}[!h]\centering
+    \begin{subfigure}[b]{0.49\textwidth}\centering
+    \includegraphics[width=\textwidth]{figures/xp_add_bruteforce/xp_add_pt_size128x128_scale2_angle1_K3_S3_node1_target.png}
+    \end{subfigure}
+\begin{subfigure}[b]{0.49\textwidth}\centering
+\includegraphics[width=\textwidth]{figures/xp_add_bruteforce/xp_add_pt_size128x128_scale2_angle1_K3_S3_node1_approx.png}
+\end{subfigure}
+\end{figure}
+\begin{figure}[!h]\centering
+    \begin{subfigure}[b]{0.49\textwidth}\centering
+    \includegraphics[width=\textwidth]{figures/xp_add_bruteforce/xp_add_pt_size128x128_scale2_angle1_K3_S3_node2_target.png}
+    \end{subfigure}
+\begin{subfigure}[b]{0.49\textwidth}\centering
+\includegraphics[width=\textwidth]{figures/xp_add_bruteforce/xp_add_pt_size128x128_scale2_angle1_K3_S3_node2_approx.png}
+\end{subfigure}
+\end{figure}
+
+\begin{figure}[!h]\centering
+    \begin{subfigure}[b]{0.49\textwidth}\centering
+    \includegraphics[width=\textwidth]{figures/xp_add_bruteforce/xp_add_pt_size128x128_scale2_angle1_K3_S3_node3_target.png}
+    \end{subfigure}
+\begin{subfigure}[b]{0.49\textwidth}\centering
+\includegraphics[width=\textwidth]{figures/xp_add_bruteforce/xp_add_pt_size128x128_scale2_angle1_K3_S3_node3_approx.png}
+\end{subfigure}
+\end{figure}
+
+\begin{figure}[!h]\centering
+    \begin{subfigure}[b]{0.49\textwidth}\centering
+    \includegraphics[width=\textwidth]{figures/xp_add_bruteforce/xp_add_pt_size128x128_scale2_angle1_K3_S3_node4_target.png}
+    \end{subfigure}
+\begin{subfigure}[b]{0.49\textwidth}\centering
+\includegraphics[width=\textwidth]{figures/xp_add_bruteforce/xp_add_pt_size128x128_scale2_angle1_K3_S3_node4_approx.png}
+\end{subfigure}
+\end{figure}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 \end{document}
+
+
+
