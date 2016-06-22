@@ -1,16 +1,24 @@
 \input{packages_config.tex} % <-- all the \usepackages
-\usepackage{showframe}
 \author{Maël Valais}
 \date{Updated on \today}
 \title{Master's Thesis – Optimization of dictionaries structured in convolutional trees for sparse image representation}
 \begin{document}
-%\input{titlepage} % XXX Uncomment to show title page
+%\input{titlepage} % Uncomment to show title page
+
+\section{My understanding of the subject of my internship}
+
+The current work, mainly developed during Olivier Chabiron's PhD, gives a theoretical frame to the (FTL) problem. The (FTL) problem aims at approximating an ideal dictionary $D^{ideal}$ (which can be easily understood as a matrix) made of ideal atoms $a_i$ on its columns. The approximated dictionary will be called $D$ and the atoms on its columns $(H^f)_{f \in \leaves}$. 
+  
+
+\begin{equation*} \begin{aligned}
+Dx
+\end{aligned} \end{equation*}
 
 Many image processing techniques are based on... representing the signal ...
 
 We aim... 
 
-Now that it has been proven that the objective function, although non-convex, actually allows to find local minimums that are close enough to the actual minimum.
+Now that it has been proven that the objective function, , actually allows to find local minimums that are close enough to the actual minimum.
 
 
 The idea behind dictionaries
@@ -64,7 +72,7 @@ So: does the partial gradient \ref{eq_partial_gradient} give
 \nabla_{h^{e'}}\Phi((h^e)_{e \in \edges}) = 2 \widetilde{H^{e'}} * (h^{e'}*H^{e'}-y^{e'})
 \end{align*} \label{eq_partial_gradient}
 
-------------------------------------------
+
 
 
 
@@ -80,6 +88,17 @@ So: does the partial gradient \ref{eq_partial_gradient} give
     \includegraphics[width=\textwidth]{figures/xp_add_bruteforce/xp_add_pt_size128x128_scale2_angle1_K3_S3_node1_obj_matrix.png}
     \end{subfigure}
 \end{figure}
+
+\begin{table}[!h]\centering
+\begin{tabular}{@{}lll@{}}\toprule
+ & RMSE & Relative RMSE \\ \midrule
+Before & 0.004786 & 0\% \\
+After & 0.004325 & 9.6\% \\ \bottomrule
+\end{tabular}
+\caption{RMSE comparison when adding to the support on the \nth{1} edge. Note that for the "added point" RMSE, we took the minimum of all RMSE for every point possibly added. Here, the RMSE is at best increased by 9.6\%.}
+\end{table}
+
+
 \begin{figure}[!h]\centering
     \begin{subfigure}[b]{0.49\textwidth}\centering
     \includegraphics[width=\textwidth]{figures/xp_add_bruteforce/xp_add_pt_size128x128_scale2_angle1_K3_S3_node2_target.png}
@@ -91,6 +110,16 @@ So: does the partial gradient \ref{eq_partial_gradient} give
     \includegraphics[width=\textwidth]{figures/xp_add_bruteforce/xp_add_pt_size128x128_scale2_angle1_K3_S3_node2_obj_matrix.png}
     \end{subfigure}
 \end{figure}
+
+\begin{table}[!h]\centering
+\begin{tabular}{@{}lll@{}}\toprule
+ & RMSE & Relative RMSE \\ \midrule
+Before & 0.004786 & 0\% \\
+After & 0.004407 & 7.9\% \\ \bottomrule
+\end{tabular}
+\caption{RMSE comparison when adding to the support on the \nth{2} edge}
+\end{table}
+
 
 \begin{figure}[!h]\centering
     \begin{subfigure}[b]{0.49\textwidth}\centering
@@ -104,6 +133,17 @@ So: does the partial gradient \ref{eq_partial_gradient} give
     \end{subfigure}
 \end{figure}
 
+
+\begin{table}[!h]\centering
+\begin{tabular}{@{}lll@{}}\toprule
+ & RMSE & Relative RMSE \\ \midrule
+Before & 0.004786 & 0\% \\
+After & 0.003973 & 16.9\% \\ \bottomrule
+\end{tabular}
+\caption{RMSE comparison when adding to the support on the \nth{3} edge}
+\end{table}
+
+
 \begin{figure}[!h]\centering
     \begin{subfigure}[b]{0.49\textwidth}\centering
     \includegraphics[width=\textwidth]{figures/xp_add_bruteforce/xp_add_pt_size128x128_scale2_angle1_K3_S3_node4_target.png}
@@ -116,20 +156,37 @@ So: does the partial gradient \ref{eq_partial_gradient} give
     \end{subfigure}
 \end{figure}
 
+\begin{table}[!h]\centering
+\begin{tabular}{@{}lll@{}}\toprule
+ & RMSE & Relative RMSE \\ \midrule
+Before & 0.004786 & 0\% \\
+After & 0.003790 & 20.8\% \\ \bottomrule
+\end{tabular}
+\caption{RMSE comparison when adding to the support on the \nth{4} edge}
+\end{table}
+
+% XXX Proof not finished; this proof might be useless/overkill in my thesis...
+\begin{align*}
+(\widehat{\widetilde{A}})_{m,n} =& \sum_{k=1}^M \sum_{l=1}^N \widehat{A}_{k,l} e^{-2i\pi (k\frac{m}{M}+l \frac{n}{N})}\\
+=& \sum_{k=1}^M \sum_{l=1}^N A_{-k,-l} e^{-2i\pi (k\frac{m}{M}+l \frac{n}{N})}\\
+\shortintertext{By changing variables $k'=-k$ and $l'=-l$, we get:}
+=& \sum_{k'=-M}^{-1} \sum_{l'=-N}^{-1} A_{k',l'} e^{2i\pi (k'\frac{m}{M}+l' \frac{n}{N})}
+\shortintertext{And thanks to the $(M,N)$ periodicity of $A$, which means that $A_{i,j}=A_{i+kM,j+lN}$, $\forall (k,l) \in \mathbb{N}^2$, letting us with:}
+=& \sum_{k'=-M}^{-1} \sum_{l'=-N}^{-1} A_{k'+M,l'+N} e^{2i\pi (k'\frac{m}{M}+l' \frac{n}{N})}\\
+\shortintertext{With a second change of variables $k''=k'+M$ and $l''=l'+N$:}
+=& \sum_{k''=-M+M}^{-1+M} \sum_{l''=-N+N}^{-1+N} A_{k'',l''} e^{2i\pi (k'\frac{m}{M}+l' \frac{n}{N})}\\
+=& \sum_{k'=1}^{M} \sum_{l'=1}^{N} A_{k',l'} e^{2i\pi (k'\frac{m}{M}+l' \frac{n}{N})}
+\end{align*}
 
 
-
-
-
-
-
-
-
-
-
-
-
-
+%---------- USELESS \\
+Note: I first wrote it using indices running from 1 to N, but it creates a kind of "glitch" that breaks the symmetry... With a signal $x$ that spans in $[1;3]$. As this signal is periodical, you get the same values at $[1+3;3+3]=[4;6]$. The generalization gives $x_i = x_{i+kN}$ with $k\in\mathbb{N}$. But starting at 1 prevents from generalizing to negative $k$.
+\begin{table}\centering\begin{tabular}{lllllllllll}\hline 
+-3 & -2 & -1 & \multicolumn{1}{l|}{0} & 1 & 2 & \multicolumn{1}{l|}{3} & 4 & 5 & \multicolumn{1}{l|}{6} & 7 \\ \hline
+\multicolumn{4}{c}{Signal?} & \multicolumn{3}{c}{Signal} & \multicolumn{3}{c}{Signal} & 
+\end{tabular}\end{table}
+Indeed, $[1-3;3-3]=[2;0]$
+% ------------------------ \\
 \end{document}
 
 
