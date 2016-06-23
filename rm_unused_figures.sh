@@ -8,12 +8,15 @@
 #    ...
 # done < <(find samples/ )
 unused=unused_figures
-if ! [ -d "$unused" ]; then 
-    mkdir "$unused"; 
-fi
-
 imgused=`./included_figures.sh`
-i=0
+
+if [ $# -eq 0 ]; then
+    echo "dry-run mode"
+    mv=false
+elif [ $1 == "-f" ]; then
+    echo "move mode"
+    mv=true
+fi
 find . -type f -exec file {} \; | grep "image data" | while read f; do
     file=`echo $f | cut -d ":" -f1 | sed "s/^\.\///g"`
     found=false
@@ -25,7 +28,12 @@ find . -type f -exec file {} \; | grep "image data" | while read f; do
     done < <( printf '%s\n' "$imgused" )
     if [ $found = false ]; then
         echo Moves: "$file"
-        #mv "$file" "${unused}/`basename $file`"
+        if [ $mv = true ]; then
+            if ! [ -d "$unused" ]; then 
+                mkdir "$unused"; 
+            fi
+            mv "$file" "${unused}/`basename $file`"
+        fi
     fi
 done
 
