@@ -9,14 +9,15 @@
 
 The current work, mainly developed during Olivier Chabiron's PhD, gives a theoretical frame to the (FTL) problem. The (FTL) problem aims at approximating an ideal dictionary $D^{ideal}$ (which can be easily understood as a matrix) made of ideal atoms $a_i$ on its columns. The approximated dictionary will be called $D$ and the atoms formed by its columns $(H^f)_{f \in \leaves}$. 
 
-But instead of using a standard matrix-vector product to compute $Dx$ and $D^Ty$, the operator $D$ is constituted 
+Instead of using a standard matrix-vector product between  to compute $Dx$ and $D^Ty$, the operator $D(x)$ is defined as a convolutional tree:
+$$D(x) = \sum_{f\in\leaves} x^f$$
 \begin{equation*} \begin{aligned}
-Dx
+Dx \approx y
 \end{aligned} \end{equation*}
 
 
 \begin{figure} \centering
-\includegraphics[width=0.9\textwidth]{figures/matrix-vs-tree.pdf}
+\includegraphics[width=0.9\textwidth]{figures/matrix-vs-tree.pdf} \label{matrix_vs_tree}
 \end{figure}
 
 
