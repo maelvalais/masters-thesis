@@ -23,11 +23,13 @@ Also, we can see that the right picture doesn't seem to be sparse: many coeffici
 Many other non-adaptative dictionaries exist, like the cosine transform (used by JPEG), the wavelet transform (used by JPEG2000, heavily used in theaters) or the curvelet transform. And as for the Fourier transform, these operators are known to be fast.
 
 \section{Adaptative dictionaries}
+As mentioned, analytically-based dictionaries do not always result to sparse representations, although allowing low computational time. Dictionary learning tries to address the adaptativeness issue; instead of using basis, we allow ourselves to use overcomplete dictionaries made of learned images (the atoms).
 
+K-SVD is a very well known algorithm for dictionary learning. Instead of having a pre-determined $D$, we are going to learn it. Many of the concepts behind the PALMTREE algorithm developed by Olivier Chabiron come from the K-SVD algorithm.
 
-\section{Learning dictionaries}
-Dictionary learning is a  
+\section{K-SVD algorithm}
 
+K-SVD basically optimizes the dictionary by alterminatilvy optimizing $x$ and $D$. Optimizing $x$ is the sparse coding phase, and optimizing $D$ is the dictionary update phase.
 
 \section{Subject and goals}
 
