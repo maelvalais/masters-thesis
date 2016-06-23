@@ -24,14 +24,16 @@ Many other non-adaptative dictionaries exist, like the cosine transform (used by
 
 \section{Adaptative dictionaries}
 As mentioned, analytically-based dictionaries do not always result to sparse representations, although allowing low computational time. Dictionary learning tries to address the adaptativeness issue; instead of using basis, we allow ourselves to use overcomplete dictionaries made of learned images (the atoms).
-
+\begin{figure}
+\includegraphics[width=0.5\textwidth]{figures/sparsity-matrix.pdf}
+\end{figure}
 K-SVD is a very well known algorithm for dictionary learning. Instead of having a pre-determined $D$, we are going to learn it. Many of the concepts behind the PALMTREE algorithm developed by Olivier Chabiron come from the K-SVD algorithm.
 
 \section{K-SVD algorithm}
 
-K-SVD basically optimizes the dictionary by alterminatilvy optimizing $x$ and $D$. Optimizing $x$ is the sparse coding phase, and optimizing $D$ is the dictionary update phase.
+K-SVD basically optimizes the dictionary by alternatively optimizing $x$ and $D$. Optimizing $x$ is the sparse coding phase, and optimizing $D$ is the dictionary update phase.
 
-\section{Subject and goals}
+\section{PALMTREE algorithm}
 
 The current work, mainly developed during Olivier Chabiron's PhD, gives a theoretical frae to the (FTL) problem. The (FTL) problem aims at approximating an ideal dictionary $D^{ideal}$ (which can be easily understood as a matrix) made of ideal atoms $a_i$ on its columns. The approximated dictionary will be called $D$ and the atoms formed by its columns $(H^f)_{f \in \leaves}$. 
 
@@ -58,18 +60,6 @@ Dx \approx y
 \end{figure}
 
 
-Many image processing techniques are based on... representing the signal ...
-
-We aim... 
-
-Now that it has been proven that the objective function, , actually allows to find local minimums that are close enough to the actual minimum.
-
-
-The idea behind dictionaries
-Say $y$ is a signal we want to ...
-We want to find a transform/dictionary D such that, when applied to a code (think of the "transformed" signal) will give an approximated signal $\hat{y}$:
-
-$$D\alpha=\hat{y} \approx y$$
 
 In this work, we will generally stay on the non-noisy case, leaving noisiness to further work.
 
