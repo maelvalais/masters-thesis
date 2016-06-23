@@ -8,7 +8,21 @@
 \section{The need for sparse representations}
 A sparse signal over some representation means that it can be written with as few information as possible – in other words, sparse means with many zeros. Many applications spanning from machine learning to image denoising heavily rely on the property that we can summarize – or more precisely approximate, or factorize – any signal using a proper representation. The job of transforming the raw\footnote{Any raw signal is actually represented by the canonical basis} signal to its sparse counterpart takes the form of an operator, often called dictionary or transform.
 
-The Fourier transform is an ideal example of such operators. 
+The Fourier transform is an ideal example of such operators. In figure\ref{exple_fourier}, the left picture $y$ has been represented using the Fourier basis, which can be written as a matrix $D$. The right picture shows the coefficients $x$ such that
+$$x = D^Ty$$
+\begin{figure}  \label{exple_fourier}
+\subcaptionbox{A picture featuring the definition of an isometry on a blackboard}%
+  [.49\linewidth]{\includegraphics[width=0.49\textwidth]{figures/exple_fourier_spacial.jpg}}
+ \subcaptionbox{Frequential representation of the blackboard using Fourier transform. Middle coefficients are coding for general and constant features of the picture while the corner values are coding for the details. The multiple white lines, spanning from the middle to the borders, outline the discontinuities caused by the edges of the blackboard.}%
+  [.49\linewidth]{\includegraphics[width=0.49\textwidth]{figures/exple_fourier_frequen.jpg}}
+\end{figure}
+But Fourier is quite different to our convolutional tree structure. Note that Fourier representation is exact thanks to its analytic form. This allows fast implementations, meaning that the transform is fast (computing the above picture using \texttt{fft2} on matlab is extremely fast). Also, due to the fact that it is a basis (thus bijective), the inverse transform exists and is unique. % XXX useless? 
+
+Also, we can see that the right picture doesn't seem to be sparse: many coefficients are non-zeros. Fourier is not adapted to every kind of signals, but can give good results in some cases.
+
+Many other non-adaptative dictionaries exist, like the cosine transform (used by JPEG), the wavelet transform (used by JPEG2000, heavily used in theaters) or the curvelet transform. And as for the Fourier transform, these operators are known to be fast.
+
+\section{Adaptative dictionaries}
 
 
 \section{Learning dictionaries}
@@ -17,7 +31,7 @@ Dictionary learning is a
 
 \section{Subject and goals}
 
-The current work, mainly developed during Olivier Chabiron's PhD, gives a theoretical frame to the (FTL) problem. The (FTL) problem aims at approximating an ideal dictionary $D^{ideal}$ (which can be easily understood as a matrix) made of ideal atoms $a_i$ on its columns. The approximated dictionary will be called $D$ and the atoms formed by its columns $(H^f)_{f \in \leaves}$. 
+The current work, mainly developed during Olivier Chabiron's PhD, gives a theoretical frae to the (FTL) problem. The (FTL) problem aims at approximating an ideal dictionary $D^{ideal}$ (which can be easily understood as a matrix) made of ideal atoms $a_i$ on its columns. The approximated dictionary will be called $D$ and the atoms formed by its columns $(H^f)_{f \in \leaves}$. 
 
 Instead of using a standard matrix-vector product to compute $Dx$ and $D^Ty$, the operator $D(x)$ is defined as a convolutional tree:
 $$D(x) = \sum_{f\in\leaves} H^f * x^f$$
@@ -99,8 +113,6 @@ So: does the partial gradient \ref{eq_partial_gradient} give
 \begin{align*} 
 \nabla_{h^{e'}}\Phi((h^e)_{e \in \edges}) = 2 \widetilde{H^{e'}} * (h^{e'}*H^{e'}-y^{e'})
 \end{align*} \label{eq_partial_gradient}
-
-
 
 
 
