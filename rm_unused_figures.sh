@@ -7,7 +7,7 @@
 # while do
 #    ...
 # done < <(find samples/ )
-unused=unused_figures
+unused=_figures
 imgused=`./included_figures.sh`
 
 if [ $# -eq 0 ]; then
@@ -17,7 +17,7 @@ elif [ $1 == "-f" ]; then
     echo "move mode"
     mv=true
 fi
-find . -type f -exec file {} \; | grep "image data" | while read f; do
+while read f; do
     file=`echo $f | cut -d ":" -f1 | sed "s/^\.\///g"`
     found=false
     while IFS= read -r used && [ $found = false ]; do
@@ -35,5 +35,5 @@ find . -type f -exec file {} \; | grep "image data" | while read f; do
             mv "$file" "${unused}/`basename $file`"
         fi
     fi
-done
+done < <(find . -type f -exec file {} \; | grep "image data")
 
