@@ -1,4 +1,7 @@
 \input{packages_config.tex} % <-- all the \usepackages
+\input{mystyle.tex}
+\input{acronyms.tex}
+\input{macros.tex}
 \author{Maël Valais}
 \date{Updated on \today}
 \title{Master's Thesis – Optimization of dictionaries structured in convolutional trees for sparse image representation}
@@ -27,7 +30,7 @@ As mentioned, analytically-based dictionaries do not always result to sparse rep
 \begin{figure}
 \includegraphics[width=0.5\textwidth]{figures/sparsity-matrix.pdf}
 \end{figure}
-\ac{K-SVD} is a very well known algorithm for dictionary learning. Instead of having a pre-determined $D$, we are going to learn it. Many of the concepts behind the PALMTREE algorithm developed by Olivier Chabiron come from the K-SVD algorithm.
+\ac{KSVD} is a very well known algorithm for dictionary learning. Instead of having a pre-determined $D$, we are going to learn it. Many of the concepts behind the PALMTREE algorithm developed by Olivier Chabiron come from the K-SVD algorithm.
 
 \section{K-SVD algorithm}
 
