@@ -245,7 +245,9 @@ After & 0.003790 & 20.8\% \\ \bottomrule
 
 \section{Why is sparse coding used in image recovery}
 
-
+\begin{figure}\centering
+\includegraphics[width=0.5\textwidth]{figures/sparse-reduce-noise.pdf}
+\end{figure}
 
 %---------- USELESS \\
 Note: I first wrote it using indices running from 1 to N, but it creates a kind of "glitch" that breaks the symmetry... With a signal $x$ that spans in $[1;3]$. As this signal is periodical, you get the same values at $[1+3;3+3]=[4;6]$. The generalization gives $x_i = x_{i+kN}$ with $k\in\mathbb{N}$. But starting at 1 prevents from generalizing to negative $k$.
