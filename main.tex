@@ -14,7 +14,7 @@ A sparse signal over some representation means that it can be written with as fe
 
 The Fourier transform is an ideal example of such operators. In figure \ref{explefourier}, the left picture $y$ has been represented using the Fourier basis, which can be written as a matrix $D$. The right picture shows the coefficients $x$ such that
 $$x = D^Ty$$
-\begin{figure}
+\begin{figure}[!h]
 \subcaptionbox{A picture featuring a blackboard at INSA Toulouse}%
   [.49\linewidth]{\includegraphics[width=0.49\textwidth]{figures/exple_fourier_spacial.pdf}}
  \subcaptionbox{Frequential representation of the blackboard using Fourier transform. Middle coefficients are coding for general and constant features of the picture while the corner values are coding for the details. The multiple white lines, spanning from the middle to the borders, outline the discontinuities caused by the edges of the blackboard.}%
@@ -28,28 +28,38 @@ Also, we can see that the right picture doesn't seem to be sparse: many coeffici
 Many other non-adaptative dictionaries exist, like the cosine transform (used by JPEG), the wavelet transform (used by JPEG2000, heavily used for encoding movies in theaters) or the curvelet transform. And as for the Fourier transform, these operators are known to be fast.
 
 \section{Adaptative dictionaries}
-As mentioned, analytically-based dictionaries do not always result to sparse representations, although allowing low computational time. Dictionary learning tries to address the adaptativeness issue; instead of using basis, we allow ourselves to use overcomplete dictionaries made of learned images (the atoms).
-\begin{figure}
+As mentioned, analytically-based dictionaries do not always result to sparse representations, although allowing low computational time. Dictionary learning tries to address the adaptativeness issue. Instead of using basis matrices, we allow ourselves to use overcomplete dictionaries (more columns than lines) made of learned images (the atoms).
+\begin{figure}[!h] \centering
 \includegraphics[width=0.5\textwidth]{figures/sparsity-matrix.pdf}
+\caption{Matrix view of $Dx$ when $D$ is overcomplete (much more columns – the atoms – than lines, which is the dimension of the signal $y$) \label{fig_overcomplete_matrix}}
 \end{figure}
-\ac{KSVD} is a very well known algorithm for dictionary learning. Instead of having a pre-determined $D$, we are going to learn it. Many of the concepts behind the PALMTREE algorithm developed in \cite{chabiron_optimization_2016} come from the K-SVD algorithm.
+In figure \ref{fig_overcomplete_matrix}, the sparse code is multiplied to $D$ to give an approximation of $y$. Finding a good dictionary amounts to find the best atoms in $D$ such that every $y$ gives a good sparse representation – or code – $x$.
 
-\section{K-SVD algorithm}
+More formally, the dictionary learning problem is defined by
+\begin{equation*}
+\begin{aligned}
+(DL) & \underset{D,x}{\min} \lambda \lVert x \rVert + \lVert Dx-y \rVert^2
+\end{aligned}
+\end{equation*}
+\ac{KSVD} is a very well known algorithm for dictionary learning. Instead of having a pre-determined $D$, we are going to learn it.
 
-K-SVD basically optimizes the dictionary by alternatively optimizing $x$ and $D$. Optimizing $x$ is the sparse coding phase, and optimizing $D$ is the dictionary update phase.
+As many of the concepts behind the PALMTREE algorithm developed in \cite{chabiron_optimization_2016} come from the K-SVD algorithm, the next section will introduce it.
 
-\begin{algorithm}
-    \caption{OMP (Orthogonal Matching Pursuit) algorithm for sparse approximation}
+
+\section{\ac{KSVD} algorithm}
+
+
+K-SVD learns the dictionary by alternatively optimizing $x$ and $D$. Optimizing $x$ is the sparse coding phase, and optimizing $D$ is the dictionary update phase.
+
+
+\begin{algorithm} % XXX Finish algorithm
+    \caption{K-SVD (K-Singular Value Decomposition) algorithm for dictionary learning}
   \begin{algorithmic}[1]
-    \Input signal $y \in \mathbb{R}^{n}$, dictionary $D \in \mathbb{R}^{n \times m}$ with $m>>n$, $x = 0_{\mathbb{R}^m}$
-    \Output Code $x$ which is $k$-sparse
-    \State \textbf{Initialization} $R^{(0)} = y$
-    \While{$i \leq k$} \Comment note the fixed number of iterations
-      \State $l =  \argmax_{l = 1,\dots,l} |\left< d_l,R^{(i)} \right>|$ \label{omp_pick_correlation}
-        \Comment{find atom with max. correlation with $R$}
-      \State $R^{(i+1)} = R^{(i)}-x_l d_l^{(i)}$
-      \State $\hat{y} = \hat{y}+\langle R^{(i)}, d_{l}^{(i)} \rangle d_{l}^{(i)}$
-      \State $i = i + 1$
+    \Input learning signals $(y_i)_{i=1..N}$ forming columns of $Y \in \mathbb{R}^{n \times N}$
+    \Output dictionary $D \in \mathbb{R}^{n \times K}$ with $K>>n$
+    \State \textbf{Initialization} Initialize $D^{(0)}$
+    \While{condition}
+	\State \dots
     \EndWhile
   \end{algorithmic}
 \end{algorithm}
@@ -57,7 +67,7 @@ K-SVD basically optimizes the dictionary by alternatively optimizing $x$ and $D$
 
 \section{PALMTREE algorithm}
 
-The current work, mainly developed during Olivier Chabiron's PhD, gives a theoretical frae to the (FTL) problem. The (FTL) problem aims at approximating an ideal dictionary $D^{ideal}$ (which can be easily understood as a matrix) made of ideal atoms $a_i$ on its columns. The approximated dictionary will be called $D$ and the atoms formed by its columns $(H^f)_{f \in \leaves}$. 
+The current work, developed in \cite{chabiron_toward_2015} and \cite{chabiron_optimization_2016} gives a theoretical framework to the (FTL) problem. The (FTL) problem aims at approximating an ideal dictionary $D^{ideal}$ (which can be easily understood as a matrix) made of ideal atoms $a_i$ on its columns. The approximated dictionary will be called $D$ and the atoms formed by its columns $(H^f)_{f \in \leaves}$. 
 
 Instead of using a standard matrix-vector product to compute $Dx$ and $D^Ty$, the operator $D(x)$ is defined as a convolutional tree:
 $$D(x) = \sum_{f\in\leaves} H^f * x^f$$
@@ -77,7 +87,7 @@ Dx \approx y
 \end{aligned} \end{equation*}
 
 
-\begin{figure} \centering
+\begin{figure}[!h] \centering
 \includegraphics[width=0.9\textwidth]{figures/matrix-vs-tree.pdf} \label{matrix_vs_tree}
 \end{figure}
 
@@ -91,8 +101,8 @@ In dictionary learning, we call the columns of $D$ the \emph{atoms}.
 
 
 This experiment aims to simulate the choice of an atom by the OMP algorithm. As a short reminder, here is the step we are studying:
-\begin{algorithm}
-    \caption{OMP (Orthogonal Matching Pursuit) algorithm for sparse approximation}
+\begin{algorithm} % XXX Finish algorithm
+    \caption{MP (Matching Pursuit) algorithm for sparse approximation}
   \begin{algorithmic}[1]
     \Input signal $y \in \mathbb{R}^{n}$, dictionary $D \in \mathbb{R}^{n \times m}$ with $m>>n$, $x = 0_{\mathbb{R}^m}$
     \Output Code $x$ which is $k$-sparse
@@ -127,34 +137,9 @@ So: does the partial gradient \ref{eq_partial_gradient} give
 \nabla_{h^{e'}}\Phi((h^e)_{e \in \edges}) = 2 \widetilde{H^{e'}} * (h^{e'}*H^{e'}-y^{e'})
 \end{align*} \label{eq_partial_gradient}
 
+\section{Is the gradient enough to choose an element to be added to the support?}
 
-
-
-\begin{figure}[!h]\centering
-    \begin{subfigure}[b]{0.49\textwidth}\centering
-    \includegraphics[width=\textwidth]{figures/xp/xp_128x128_sc2_angl1_K3_S3_node1_target.png}
-    \end{subfigure}
-\begin{subfigure}[b]{0.49\textwidth}\centering
-\includegraphics[width=\textwidth]{figures/xp/xp_128x128_sc2_angl1_K3_S3_node1_approx.png}
-\end{subfigure}
-    \begin{subfigure}[b]{0.49\textwidth}\centering
-    \includegraphics[width=\textwidth]{figures/xp/xp_128x128_sc2_angl1_K3_S3_node1_obj_matrix.png}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.49\textwidth}\centering
-    \includegraphics[width=\textwidth]{figures/xp/xp_128x128_sc2_angl1_K3_S3_node1_gradient_node_1.png}
-    \end{subfigure}
-\end{figure}
-
-\begin{table}[!h]\centering
-\begin{tabular}{@{}lll@{}}\toprule
- & RMSE & Relative RMSE \\ \midrule
-Before & 0.004786 & 0\% \\
-After & 0.004325 & 9.6\% \\ \bottomrule
-\end{tabular}
-\caption{RMSE comparison when adding to the support on the \nth{1} edge. Note that for the "added point" RMSE, we took the minimum of all RMSE for every point possibly added. Here, the RMSE is at best increased by 9.6\%.}
-\end{table}
-
-
+\subsection{Results}
 \begin{figure}[!h]\centering
     \begin{subfigure}[b]{0.49\textwidth}\centering
     \includegraphics[width=\textwidth]{figures/xp/xp_128x128_sc2_angl1_K3_S3_node2_target.png}
@@ -176,59 +161,9 @@ After & 0.004325 & 9.6\% \\ \bottomrule
 Before & 0.004786 & 0\% \\
 After & 0.004407 & 7.9\% \\ \bottomrule
 \end{tabular}
-\caption{RMSE comparison when adding to the support on the \nth{2} edge}
+\caption{RMSE comparison when adding to the support on the \nth{2} edge. Note that for the "added point" RMSE, we took the minimum of all RMSE for every point possibly added. Here, the RMSE is at best increased by 7.9\%.}
 \end{table}
 
-
-\begin{figure}[!h]\centering
-    \begin{subfigure}[b]{0.49\textwidth}\centering
-    \includegraphics[width=\textwidth]{figures/xp/xp_128x128_sc2_angl1_K3_S3_node3_target.png}
-    \end{subfigure}
-\begin{subfigure}[b]{0.49\textwidth}\centering
-\includegraphics[width=\textwidth]{figures/xp/xp_128x128_sc2_angl1_K3_S3_node3_approx.png}
-\end{subfigure}
-   \begin{subfigure}[b]{0.49\textwidth}\centering
-    \includegraphics[width=\textwidth]{figures/xp/xp_128x128_sc2_angl1_K3_S3_node3_obj_matrix.png}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.49\textwidth}\centering
-    \includegraphics[width=\textwidth]{figures/xp/xp_128x128_sc2_angl1_K3_S3_node3_gradient_node_3.png}
-    \end{subfigure}
-\end{figure}
-
-
-\begin{table}[!h]\centering
-\begin{tabular}{@{}lll@{}}\toprule
- & RMSE & Relative RMSE \\ \midrule
-Before & 0.004786 & 0\% \\
-After & 0.003973 & 16.9\% \\ \bottomrule
-\end{tabular}
-\caption{RMSE comparison when adding to the support on the \nth{3} edge}
-\end{table}
-
-
-\begin{figure}[!h]\centering
-    \begin{subfigure}[b]{0.49\textwidth}\centering
-    \includegraphics[width=\textwidth]{figures/xp/xp_128x128_sc2_angl1_K3_S3_node4_target.png}
-    \end{subfigure}
-\begin{subfigure}[b]{0.49\textwidth}\centering
-\includegraphics[width=\textwidth]{figures/xp/xp_128x128_sc2_angl1_K3_S3_node4_approx.png}
-\end{subfigure}
-   \begin{subfigure}[b]{0.49\textwidth}\centering
-    \includegraphics[width=\textwidth]{figures/xp/xp_128x128_sc2_angl1_K3_S3_node4_obj_matrix.png}
-    \end{subfigure}
-       \begin{subfigure}[b]{0.49\textwidth}\centering
-    \includegraphics[width=\textwidth]{figures/xp/xp_128x128_sc2_angl1_K3_S3_node4_gradient_node_4.png}
-    \end{subfigure}
-\end{figure}
-
-\begin{table}[!h]\centering
-\begin{tabular}{@{}lll@{}}\toprule
- & RMSE & Relative RMSE \\ \midrule
-Before & 0.004786 & 0\% \\
-After & 0.003790 & 20.8\% \\ \bottomrule
-\end{tabular}
-\caption{RMSE comparison when adding to the support on the \nth{4} edge}
-\end{table}
 
 % XXX Proof not finished; this proof might be useless/overkill in my thesis...
 \begin{align*}
@@ -243,22 +178,33 @@ After & 0.003790 & 20.8\% \\ \bottomrule
 =& \sum_{k'=1}^{M} \sum_{l'=1}^{N} A_{k',l'} e^{2i\pi (k'\frac{m}{M}+l' \frac{n}{N})}
 \end{align*}
 
-\section{Why is sparse coding used in image recovery}
+\section{Why is sparse coding used in image recovery?}
 
-\begin{figure}\centering
+The figure \ref{sparse_reduce_noise} shows a noisy signal $y$ living in a high-dimensional $N$ and defined by
+$$y=\hat{y} + b$$
+with $b$ following a centered Gaussian distribution $\mathcal{N}(0,\sigma^2I)$ and $\hat{y}$ the noise-less signal. We see that the distance $||b||$ is always lower than the projected distance.
+
+This is because the deviation in the $N$ dimensional space can be written as
+\begin{align*}
+\sigma^2(b) =& \mathbb{E}\left[\lVert b-\mathbb{E}(b) \rVert^2 \right]\\
+=& \mathbb{E}\left(\lVert b \rVert^2 \right)\\
+=& ???\\
+=& \frac{1}{N}\lVert b \rVert^2
+\end{align*}
+which gives 
+$$ \lVert b \rVert = \sigma\sqrt{N} $$
+When projected to the $K$ dimensional space, the noise deviation becomes
+$$\lVert b \rVert = \sigma\sqrt{K} $$
+which is much better than the previous distance, provided that $K<<N$. 
+
+\begin{figure}[!h]\centering
 \includegraphics[width=0.5\textwidth]{figures/sparse-reduce-noise.pdf}
+\caption{When projected onto a lower dimensional space, the standard derivation of the additive Gaussian noise $b \sim \mathcal{N}(0,\sigma^2)$ will be greatly reduced if $K<<N$. The sparser the representation the better the denoising. \label{sparse_reduce_noise}}
 \end{figure}
 
-%---------- USELESS \\
-Note: I first wrote it using indices running from 1 to N, but it creates a kind of "glitch" that breaks the symmetry... With a signal $x$ that spans in $[1;3]$. As this signal is periodical, you get the same values at $[1+3;3+3]=[4;6]$. The generalization gives $x_i = x_{i+kN}$ with $k\in\mathbb{N}$. But starting at 1 prevents from generalizing to negative $k$.
-\begin{table}\centering\begin{tabular}{lllllllllll}\hline 
--3 & -2 & -1 & \multicolumn{1}{l|}{0} & 1 & 2 & \multicolumn{1}{l|}{3} & 4 & 5 & \multicolumn{1}{l|}{6} & 7 \\ \hline
-\multicolumn{4}{c}{Signal?} & \multicolumn{3}{c}{Signal} & \multicolumn{3}{c}{Signal} & 
-\end{tabular}\end{table}
-Indeed, $[1-3;3-3]=[2;0]$
-% ------------------------ \\
 
 
+\printbibliography
 
 \end{document}
 
