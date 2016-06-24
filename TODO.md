@@ -8,7 +8,8 @@
 * introduce with basis like DCT transform/dictionary
 * why it is better to learn a dictionary
 * the actual techniques for finding a dictionary
-* introduce the K-SVD algorithm (for future reference: it means we'll compare our algorithm to ksvd!)
+* introduce the K-SVD algorithm (for future reference: it means we'll compare our 
+  algorithm to ksvd!)
   - ksvd gives state of the art results
   - but not so good for multi-resolution representation and machine learning
 * tell that we are currently only focusing on the dictionary update step; 
