@@ -8,33 +8,52 @@
 \begin{document}
 %\input{titlepage} % Uncomment to show title page
 
+\chapter{Introduction}
 \section{The need for sparse representations}
 A sparse signal over some representation means that it can be written with as few information as possible – in other words, sparse means with many zeros. Many applications spanning from machine learning to image denoising heavily rely on the property that we can summarize – or more precisely approximate, or factorize – any signal using a proper representation. The job of transforming the raw\footnote{Any raw signal is actually represented by the canonical basis} signal to its sparse counterpart takes the form of an operator, often called dictionary or transform.
 
-The Fourier transform is an ideal example of such operators. In figure\ref{exple_fourier}, the left picture $y$ has been represented using the Fourier basis, which can be written as a matrix $D$. The right picture shows the coefficients $x$ such that
+The Fourier transform is an ideal example of such operators. In figure \ref{explefourier}, the left picture $y$ has been represented using the Fourier basis, which can be written as a matrix $D$. The right picture shows the coefficients $x$ such that
 $$x = D^Ty$$
-\begin{figure}  \label{exple_fourier}
-\subcaptionbox{A picture featuring the definition of an isometry on a blackboard}%
-  [.49\linewidth]{\includegraphics[width=0.49\textwidth]{figures/exple_fourier_spacial.jpg}}
+\begin{figure}
+\subcaptionbox{A picture featuring a blackboard at INSA Toulouse}%
+  [.49\linewidth]{\includegraphics[width=0.49\textwidth]{figures/exple_fourier_spacial.pdf}}
  \subcaptionbox{Frequential representation of the blackboard using Fourier transform. Middle coefficients are coding for general and constant features of the picture while the corner values are coding for the details. The multiple white lines, spanning from the middle to the borders, outline the discontinuities caused by the edges of the blackboard.}%
-  [.49\linewidth]{\includegraphics[width=0.49\textwidth]{figures/exple_fourier_frequen.jpg}}
+  [.49\linewidth]{\includegraphics[width=0.49\textwidth]{figures/exple_fourier_frequen.pdf}}
+  \caption{ ($Dx=y$) Example of decomposition of a signal $y$ using the dictionary $D$ made of Fourier series.} \label{explefourier}
 \end{figure}
 But Fourier is quite different to our convolutional tree structure. Note that Fourier representation is exact thanks to its analytic form. This allows fast implementations, meaning that the transform is fast (computing the above picture using \texttt{fft2} on matlab is extremely fast). Also, due to the fact that it is a basis (thus bijective), the inverse transform exists and is unique. % XXX useless? 
 
 Also, we can see that the right picture doesn't seem to be sparse: many coefficients are non-zeros. Fourier is not adapted to every kind of signals, but can give good results in some cases.
 
-Many other non-adaptative dictionaries exist, like the cosine transform (used by JPEG), the wavelet transform (used by JPEG2000, heavily used in theaters) or the curvelet transform. And as for the Fourier transform, these operators are known to be fast.
+Many other non-adaptative dictionaries exist, like the cosine transform (used by JPEG), the wavelet transform (used by JPEG2000, heavily used for encoding movies in theaters) or the curvelet transform. And as for the Fourier transform, these operators are known to be fast.
 
 \section{Adaptative dictionaries}
 As mentioned, analytically-based dictionaries do not always result to sparse representations, although allowing low computational time. Dictionary learning tries to address the adaptativeness issue; instead of using basis, we allow ourselves to use overcomplete dictionaries made of learned images (the atoms).
 \begin{figure}
 \includegraphics[width=0.5\textwidth]{figures/sparsity-matrix.pdf}
 \end{figure}
-\ac{KSVD} is a very well known algorithm for dictionary learning. Instead of having a pre-determined $D$, we are going to learn it. Many of the concepts behind the PALMTREE algorithm developed by Olivier Chabiron come from the K-SVD algorithm.
+\ac{KSVD} is a very well known algorithm for dictionary learning. Instead of having a pre-determined $D$, we are going to learn it. Many of the concepts behind the PALMTREE algorithm developed in \cite{chabiron_optimization_2016} come from the K-SVD algorithm.
 
 \section{K-SVD algorithm}
 
 K-SVD basically optimizes the dictionary by alternatively optimizing $x$ and $D$. Optimizing $x$ is the sparse coding phase, and optimizing $D$ is the dictionary update phase.
+
+\begin{algorithm}
+    \caption{OMP (Orthogonal Matching Pursuit) algorithm for sparse approximation}
+  \begin{algorithmic}[1]
+    \Input signal $y \in \mathbb{R}^{n}$, dictionary $D \in \mathbb{R}^{n \times m}$ with $m>>n$, $x = 0_{\mathbb{R}^m}$
+    \Output Code $x$ which is $k$-sparse
+    \State \textbf{Initialization} $R^{(0)} = y$
+    \While{$i \leq k$} \Comment note the fixed number of iterations
+      \State $l =  \argmax_{l = 1,\dots,l} |\left< d_l,R^{(i)} \right>|$ \label{omp_pick_correlation}
+        \Comment{find atom with max. correlation with $R$}
+      \State $R^{(i+1)} = R^{(i)}-x_l d_l^{(i)}$
+      \State $\hat{y} = \hat{y}+\langle R^{(i)}, d_{l}^{(i)} \rangle d_{l}^{(i)}$
+      \State $i = i + 1$
+    \EndWhile
+  \end{algorithmic}
+\end{algorithm}
+
 
 \section{PALMTREE algorithm}
 
@@ -73,17 +92,16 @@ In dictionary learning, we call the columns of $D$ the \emph{atoms}.
 
 This experiment aims to simulate the choice of an atom by the OMP algorithm. As a short reminder, here is the step we are studying:
 \begin{algorithm}
-    \caption{OMP Algorithm}
+    \caption{OMP (Orthogonal Matching Pursuit) algorithm for sparse approximation}
   \begin{algorithmic}[1]
-    \Require Decomposition of signal $x$
-    \Input signal $x \in \mathcal{R}^{m}$, Dictionary $\mathcal{G} \in \mathcal{R}^{m \times n}$, $\hat{x} = \emptyset$
-    \Output Decomposed signal $\hat{x}_{\text{est}}$ after $k$ iteration, Residual $R^{(k)}$
-    \State \textbf{Initialization} $R^{(0)} = x$
-    \While{$i \leq k$}
-      \State $l =  \argmax_{l = 1,\dots,l} |\left< g_l,R^{(i)} \right>|$ \label{omp_pick_correlation}
-        \Comment{finding the atom in $\mathcal{G}$ with max correlation with residual.}
-      \State $R^{(i+1)} = R{(i)}-a_l g_l^{(i)}$
-      \State $\hat{x} = \hat{x}+\langle R^{(i)}, g_{l}^{(i)} \rangle g_{l}^{(i)}$
+    \Input signal $y \in \mathbb{R}^{n}$, dictionary $D \in \mathbb{R}^{n \times m}$ with $m>>n$, $x = 0_{\mathbb{R}^m}$
+    \Output Code $x$ which is $k$-sparse
+    \State \textbf{Initialization} $R^{(0)} = y$
+    \While{$i \leq k$} \Comment note the fixed number of iterations
+      \State $l =  \argmax_{l = 1,\dots,l} |\left< d_l,R^{(i)} \right>|$ \label{omp_pick_correlation}
+        \Comment{find atom with max. correlation with $R$}
+      \State $R^{(i+1)} = R^{(i)}-x_l d_l^{(i)}$
+      \State $\hat{y} = \hat{y}+\langle R^{(i)}, d_{l}^{(i)} \rangle d_{l}^{(i)}$
       \State $i = i + 1$
     \EndWhile
   \end{algorithmic}
@@ -98,8 +116,8 @@ But we have been questioning ourselves on the fairness of choosing an element to
 
 \begin{align*}
 l =& \argmax \left|\left< g_l,R^{(i)} \right>\right| \\
-=& \argmax \left| \mathcal{G}^TR^{(i)}\right| \\
-=& \argmax \left| \mathcal{G}^T(\mathcal{G}\alpha - u)\right| \\
+=& \argmax \left| D^TR^{(i)}\right| \\
+=& \argmax \left| D^T(D\alpha - u)\right| \\
 \end{align*}
 So: does the partial gradient \ref{eq_partial_gradient} give 
 \begin{align*}
@@ -225,6 +243,9 @@ After & 0.003790 & 20.8\% \\ \bottomrule
 =& \sum_{k'=1}^{M} \sum_{l'=1}^{N} A_{k',l'} e^{2i\pi (k'\frac{m}{M}+l' \frac{n}{N})}
 \end{align*}
 
+\section{Why is sparse coding used in image recovery}
+
+
 
 %---------- USELESS \\
 Note: I first wrote it using indices running from 1 to N, but it creates a kind of "glitch" that breaks the symmetry... With a signal $x$ that spans in $[1;3]$. As this signal is periodical, you get the same values at $[1+3;3+3]=[4;6]$. The generalization gives $x_i = x_{i+kN}$ with $k\in\mathbb{N}$. But starting at 1 prevents from generalizing to negative $k$.
@@ -234,6 +255,9 @@ Note: I first wrote it using indices running from 1 to N, but it creates a kind 
 \end{tabular}\end{table}
 Indeed, $[1-3;3-3]=[2;0]$
 % ------------------------ \\
+
+
+
 \end{document}
 
 
