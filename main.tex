@@ -160,16 +160,22 @@ The reason why the previous work only consider approximating (mainly) curvelet a
 
 But our goal is to be able to approximate any kind of atoms, as \ac{KSVD} is able to do. Being able to choose what elements should be in the kernel supports as part of the optimization process is another goal during this internship.
 
-Allowing us to add or remove elements from kernel supports may yield the result showed in figure \ref
-
-\begin{figure}
-\includegraphics[width=\textwidth]{figures/example-optimized-support.pdf}
-\caption{\label{fig_example_optimal_support}}
+\begin{figure}[!ht] \centering
+\includegraphics[width=0.7\textwidth]{figures/example-optimized-support.pdf}
+\caption{On the left, a simple curvelet atom which serves as our target image. The right figure represents the positions of the support element for one of the kernels of the tree. The dashed squares represent the initial "fixed" support given in figure \ref{fig_example_kernel}. The gray squares show the positions of the support elements after having optimized: the elements have moved to the general direction of the curvelet.\label{fig_example_optimal_support}}
 \end{figure}
+
+Figure \ref{fig_example_optimal_support} shows what we could expect after adding and removing elements from one of the kernel supports: the kernel will "melt" to match the shape of the target image.
+
+
 
 \section{Experimenting with adaptative support}
 
+After being able to correctly add and remove support elements, the second phase was to think about what elements we would add or remove, and when (i.e. when during the PALMTREE algorithm).
 
+\subsection{}
+
+Our first thoughts on how to 
 
 
 
