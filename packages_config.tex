@@ -19,8 +19,24 @@
 
 %\usepackage[toc,page]{appendix}
 \usepackage{fancyhdr} % For titlepage \lhead, \rhead... 
-\usepackage[backend=bibtex]{biblatex}
+\usepackage[backend=biber,style=ieee,date=long,maxbibnames=5,language=english]{biblatex}
 \bibliography{master-thesis.bib}
+
+% To suppress fields in my .bib, try 
+% \clearfield, \clearname or \clearlist
+% For url date and date, use \DeclareSourcemap
+\AtEveryBibitem{\clearfield{doi}}
+\AtEveryBibitem{\clearfield{issn}}
+\AtEveryBibitem{\clearfield{url}}
+
+\DeclareSourcemap{
+  \maps[datatype=bibtex]{
+    \map[overwrite=true]{
+      \step[fieldset=urldate, null]
+    }
+  }
+}
+
 %\usepackage{multirow} % Pour colonnes multiples des tableaux
 %\usepackage{longtable} % Pour longs tableaux
 %\usepackage{array} % Pour \texttt sur tout une colonne

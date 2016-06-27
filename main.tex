@@ -6,7 +6,7 @@
 \date{Updated on \today}
 \title{Optimization of dictionaries structured in convolutional trees for sparse image representation - Master's Thesis}
 \begin{document}
-\input{titlepage} % Uncomment to show title page
+%\input{titlepage} % Uncomment to show title page
 
 \chapter{Introduction}
 \section{The need for sparse representations}
@@ -38,7 +38,7 @@ In figure \ref{fig_overcomplete_matrix}, the sparse code is multiplied to $D$ to
 More formally, the dictionary learning problem is defined by
 \begin{equation*}
 \begin{aligned}
-(DL) & \underset{D,x}{\min} \lambda \lVert x \rVert + \lVert Dx-y \rVert^2
+(DL) && \underset{D,x}{\min} \lambda \lVert x \rVert + \lVert Dx-y \rVert^2
 \end{aligned}
 \end{equation*}
 \ac{KSVD} is a very well known algorithm for dictionary learning. Instead of having a pre-determined $D$, we are going to learn it.
@@ -137,8 +137,30 @@ So: does the partial gradient \ref{eq_partial_gradient} give
 \nabla_{h^{e'}}\Phi((h^e)_{e \in \edges}) = 2 \widetilde{H^{e'}} * (h^{e'}*H^{e'}-y^{e'})
 \end{align*} \label{eq_partial_gradient}
 
-\section{Is the gradient enough to choose an element to be added to the support?}
+\section{Goals for this internship}
+The goal is mainly to go on improving the PALMTREE algorithm. As explained in \cite[p. 23]{chabiron_optimization_2016}, the main drawbacks to using this convolutional tree model for practical use are because some aspects of the model are hand-made, leading to arbitrary and non-optimal results.
+\subsection{Choice of the tree}
+The paper chooses to use a fixed tree structure, meaning that the tree (degree per node, depth) has been created \emph{ad-hoc} on a per-experiment basis, trying to mimic the frequency pyramid tiling of a curvelet decomposition. The number of leaves was also specifically chosen to match the number of atoms that was generated on the target image.
 
+But getting an actual adaptative dictionary update step implies that designing the tree is made optimally and as part of the optimization process. This is one of the internship research axis.
+
+\subsection{Choice of the kernel shapes}
+The kernels $h^e$ mentioned above are similar to traditional kernel filters used in signal processing, like the well-known averaging filter (fig. \ref{example-kernel}. The only difference is that instead of having fixed values (like $1/9$ for a $3\times3$ averaging filter), the values are the variables to be optimized. Also, the points that can be non-zero.
+
+\begin{figure}
+\includegraphics[width=0.5\textwidth]{figures/example-kernel.pdf}
+\caption{Comparison of the well-known averaging kernel, which has fixed support ($3\times3$) and fixed values, and the kernels used in the PALMTREE, which does not have fixed values or support (this $5\times5$ shape will be explained later).}
+\end{figure}
+
+As for the tree design, the choice of the kernel shapes (meaning where the non-zero values of the kernel are located, and more formally called support) has been made arbitrarily, using the results of \cite{chabiron_toward_2015}
+
+% XXX Image of something to illustrate all that
+
+
+
+\section{Does the gradient give enough information to choose an element to be added to the support?}
+
+After being able to add
 \subsection{Results}
 \begin{figure}[!h]\centering
     \begin{subfigure}[b]{0.49\textwidth}\centering
