@@ -137,24 +137,39 @@ So: does the partial gradient \ref{eq_partial_gradient} give
 \nabla_{h^{e'}}\Phi((h^e)_{e \in \edges}) = 2 \widetilde{H^{e'}} * (h^{e'}*H^{e'}-y^{e'})
 \end{align*} \label{eq_partial_gradient}
 
-\section{Goals for this internship}
-The goal is mainly to go on improving the PALMTREE algorithm. As explained in \cite[p. 23]{chabiron_optimization_2016}, the main drawbacks to using this convolutional tree model for practical use are because some aspects of the model are hand-made, leading to arbitrary and non-optimal results.
+\section{Issues with PALMTREE algorithm and internship goals}
+As explained in \cite[p. 23]{chabiron_optimization_2016}, the main drawbacks to use this convolutional tree model for practical dictionary learning (as many other applications) are because some aspects of the model are hand-made, leading to arbitrary and sub-optimal results.
 \subsection{Choice of the tree}
 The paper chooses to use a fixed tree structure, meaning that the tree (degree per node, depth) has been created \emph{ad-hoc} on a per-experiment basis, trying to mimic the frequency pyramid tiling of a curvelet decomposition. The number of leaves was also specifically chosen to match the number of atoms that was generated on the target image.
 
 But getting an actual adaptative dictionary update step implies that designing the tree is made optimally and as part of the optimization process. This is one of the internship research axis.
 
-\subsection{Choice of the kernel shapes}
-The kernels $h^e$ mentioned above are similar to traditional kernel filters used in signal processing, like the well-known averaging filter (fig. \ref{example-kernel}. The only difference is that instead of having fixed values (like $1/9$ for a $3\times3$ averaging filter), the values are the variables to be optimized. Also, the points that can be non-zero.
+\subsection{Choice of the kernel supports}
+The kernels $h^e$ mentioned above are similar to traditional kernel filters used in signal processing, like the well-known averaging filter (fig. \ref{fig_example_kernel}. The two slight differences are that, for one, that instead of having fixed values (like $1/9$ for a $3\times3$ averaging filter), the values can be changed (those are actually the variables to be optimized); for two, the supports (the locations of the points of the kernel) are not fixed (the fig. \ref{fig_example_kernel} shows a support with 9 elements but with spaces between those elements).
+
+
+\begin{figure}[!ht]\centering
+\includegraphics[width=0.5\textwidth]{figures/example-kernel.pdf}
+\caption{Comparison of the well-known averaging kernel, which has fixed support ($3\times3$) and fixed values, and the kernels used in the PALMTREE, which does not have fixed values or support (this $5\times5$ shape will be explained later). You can imagine that the value of this $h^e$ kernel are the result of the PALMTREE algorithm.\label{fig_example_kernel}}
+\end{figure}
+More formally, the support of the kernel $h^e$is defined as the element (i.e. the points) of $h^e$ that are free to be non-zero.
+
+And as for the tree design, the choice of where are located the elements of each kernel support has been made (so far) arbitrarily. The support of the $h^e$ kernel of fig. \ref{fig_example_kernel} shows an example of typical layout chosen for the experiments in \cite{chabiron_optimization_2016}. 
+
+The reason why the previous work only consider approximating (mainly) curvelet atoms is because \cite{chabiron_apprentissage_2015} has shown that they can be well approximated using chain convoluted fixed-support kernels.
+
+But our goal is to be able to approximate any kind of atoms, as \ac{KSVD} is able to do. Being able to choose what elements should be in the kernel supports as part of the optimization process is another goal during this internship.
+
+Allowing us to add or remove elements from kernel supports may yield the result showed in figure \ref
 
 \begin{figure}
-\includegraphics[width=0.5\textwidth]{figures/example-kernel.pdf}
-\caption{Comparison of the well-known averaging kernel, which has fixed support ($3\times3$) and fixed values, and the kernels used in the PALMTREE, which does not have fixed values or support (this $5\times5$ shape will be explained later).}
+\includegraphics[width=\textwidth]{figures/example-optimized-support.pdf}
+\caption{\label{fig_example_optimal_support}}
 \end{figure}
 
-As for the tree design, the choice of the kernel shapes (meaning where the non-zero values of the kernel are located, and more formally called support) has been made arbitrarily, using the results of \cite{chabiron_toward_2015}
+\section{Experimenting with adaptative support}
 
-% XXX Image of something to illustrate all that
+
 
 
 
