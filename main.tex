@@ -67,14 +67,29 @@ K-SVD learns the dictionary by alternatively optimizing $x$ and $D$. Optimizing 
 
 \section{PALMTREE algorithm}
 
-The current work, developed in \cite{chabiron_toward_2015} and \cite{chabiron_optimization_2016} gives a theoretical framework to the (FTL) problem. The (FTL) problem aims at approximating an ideal dictionary $D^{ideal}$ (which can be easily understood as a matrix) made of ideal atoms $a_i$ on its columns. The approximated dictionary will be called $D$ and the atoms formed by its columns $(H^f)_{f \in \leaves}$. 
+The current work, developed in \cite{chabiron_toward_2015} and \cite{chabiron_optimization_2016} propose a different way of structuring the matrix $D$. Instead of using "plain" atoms as columns and dealing with the matrix-vector product in $O(N^2)$, $D$ is defined implicitly by a tree. Each edge has a kernel $h^e$ – like the one in figure \ref{fig_example_kernel} – and one columns of $D$ corresponds to one branch (from the root to one of the leaves) where the kernels are consecutively convoluted.
+
+The dictionary $D$ can then be understood as
+$$D = \begin{bmatrix}H^{l_1} & H^{l_2} & \dots & H^{l_L}\end{bmatrix}$$
+with $L$ the number of leaves in the tree – $l$ means "leaf"–. Each atom is thus written as (with the example of figure \ref{fig_matrix_vs_tree}) :
+\begin{align*}
+H^{l_4} = h^1 * h^2 \dots * h^k
+\end{align*}
+
+
+\begin{figure}[!h] \centering
+\includegraphics[width=0.9\textwidth]{figures/matrix-vs-tree.pdf} \caption{ \label{fig_matrix_vs_tree}}
+\end{figure}
+
+
+a theoretical framework to the (FTL) problem. The (FTL) problem aims at approximating an ideal dictionary $D^{ideal}$ (which can be easily understood as a matrix) made of ideal atoms $a_i$ on its columns. The approximated dictionary will be called $D$ and the atoms formed by its columns $(H^f)_{f \in \leaves}$. 
 
 
 
 Instead of using a standard matrix-vector product to compute $Dx$ and $D^Ty$, the operator $D(x)$ is defined as a convolutional tree:
 $$D(x) = \sum_{f\in\leaves} H^f * x^f$$
 The columns of $D$ – the atoms $H^f$ – are simply defined by the successive convolution of kernels $h^i$ from the root to the leaf
-$$H^f = h^1 * h^2 \dots * h^k$$
+
 
 
 % XXX code ?
@@ -91,9 +106,7 @@ Dx \approx y
 \end{aligned} \end{equation*}
 
 
-\begin{figure}[!h] \centering
-\includegraphics[width=0.9\textwidth]{figures/matrix-vs-tree.pdf} \label{matrix_vs_tree}
-\end{figure}
+
 
 
 
