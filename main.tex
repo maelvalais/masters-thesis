@@ -69,10 +69,14 @@ K-SVD learns the dictionary by alternatively optimizing $x$ and $D$. Optimizing 
 
 The current work, developed in \cite{chabiron_toward_2015} and \cite{chabiron_optimization_2016} gives a theoretical framework to the (FTL) problem. The (FTL) problem aims at approximating an ideal dictionary $D^{ideal}$ (which can be easily understood as a matrix) made of ideal atoms $a_i$ on its columns. The approximated dictionary will be called $D$ and the atoms formed by its columns $(H^f)_{f \in \leaves}$. 
 
+
+
 Instead of using a standard matrix-vector product to compute $Dx$ and $D^Ty$, the operator $D(x)$ is defined as a convolutional tree:
 $$D(x) = \sum_{f\in\leaves} H^f * x^f$$
 The columns of $D$ – the atoms $H^f$ – are simply defined by the successive convolution of kernels $h^i$ from the root to the leaf
 $$H^f = h^1 * h^2 \dots * h^k$$
+
+
 % XXX code ?
 
 To sum up the convolutional tree model, here are some outlines of the $D$ operator:
