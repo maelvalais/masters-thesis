@@ -7,8 +7,10 @@
 \title{Optimization of dictionaries structured in convolutional trees for sparse image representation - Master's Thesis}
 \begin{document}
 %\input{titlepage} % Uncomment to show title page
+\tableofcontents
 
 \chapter{Introduction}
+
 \section{The need for sparse representations}
 A sparse signal over some representation means that it can be written with as few information as possible – in other words, sparse means with many zeros. Many applications spanning from machine learning to image denoising heavily rely on the property that we can summarize – or more precisely approximate, or factorize – any signal using a proper representation. The job of transforming the raw\footnote{Any raw signal is actually represented by the canonical basis} signal to its sparse counterpart takes the form of an operator, often called dictionary or transform.
 
@@ -31,7 +33,7 @@ Many other non-adaptative dictionaries exist, like the cosine transform (used by
 As mentioned, analytically-based dictionaries do not always result to sparse representations, although allowing low computational time. Dictionary learning tries to address the adaptativeness issue. Instead of using basis matrices, we allow ourselves to use overcomplete dictionaries (more columns than lines) made of learned images (the atoms).
 \begin{figure}[!h] \centering
 \includegraphics[width=0.5\textwidth]{figures/sparsity-matrix.pdf}
-\caption{Matrix view of $Dx$ when $D$ is overcomplete (much more columns – the atoms – than lines, which is the dimension of the signal $y$) \label{fig_overcomplete_matrix}}
+\caption{Matrix view of $Dx$ when $D$ is overcomplete (much more columns/atoms than lines, which is the dimension of the signal $y$) \label{fig_overcomplete_matrix}}
 \end{figure}
 In figure \ref{fig_overcomplete_matrix}, the sparse code is multiplied to $D$ to give an approximation of $y$. Finding a good dictionary amounts to find the best atoms in $D$ such that every $y$ gives a good sparse representation – or code – $x$.
 
@@ -67,55 +69,87 @@ K-SVD learns the dictionary by alternatively optimizing $x$ and $D$. Optimizing 
 
 \section{PALMTREE algorithm}
 
+\subsection{Dictionary-as-a-tree model}
 The current work, developed in \cite{chabiron_toward_2015} and \cite{chabiron_optimization_2016} propose a different way of structuring the matrix $D$. Instead of using "plain" atoms as columns and dealing with the matrix-vector product in $O(N^2)$, $D$ is defined implicitly by a tree. Each edge has a kernel $h^e$ – like the one in figure \ref{fig_example_kernel} – and one columns of $D$ corresponds to one branch (from the root to one of the leaves) where the kernels are consecutively convoluted.
 
 The dictionary $D$ can then be understood as
 $$D = \begin{bmatrix}H^{l_1} & H^{l_2} & \dots & H^{l_L}\end{bmatrix}$$
-with $L$ the number of leaves in the tree – $l$ means "leaf"–. Each atom is thus written as (with the example of figure \ref{fig_matrix_vs_tree}) :
-\begin{align*}
-H^{l_4} = h^1 * h^2 \dots * h^k
-\end{align*}
+with $L$ the number of leaves in the tree. $l$ means "leaf" and $\leaves$ contains all leaves. Each atom is thus written as (with the example of figure \ref{fig_matrix_vs_tree}):
 
+$$H^{l_4} = h^1 * h^5 \dots * h^7$$
 
 \begin{figure}[!h] \centering
-\includegraphics[width=0.9\textwidth]{figures/matrix-vs-tree.pdf} \caption{ \label{fig_matrix_vs_tree}}
+\includegraphics[width=0.9\textwidth]{figures/matrix-vs-tree.pdf} \caption{This figure shows how to go from the tree defined by its kernels $(h^e)_e$ to a matrix $D$. Note that this figure doesn't illustrates $Dx \approx y$ (standard matrix-vector product). Instead, it uses $D*x\approx y$ (convolutional product) which gives every possible translation for every atom.  \label{fig_matrix_vs_tree}}
 \end{figure}
+Now that $D$ is correctly defined, let's talk about $x$, the sparse representation that approximates $y$. As seen above, we use a convolution instead of the standard matrix-vector product:
+
+$$D(x) = D*x \approx y$$
+Note that $x$ belongs to $\mathbb{R}^{L\times N}$, $D$ has dimensions $N \times L$ and $y$ belongs to $\mathbb{R}^N$. To sum up the whole $D(x)$ operation:
+
+$$
+D(x) = \Req{\sum_{l \in \leaves}} \code^{\Req{l}} * h^{*\Req{l}}
+$$
 
 
-a theoretical framework to the (FTL) problem. The (FTL) problem aims at approximating an ideal dictionary $D^{ideal}$ (which can be easily understood as a matrix) made of ideal atoms $a_i$ on its columns. The approximated dictionary will be called $D$ and the atoms formed by its columns $(H^f)_{f \in \leaves}$. 
+\section{The (FTL) problem}
 
-
-
-Instead of using a standard matrix-vector product to compute $Dx$ and $D^Ty$, the operator $D(x)$ is defined as a convolutional tree:
-$$D(x) = \sum_{f\in\leaves} H^f * x^f$$
-The columns of $D$ – the atoms $H^f$ – are simply defined by the successive convolution of kernels $h^i$ from the root to the leaf
-
-
-
-% XXX code ?
-
-To sum up the convolutional tree model, here are some outlines of the $D$ operator:
-\begin{itemize}
-\item a standard dictionary would require many translated versions of the same atom; here, the convolution $D*x$ does the job 
-\item because of the convolution $D*x$, each "component" $x^f$ of the code $x$ is the same size as the target image $y$. We will talk about this block-wise code a bit farther
-\end{itemize}
-
-
+The dictionary update step is defined as 
 \begin{equation*} \begin{aligned}
-Dx \approx y
+(FTL) && \underset{\substack{(h^\text{e})_{e}}}\min \lVert D(x) - y \rVert_2^2 \\
+&& ...
 \end{aligned} \end{equation*}
 
+Remember that $(h^e)_e$ represents "implicitly" the dictionary and is the variable to be minimized when updating the dictionary (see figure \ref{fig_hk_tree}). $x^l$is fixed at all time.
+
+\begin{figure}[!ht] \centering
+\includegraphics[width=0.8\textwidth]{figures/hk_tree.pdf}
+\caption{A view of $(h^e)_e$ that contains "implicitly" the dictionary information. In the (FTL) problem, $(h^e)_e$ is the variable to be minimized.}\label{fig_hk_tree}
+\end{figure}
+
+\subsection{Interesting (FTL) properties}
+We may consider $D(x)$ as a polynomial form (see \ref{proof_ftl_polynomial}) ...
+
+\subsection{PALMTREE, the algorithm for solving (FTL)}
+...
+
+\section{Issues with PALMTREE algorithm and internship goals}
+As explained in \cite[p. 23]{chabiron_optimization_2016}, the main drawbacks to use this convolutional tree model for practical dictionary learning (as many other applications) are because some aspects of the model are hand-made, leading to arbitrary and sub-optimal results.
+\subsection{Choice of the tree}
+The paper chooses to use a fixed tree structure, meaning that the tree (degree per node, depth) has been created \emph{ad-hoc} on a per-experiment basis, trying to mimic the frequency pyramid tiling of a curvelet decomposition. The number of leaves was also specifically chosen to match the number of atoms that was generated on the target image.
+
+But getting an actual adaptative dictionary update step implies that designing the tree is made optimally and as part of the optimization process. This is one of the internship research axis.
+
+\subsection{Choice of the kernel supports}
+The kernels $h^e$ mentioned above are similar to traditional kernel filters used in signal processing, like the well-known averaging filter (fig. \ref{fig_example_kernel}. The two slight differences are that, for one, that instead of having fixed values (like $1/9$ for a $3\times3$ averaging filter), the values can be changed (those are actually the variables to be optimized); for two, the supports (the locations of the points of the kernel) are not fixed (the fig. \ref{fig_example_kernel} shows a support with 9 elements but with spaces between those elements).
 
 
+\begin{figure}[!ht]\centering
+\includegraphics[width=0.6\textwidth]{figures/example-kernel.pdf}
+\caption{Comparison of the well-known averaging kernel, which has fixed support ($3\times3$) and fixed values, and the kernels used in the PALMTREE, which does not have fixed values or support (this $5\times5$ shape will be explained later). You can imagine that the value of this $h^e$ kernel are the result of the PALMTREE algorithm.\label{fig_example_kernel}}
+\end{figure}
+More formally, the support of the kernel $h^e$is defined as the element (i.e. the points) of $h^e$ that are free to be non-zero.
+
+And as for the tree design, the choice of where are located the elements of each kernel support has been made (so far) arbitrarily. The support of the $h^e$ kernel of fig. \ref{fig_example_kernel} shows an example of typical layout chosen for the experiments in \cite{chabiron_optimization_2016}. 
+
+The reason why the previous work only consider approximating (mainly) curvelet atoms is because \cite{chabiron_apprentissage_2015} has shown that they can be well approximated using chain convoluted fixed-support kernels.
+
+But our goal is to be able to approximate any kind of atoms, as \ac{KSVD} is able to do. Being able to choose what elements should be in the kernel supports as part of the optimization process is another goal during this internship.
+
+\begin{figure}[!ht] \centering
+\includegraphics[width=0.6\textwidth]{figures/example-optimized-support.pdf}
+\caption{On the left, a simple curvelet atom which serves as our target image. The right figure represents the positions of the support element for one of the kernels of the tree. The dashed squares represent the initial "fixed" support given in figure \ref{fig_example_kernel}. The gray squares show the positions of the support elements after having optimized: the elements have moved to the general direction of the curvelet.\label{fig_example_optimal_support}}
+\end{figure}
+
+Figure \ref{fig_example_optimal_support} shows what we could expect after adding and removing elements from one of the kernel supports: the kernel will "melt" to match the shape of the target image.
 
 
+\chapter{Experiments}
 
-In this work, we will generally stay on the non-noisy case, leaving noisiness to further work.
+\section{First axis: experimenting with adaptative supports}
 
-Algorithm PALMTREE: a Gauss-Seidel algorithm (in the sense that we 
+After being able to correctly add and remove support elements, the second phase was to think about what elements we would add or remove, and when (i.e. when during the PALMTREE algorithm).
 
-In dictionary learning, we call the columns of $D$ the \emph{atoms}.
-
+Our first thoughts on how to 
 
 This experiment aims to simulate the choice of an atom by the OMP algorithm. As a short reminder, here is the step we are studying:
 \begin{algorithm} % XXX Finish algorithm
@@ -154,45 +188,7 @@ So: does the partial gradient \ref{eq_partial_gradient} give
 \nabla_{h^{e'}}\Phi((h^e)_{e \in \edges}) = 2 \widetilde{H^{e'}} * (h^{e'}*H^{e'}-y^{e'})
 \end{align*} \label{eq_partial_gradient}
 
-\section{Issues with PALMTREE algorithm and internship goals}
-As explained in \cite[p. 23]{chabiron_optimization_2016}, the main drawbacks to use this convolutional tree model for practical dictionary learning (as many other applications) are because some aspects of the model are hand-made, leading to arbitrary and sub-optimal results.
-\subsection{Choice of the tree}
-The paper chooses to use a fixed tree structure, meaning that the tree (degree per node, depth) has been created \emph{ad-hoc} on a per-experiment basis, trying to mimic the frequency pyramid tiling of a curvelet decomposition. The number of leaves was also specifically chosen to match the number of atoms that was generated on the target image.
 
-But getting an actual adaptative dictionary update step implies that designing the tree is made optimally and as part of the optimization process. This is one of the internship research axis.
-
-\subsection{Choice of the kernel supports}
-The kernels $h^e$ mentioned above are similar to traditional kernel filters used in signal processing, like the well-known averaging filter (fig. \ref{fig_example_kernel}. The two slight differences are that, for one, that instead of having fixed values (like $1/9$ for a $3\times3$ averaging filter), the values can be changed (those are actually the variables to be optimized); for two, the supports (the locations of the points of the kernel) are not fixed (the fig. \ref{fig_example_kernel} shows a support with 9 elements but with spaces between those elements).
-
-
-\begin{figure}[!ht]\centering
-\includegraphics[width=0.5\textwidth]{figures/example-kernel.pdf}
-\caption{Comparison of the well-known averaging kernel, which has fixed support ($3\times3$) and fixed values, and the kernels used in the PALMTREE, which does not have fixed values or support (this $5\times5$ shape will be explained later). You can imagine that the value of this $h^e$ kernel are the result of the PALMTREE algorithm.\label{fig_example_kernel}}
-\end{figure}
-More formally, the support of the kernel $h^e$is defined as the element (i.e. the points) of $h^e$ that are free to be non-zero.
-
-And as for the tree design, the choice of where are located the elements of each kernel support has been made (so far) arbitrarily. The support of the $h^e$ kernel of fig. \ref{fig_example_kernel} shows an example of typical layout chosen for the experiments in \cite{chabiron_optimization_2016}. 
-
-The reason why the previous work only consider approximating (mainly) curvelet atoms is because \cite{chabiron_apprentissage_2015} has shown that they can be well approximated using chain convoluted fixed-support kernels.
-
-But our goal is to be able to approximate any kind of atoms, as \ac{KSVD} is able to do. Being able to choose what elements should be in the kernel supports as part of the optimization process is another goal during this internship.
-
-\begin{figure}[!ht] \centering
-\includegraphics[width=0.7\textwidth]{figures/example-optimized-support.pdf}
-\caption{On the left, a simple curvelet atom which serves as our target image. The right figure represents the positions of the support element for one of the kernels of the tree. The dashed squares represent the initial "fixed" support given in figure \ref{fig_example_kernel}. The gray squares show the positions of the support elements after having optimized: the elements have moved to the general direction of the curvelet.\label{fig_example_optimal_support}}
-\end{figure}
-
-Figure \ref{fig_example_optimal_support} shows what we could expect after adding and removing elements from one of the kernel supports: the kernel will "melt" to match the shape of the target image.
-
-
-
-\section{Experimenting with adaptative support}
-
-After being able to correctly add and remove support elements, the second phase was to think about what elements we would add or remove, and when (i.e. when during the PALMTREE algorithm).
-
-\subsection{}
-
-Our first thoughts on how to 
 
 
 
