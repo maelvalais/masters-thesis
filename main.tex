@@ -94,12 +94,17 @@ $$
 \section{The (FTL) problem}
 
 The dictionary update step is defined as 
-\begin{equation*} \begin{aligned}
-(FTL) && \underset{\substack{(h^\text{e})_{e}}}\min \lVert D(x) - y \rVert_2^2 \\
-&& ...
-\end{aligned} \end{equation*}
+\begin{align}
+(FTL) \quad \underset{\substack{(h^\text{e})_{e}}}\min & \lVert D(x) - y \rVert_2^2 \label{eq_ftl_energy}\\
+\text{s.t. } & h^e_p = 0 \Rightarrow  s^e_p=0 \quad & \forall e \in 1..E, \forall p \in 1..N \label{eq_ftl_in_support} \\
+ & \lVert h^e \rVert \le \gamma \label{eq_ftl_kernel_finite_nrj}
+\end{align}
 
-Remember that $(h^e)_e$ represents "implicitly" the dictionary and is the variable to be minimized when updating the dictionary (see figure \ref{fig_hk_tree}). $x^l$is fixed at all time.
+In the following, we will use the notation $(h^e)_{e}$ to denote $(h^e)_{e \in \mathcal{E}}$ . Also, the notation $\Phi((h^e)_{e})$ will denote the objective function (or energy) \ref{eq_ftl_energy}.
+The constraint \ref{eq_ftl_in_support} guarantees that each kernel $h^e$ only has non-zero values on its support $s^e$. The supports are defined on every edge by
+$$s^e : \mathcal{P} \rightarrow \{0,1\}$$
+
+Keep in mind that $(h^e)_e$ represents "implicitly" the dictionary and is the variable to be minimized when updating the dictionary (see figure \ref{fig_hk_tree}). $x^l$is fixed at all time.
 
 \begin{figure}[!ht] \centering
 \includegraphics[width=0.8\textwidth]{figures/hk_tree.pdf}
@@ -182,14 +187,11 @@ l =& \argmax \left|\left< g_l,R^{(i)} \right>\right| \\
 \end{align*}
 So: does the partial gradient \ref{eq_partial_gradient} give 
 \begin{align*}
-\Phi((h^e)_{e \in \edges}) = \left\| \sum_{f\in\leaves} \code^f * h^{\CC(r,f)} \right\|^2
+\Phi((h^e)_e) = \left\| \sum_{l\in\leaves} \code^l * h^{\CC(r,l)} \right\|^2
 \end{align*}
 \begin{align*} 
-\nabla_{h^{e'}}\Phi((h^e)_{e \in \edges}) = 2 \widetilde{H^{e'}} * (h^{e'}*H^{e'}-y^{e'})
+\nabla_{h^{e'}}\Phi((h^e)_e) = 2 \widetilde{H^{e'}} * (h^{e'}*H^{e'}-y^{e'})
 \end{align*} \label{eq_partial_gradient}
-
-
-
 
 
 \section{Does the gradient give enough information to choose an element to be added to the support?}
@@ -222,19 +224,14 @@ After & 0.004407 & 7.9\% \\ \bottomrule
 
 
 % XXX Proof not finished; this proof might be useless/overkill in my thesis...
-\begin{align*}
-(\widehat{\widetilde{A}})_{m,n} =& \sum_{k=1}^M \sum_{l=1}^N \widehat{A}_{k,l} e^{-2i\pi (k\frac{m}{M}+l \frac{n}{N})}\\
-=& \sum_{k=1}^M \sum_{l=1}^N A_{-k,-l} e^{-2i\pi (k\frac{m}{M}+l \frac{n}{N})}\\
-\shortintertext{By changing variables $k'=-k$ and $l'=-l$, we get:}
-=& \sum_{k'=-M}^{-1} \sum_{l'=-N}^{-1} A_{k',l'} e^{2i\pi (k'\frac{m}{M}+l' \frac{n}{N})}
-\shortintertext{And thanks to the $(M,N)$ periodicity of $A$, which means that $A_{i,j}=A_{i+kM,j+lN}$, $\forall (k,l) \in \mathbb{N}^2$, letting us with:}
-=& \sum_{k'=-M}^{-1} \sum_{l'=-N}^{-1} A_{k'+M,l'+N} e^{2i\pi (k'\frac{m}{M}+l' \frac{n}{N})}\\
-\shortintertext{With a second change of variables $k''=k'+M$ and $l''=l'+N$:}
-=& \sum_{k''=-M+M}^{-1+M} \sum_{l''=-N+N}^{-1+N} A_{k'',l''} e^{2i\pi (k'\frac{m}{M}+l' \frac{n}{N})}\\
-=& \sum_{k'=1}^{M} \sum_{l'=1}^{N} A_{k',l'} e^{2i\pi (k'\frac{m}{M}+l' \frac{n}{N})}
-\end{align*}
 
-\section{Why is sparse coding used in image recovery?}
+\clearpage
+\addcontentsline{toc}{chapter}{Appendix}
+\appendix
+
+\chapter{Some "proofs" I should work on}
+
+\section{Why is sparse coding used for denoising?}
 
 The figure \ref{sparse_reduce_noise} shows a noisy signal $y$ living in a high-dimensional $N$ and defined by
 $$y=\hat{y} + b$$
@@ -244,7 +241,7 @@ This is because the deviation in the $N$ dimensional space can be written as
 \begin{align*}
 \sigma^2(b) =& \mathbb{E}\left[\lVert b-\mathbb{E}(b) \rVert^2 \right]\\
 =& \mathbb{E}\left(\lVert b \rVert^2 \right)\\
-=& ???\\
+=& ... \\
 =& \frac{1}{N}\lVert b \rVert^2
 \end{align*}
 which gives 
@@ -258,6 +255,18 @@ which is much better than the previous distance, provided that $K<<N$.
 \caption{When projected onto a lower dimensional space, the standard derivation of the additive Gaussian noise $b \sim \mathcal{N}(0,\sigma^2)$ will be greatly reduced if $K<<N$. The sparser the representation the better the denoising. \label{sparse_reduce_noise}}
 \end{figure}
 
+\section{Why $FT(\widetilde{A}) = FT(A)^*$}
+\begin{align*}
+(\widehat{\widetilde{A}})_{m,n} =& \sum_{k=1}^M \sum_{l=1}^N \widehat{A}_{k,l} e^{-2i\pi (k\frac{m}{M}+l \frac{n}{N})}\\
+=& \sum_{k=1}^M \sum_{l=1}^N A_{-k,-l} e^{-2i\pi (k\frac{m}{M}+l \frac{n}{N})}\\
+\shortintertext{By changing variables $k'=-k$ and $l'=-l$, we get:}
+=& \sum_{k'=-M}^{-1} \sum_{l'=-N}^{-1} A_{k',l'} e^{2i\pi (k'\frac{m}{M}+l' \frac{n}{N})}
+\shortintertext{And thanks to the $(M,N)$ periodicity of $A$, which means that $A_{i,j}=A_{i+kM,j+lN}$, $\forall (k,l) \in \mathbb{N}^2$, letting us with:}
+=& \sum_{k'=-M}^{-1} \sum_{l'=-N}^{-1} A_{k'+M,l'+N} e^{2i\pi (k'\frac{m}{M}+l' \frac{n}{N})}\\
+\shortintertext{With a second change of variables $k''=k'+M$ and $l''=l'+N$:}
+=& \sum_{k''=-M+M}^{-1+M} \sum_{l''=-N+N}^{-1+N} A_{k'',l''} e^{2i\pi (k'\frac{m}{M}+l' \frac{n}{N})}\\
+=& \sum_{k'=1}^{M} \sum_{l'=1}^{N} A_{k',l'} e^{2i\pi (k'\frac{m}{M}+l' \frac{n}{N})}
+\end{align*}
 
 
 \printbibliography
