@@ -30,7 +30,7 @@ Also, we can see that the right picture doesn't seem to be sparse: many coeffici
 Many other non-adaptative dictionaries exist, like the cosine transform (used by JPEG), the wavelet transform (used by JPEG2000, heavily used for encoding movies in theaters) or the curvelet transform. And as for the Fourier transform, these operators are known to be fast.
 
 \section{Adaptative dictionaries}
-As mentioned, analytically-based dictionaries do not always result to sparse representations, although allowing low computational time. Dictionary learning tries to address the adaptativeness issue. Instead of using basis matrices, we allow ourselves to use overcomplete dictionaries (more columns than lines) made of learned images (the atoms).
+As mentioned, analytically-based dictionaries do not produce sparse representations for every kind of signal, although allowing low computational time. Dictionary learning tries to address the adaptativeness issue. Instead of using basis matrices, we allow ourselves to use overcomplete dictionaries (more columns than lines) made of learned images (the atoms).
 \begin{figure}[!h] \centering
 \includegraphics[width=0.5\textwidth]{figures/sparsity-matrix.pdf}
 \caption{Matrix view of $Dx$ when $D$ is overcomplete (much more columns/atoms than lines, which is the dimension of the signal $y$) \label{fig_overcomplete_matrix}}
@@ -65,9 +65,8 @@ K-SVD learns the dictionary by alternatively optimizing $x$ and $D$. Optimizing 
     \EndWhile
   \end{algorithmic}
 \end{algorithm}
-
-\subsection{The seek for fast transforms}
-...
+\section{The seek for fast transforms}
+... talk about the problem of need for small patches and resolution limits in KSVD ...
 
 \section{PALMTREE algorithm}
 
@@ -76,17 +75,24 @@ The current work, developed in \cite{chabiron_toward_2015} and \cite{chabiron_op
 
 The root $r$ and leaves $l$ vertex in $\mathcal{V}$ allow to define a branch as the successive edges growing from the root to one of the leaves.
 
-Every edge $e$ in $\mathcal{E}$ bears a kernel $h^e$ and a kernel support $s^e$. The figure \ref{fig_example_kernel} exhibits an example of standard kernel filter on the left, and a $h^e$kernel on the right. The kernel support can be understood as the gray squares: they define the locations where the kernel has the right to have values on.
+Every edge $e$ in $\mathcal{E}$ bears a kernel $h^e$ and a support $s^e$. If the target image $y$ has its pixels in a "flattened" one-dimensional space $\mathcal{P}$, with
+$$y : \mathcal{P} \rightarrow \mathbb{R}$$
+then every kernel $h^e$ and support $s^e$ are also defined on $\mathcal{P}$ by $h^e:\mathcal{P} \rightarrow \mathbb{R}$ and $s^e:\mathcal{P} \rightarrow \{0,1\}$. The figure \ref{fig_example_kernel} exhibits an example of standard kernel filter on the left, and a $h^e$kernel on the right. The numerical values are the values of $h^e$ while the gray squares are the locations where $h^e$ has the right to have values on (i.e. the support $s^e$).
 
+\begin{figure}[!ht]\centering
+\includegraphics[width=0.8\textwidth]{figures/example-kernel.pdf}
+\caption{(Left) A well-known averaging kernel, which has fixed support ($3\times3$) and fixed values. (right) Example of a kernel $h^e$. The locations of the gray squares and the values actually change during PALMTREE. The shape of this $h^e$ (like a chessboard) has been shown experimentally to work well. \label{fig_example_kernel}}
+\end{figure}
 
+One columns of the dictionary $D$, usually named "atom", corresponds to one the convolution of successive kernels on a given branch identified by the leaf $l$. We will denote that successive convolution by
+\begin{flalign*}
+&& H^{l} = & h^r * \dots * h^l  && \text{$\triangleright$ column/atom $l$ of $D$}\\
+&&            = & h^{*l}
+\end{flalign*}
 
-– and one columns of $D$ corresponds to one branch (from the root to one of the leaves) where the kernels are consecutively convoluted.
-
-The dictionary $D$ can then be understood as
+Figure \ref{fig_matrix_vs_tree} outlines the relation between the tree, the atoms $H^l$ and the matrix form. The dictionary can be written using this notation
 $$D = \begin{bmatrix}H^{l_1} & H^{l_2} & \dots & H^{l_L}\end{bmatrix}$$
-with $L$ the number of leaves in the tree. $l$ means "leaf" and $\leaves$ contains all leaves. Each atom is thus written as (with the example of figure \ref{fig_matrix_vs_tree}):
-
-$$H^{l_4} = h^1 * h^5 \dots * h^7$$
+with $L$ the number of leaves in the tree. 
 
 \begin{figure}[!h] \centering
 \includegraphics[width=0.9\textwidth]{figures/matrix-vs-tree.pdf} \caption{This figure shows how to go from the tree defined by its kernels $(h^e)_e$ to a matrix $D$. Note that this figure doesn't illustrates $Dx \approx y$ (standard matrix-vector product). Instead, it uses $D*x\approx y$ (convolutional product) which gives every possible translation for every atom.  \label{fig_matrix_vs_tree}}
@@ -138,10 +144,7 @@ But getting an actual adaptative dictionary update step implies that designing t
 The kernels $h^e$ mentioned above are similar to traditional kernel filters used in signal processing, like the well-known averaging filter (fig. \ref{fig_example_kernel}. The two slight differences are that, for one, that instead of having fixed values (like $1/9$ for a $3\times3$ averaging filter), the values can be changed (those are actually the variables to be optimized); for two, the supports (the locations of the points of the kernel) are not fixed (the fig. \ref{fig_example_kernel} shows a support with 9 elements but with spaces between those elements).
 
 
-\begin{figure}[!ht]\centering
-\includegraphics[width=0.6\textwidth]{figures/example-kernel.pdf}
-\caption{Comparison of the well-known averaging kernel, which has fixed support ($3\times3$) and fixed values, and the kernels used in the PALMTREE, which does not have fixed values or support (this $5\times5$ shape will be explained later). You can imagine that the value of this $h^e$ kernel are the result of the PALMTREE algorithm.\label{fig_example_kernel}}
-\end{figure}
+
 More formally, the support of the kernel $h^e$is defined as the element (i.e. the points) of $h^e$ that are free to be non-zero.
 
 And as for the tree design, the choice of where are located the elements of each kernel support has been made (so far) arbitrarily. The support of the $h^e$ kernel of fig. \ref{fig_example_kernel} shows an example of typical layout chosen for the experiments in \cite{chabiron_optimization_2016}. 
@@ -175,7 +178,7 @@ Our first thought on how to add an element to a support was to find the best ker
 This experiment aims to simulate the choice of an atom by the OMP algorithm. As a short reminder, here is the step we are studying:
 \begin{algorithm} % XXX Finish algorithm
     \caption{MP (Matching Pursuit) algorithm for sparse approximation}
-  \begin{algorithmic}[1]
+  \begin{algorithmic}[0]
     \Input signal $y \in \mathbb{R}^{n}$, dictionary $D \in \mathbb{R}^{n \times m}$ with $m>>n$, $x = 0_{\mathbb{R}^m}$
     \Output Code $x$ which is $k$-sparse
     \State \textbf{Initialization} $R^{(0)} = y$
