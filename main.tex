@@ -117,15 +117,20 @@ The dictionary update step is defined as
 \end{align}
 
 In the following, we will use the notation $(h^e)_{e}$ to denote $(h^e)_{e \in \mathcal{E}}$ . Also, the notation $\Phi((h^e)_{e})$ will denote the objective function (or energy) \ref{eq_ftl_energy}.
-The constraint \ref{eq_ftl_in_support} guarantees that each kernel $h^e$ only has non-zero values on its support $s^e$. The supports are defined on every edge by
-
-
-Keep in mind that $(h^e)_e$ represents the dictionary and is the variable to be minimized when updating the dictionary (see figure \ref{fig_hk_tree}). $x^l$is fixed at all time.
+The constraint \ref{eq_ftl_in_support} guarantees that each kernel $h^e$ only has non-zero values on its support $s^e$. \ref{eq_ftl_kernel_finite_nrj} constrains the overall energy of every support to be finite and prevents a specific kernel to "explode".
 
 \begin{figure}[!ht] \centering
 \includegraphics[width=0.8\textwidth]{figures/hk_tree.pdf}
-\caption{A view of $(h^e)_e$ that contains "implicitly" the dictionary information. In the (FTL) problem, $(h^e)_e$ is the variable to be minimized.}\label{fig_hk_tree}
+\caption{A view of $(h^e)_e$ that "condenses" the dictionary information. In the (FTL) problem, $(h^e)_e$ is the variable to be minimized. $x^l$is fixed at all time.}\label{fig_hk_tree}
 \end{figure}
+
+(FTL) can be rewritten as an unconstrained problem, shifting the constraint spaces $(X^e)_e$ to the objective function using the characteristic function $\chi_{X^e}$defined for one edge $e$:
+$$\chi_{X_e}(h^e) = \begin{cases} 0 &\text{ if } h^e \in X^e \\ +\infty & \ \text{otherwise}\end{cases}$$
+(FTL) becomes
+
+\begin{align}
+(FTL) \quad \underset{\substack{(h^\text{e})_{e}}}\min & \lVert D(x) - y \rVert_2^2 + \sum_{e}\chi_{X_e} (h^e)
+\end{align}
 
 \subsection{Interesting (FTL) properties}
 We may consider $D(x)$ as a polynomial form (see \ref{proof_ftl_polynomial}) ...
