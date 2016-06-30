@@ -174,14 +174,21 @@ Our first thought on how to add an element to a support was to find the best ker
 
 \subsection{Experiment 1: what elements are worth adding}
 
-For this experiment, 
+This experiment was using a single-branch tree of depth 4 (see fig. \ref{fig_xp_pts_worth_adding}). One of the four supports is picked for the whole experiment. This support will be called $s^e$.
+\begin{figure}[!ht]\centering
+\includegraphics[width=0.8\textwidth]{figures/xp-pts-worth-adding.pdf}
+\caption{a} \label{fig_xp_pts_worth_adding}
+\end{figure}
+First, a full minimization with many iterations and retries is made to give a common starting point. Then, for every (not already at 1) element $i \in \mathcal{P}$  of the support $s^e$, the element is added to the support, and the minimization continues (with no retries to get the same conditions for every added point).
+The objective function of that minimization is then stored so that the location of $i$ is remembered. The element $i$ is then removed and we continue with $i+1$...
+
 
 
 
 
 
 This experiment aims to simulate the choice of an atom by the OMP algorithm. As a short reminder, here is the step we are studying:
-\begin{algorithm} % XXX Finish algorithm
+\begin{algorithm}[!ht] % XXX Finish algorithm
     \caption{MP (Matching Pursuit) algorithm for sparse approximation}
   \begin{algorithmic}[0]
     \Input signal $y \in \mathbb{R}^{n}$, dictionary $D \in \mathbb{R}^{n \times m}$ with $m>>n$, $x = 0_{\mathbb{R}^m}$
