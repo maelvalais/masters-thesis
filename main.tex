@@ -66,11 +66,21 @@ K-SVD learns the dictionary by alternatively optimizing $x$ and $D$. Optimizing 
   \end{algorithmic}
 \end{algorithm}
 
+\subsection{The seek for fast transforms}
+...
 
 \section{PALMTREE algorithm}
 
 \subsection{Dictionary-as-a-tree model}
-The current work, developed in \cite{chabiron_toward_2015} and \cite{chabiron_optimization_2016} propose a different way of structuring the matrix $D$. Instead of using "plain" atoms as columns and dealing with the matrix-vector product in $O(N^2)$, $D$ is defined implicitly by a tree. Each edge has a kernel $h^e$ – like the one in figure \ref{fig_example_kernel} – and one columns of $D$ corresponds to one branch (from the root to one of the leaves) where the kernels are consecutively convoluted.
+The current work, developed in \cite{chabiron_toward_2015} and \cite{chabiron_optimization_2016} propose a different way of structuring the matrix $D$. Instead of using "plain" atoms as columns and dealing with the matrix-vector product in $O(N^2)$, $D$ is defined by a tree structure $\mathcal{T}(\mathcal{V},\mathcal{E})$. 
+
+The root $r$ and leaves $l$ vertex in $\mathcal{V}$ allow to define a branch as the successive edges growing from the root to one of the leaves.
+
+Every edge $e$ in $\mathcal{E}$ bears a kernel $h^e$ and a kernel support $s^e$. The figure \ref{fig_example_kernel} exhibits an example of standard kernel filter on the left, and a $h^e$kernel on the right. The kernel support can be understood as the gray squares: they define the locations where the kernel has the right to have values on.
+
+
+
+– and one columns of $D$ corresponds to one branch (from the root to one of the leaves) where the kernels are consecutively convoluted.
 
 The dictionary $D$ can then be understood as
 $$D = \begin{bmatrix}H^{l_1} & H^{l_2} & \dots & H^{l_L}\end{bmatrix}$$
@@ -87,9 +97,9 @@ $$D(x) = D*x \approx y$$
 Note that $x$ belongs to $\mathbb{R}^{L\times N}$, $D$ has dimensions $N \times L$ and $y$ belongs to $\mathbb{R}^N$. To sum up the whole $D(x)$ operation:
 
 $$
-D(x) = \Req{\sum_{l \in \leaves}} \code^{\Req{l}} * h^{*\Req{l}}
+D(x) = \sum_{l \in \leaves} x^{l} * h^{*l}
 $$
-
+where $h^{*l}$ denotes the successive convolution of every kernel on the branch that leads to leaf $l$. Figure \ref{fig_matrix_vs_tree} shows an example with the branch $l=4$.
 
 \section{The (FTL) problem}
 
@@ -102,9 +112,9 @@ The dictionary update step is defined as
 
 In the following, we will use the notation $(h^e)_{e}$ to denote $(h^e)_{e \in \mathcal{E}}$ . Also, the notation $\Phi((h^e)_{e})$ will denote the objective function (or energy) \ref{eq_ftl_energy}.
 The constraint \ref{eq_ftl_in_support} guarantees that each kernel $h^e$ only has non-zero values on its support $s^e$. The supports are defined on every edge by
-$$s^e : \mathcal{P} \rightarrow \{0,1\}$$
 
-Keep in mind that $(h^e)_e$ represents "implicitly" the dictionary and is the variable to be minimized when updating the dictionary (see figure \ref{fig_hk_tree}). $x^l$is fixed at all time.
+
+Keep in mind that $(h^e)_e$ represents the dictionary and is the variable to be minimized when updating the dictionary (see figure \ref{fig_hk_tree}). $x^l$is fixed at all time.
 
 \begin{figure}[!ht] \centering
 \includegraphics[width=0.8\textwidth]{figures/hk_tree.pdf}
@@ -154,7 +164,13 @@ Figure \ref{fig_example_optimal_support} shows what we could expect after adding
 
 After being able to correctly add and remove support elements, the second phase was to think about what elements we would add or remove, and when (i.e. when during the PALMTREE algorithm).
 
-Our first thoughts on how to 
+The figure \ref{fig_example_optimal_support} shows an example of what we think would happen when allowing to add and remove elements: the support would shape itself to better match the target atom (in fig.\ref{fig_example_optimal_support}, the atom shown is actually the whole target image).
+
+
+\subsection{Adding an element}
+Our first thought on how to add an element to a support was to find the best kernel among the tree edges, and then pick the best point(s) of that support to be added. We thought the gradient of the objective function would give that information. This lead to the first batch of experimentation.
+...
+
 
 This experiment aims to simulate the choice of an atom by the OMP algorithm. As a short reminder, here is the step we are studying:
 \begin{algorithm} % XXX Finish algorithm

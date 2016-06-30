@@ -1,18 +1,18 @@
-\fancypagestyle{pagedegarde}{% 
+\fancypagestyle{titlepage}{% 
 	\lhead{\includegraphics[width=0.30\textwidth]{logos/logo-univ-ups.png}}
 	\rhead{\includegraphics[width=0.40\textwidth]{logos/logo-imt.jpg}}
 	\fancyhead[C]{} % On enlève les informations du header
 	\fancyfoot[C]{} % On enlève les informations du footer
 	\renewcommand{\headrulewidth}{0pt} % On enlève la ligne du header
 } \Huge
-\fancypagestyle{corps}{%
+\fancypagestyle{body}{%
 	\restoregeometry 
 	\pagestyle{fancy}
 	\fancyhf{}
 	\fancyhead[LO]{\ifthenelse{\equal{\value{chapter}}{0}}{}{\thesection. \rightmark}} %rightmark = section
 	\fancyhead[RE]{\ifthenelse{\equal{\value{chapter}}{0}}
 		{}
-		{Chapitre \thechapter.}
+		{Chapter \thechapter.}
 		\leftmark
 	} %leftmark = chapter
 	\fancyhead[RO]{\thepage} %
@@ -24,15 +24,15 @@
 	\renewcommand{\arraystretch}{1.5} % Espace entre cases d'un tableau
 }
 \fancypagestyle{plain}{
-	\pagestyle{corps}
+	\pagestyle{body}
 	\fancyhead[LO]{\rightmark}
 }
-\fancypagestyle{annexe}{%
+\fancypagestyle{appendix}{%
 	\restoregeometry
 	% On nettoie les headers et footers existants de "fancy"
 	\fancyhf{}
 	% Pour le header
-	\fancyhead[RE]{Annexes}
+	\fancyhead[RE]{Appendix}
 	\fancyhead[LO]{\thechapter. \leftmark} %leftmark = chapter
 	\fancyhead[RO]{\thepage} %
 	\fancyhead[LE]{\thepage} %
