@@ -146,16 +146,10 @@ The paper chooses to use a fixed tree structure, meaning that the tree (degree, 
 But getting an actual adaptative dictionary update step implies that designing the tree is made optimally and as part of the optimization process. This is one of the internship research axis.
 
 \subsection{Choice of the kernel supports}
-The kernels $h^e$ mentioned above are similar to traditional kernel filters used in signal processing, like the well-known averaging filter (fig. \ref{fig_example_kernel}. The two slight differences are that, for one, that instead of having fixed values (like $1/9$ for a $3\times3$ averaging filter), the values can be changed (those are actually the variables to be optimized); for two, the supports (the locations of the points of the kernel) are not fixed (the fig. \ref{fig_example_kernel} shows a support with 9 elements but with spaces between those elements).
 
-
-As described in \ref{sec_tree_model} and drawn in fig. \ref{fig_example_kernel}, the supports $s^e$ are part of the dictionary-as-a-tree model. In \cite{chabiron_toward_2015}, the authors experimentally show that using fixed supports for approximating curvelets is possible. For that specific purpose, the results turned to be good. But the whole model was supposed to be able to approximate any kind of image, hence the need for "adaptative" supports instead of hand-made ones.
-
-
+As described in \ref{sec_tree_model}, the supports $s^e$ are part of the dictionary-as-a-tree model. In \cite{chabiron_toward_2015}, the authors experimentally show that using fixed supports for approximating curvelets is possible. For that specific purpose, the results turned to be good. But the whole model was supposed to be able to approximate any kind of image, hence the need for "adaptative" supports instead of hand-made ones. Figure \ref{fig_example_kernel} shows in dashed-line squares the hand-made support. The gray square show what we would expect from an "adaptive" support. Instead of keeping the same shape for every target atom, the supports evolves and get closer to the target shape.
 
 And as for the tree design, the choice of where are located the elements of each kernel support has been made (so far) arbitrarily. The support of the $h^e$ kernel of fig. \ref{fig_example_kernel} shows an example of typical layout chosen for the experiments in \cite{chabiron_optimization_2016}. 
-
-The reason why the previous work only consider approximating (mainly) curvelet atoms is because \cite{chabiron_apprentissage_2015} has shown that they can be well approximated using chain convoluted fixed-support kernels.
 
 But our goal is to be able to approximate any kind of atoms, as \ac{KSVD} is able to do. Being able to choose what elements should be in the kernel supports as part of the optimization process is another goal during this internship.
 
@@ -163,9 +157,6 @@ But our goal is to be able to approximate any kind of atoms, as \ac{KSVD} is abl
 \includegraphics[width=0.6\textwidth]{figures/example-optimized-support.pdf}
 \caption{On the left, a simple curvelet atom which serves as our target image. The right figure represents the positions of the support element for one of the kernels of the tree. The dashed squares represent the initial "fixed" support given in figure \ref{fig_example_kernel}. The gray squares show the positions of the support elements after having optimized: the elements have moved to the general direction of the curvelet.\label{fig_example_optimal_support}}
 \end{figure}
-
-Figure \ref{fig_example_optimal_support} shows what we could expect after adding and removing elements from one of the kernel supports: the kernel will "melt" to match the shape of the target image.
-
 
 \chapter{Experiments}
 
@@ -178,6 +169,14 @@ The figure \ref{fig_example_optimal_support} shows an example of what we think w
 
 \subsection{Adding an element}
 Our first thought on how to add an element to a support was to find the best kernel among the tree edges, and then pick the best point(s) of that support to be added. We thought the gradient of the objective function would probably give that information. 
+
+...explain...
+
+\subsection{Experiment 1: what elements are worth adding}
+
+For this experiment, 
+
+
 
 
 
