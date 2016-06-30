@@ -70,7 +70,7 @@ K-SVD learns the dictionary by alternatively optimizing $x$ and $D$. Optimizing 
 
 \section{PALMTREE algorithm}
 
-\subsection{Dictionary-as-a-tree model}
+\subsection{Dictionary-as-a-tree model \label{sec_tree_model}}
 The current work, developed in \cite{chabiron_toward_2015} and \cite{chabiron_optimization_2016} propose a different way of structuring the matrix $D$. Instead of using "plain" atoms as columns and dealing with the matrix-vector product in $O(N^2)$, $D$ is defined by a tree structure $\mathcal{T}(\mathcal{V},\mathcal{E})$. 
 
 The root $r$ and leaves $l$ vertex in $\mathcal{V}$ allow to define a branch as the successive edges growing from the root to one of the leaves.
@@ -139,9 +139,9 @@ We may consider $D(x)$ as a polynomial form (see \ref{proof_ftl_polynomial}) ...
 ...
 
 \section{Issues with PALMTREE algorithm and internship goals}
-As explained in \cite[p. 23]{chabiron_optimization_2016}, the main drawbacks to use this convolutional tree model for practical dictionary learning (as many other applications) are because some aspects of the model are hand-made, leading to arbitrary and sub-optimal results.
+As explained in \cite[p. 23]{chabiron_optimization_2016}, the main drawbacks to use this convolutional tree model for practical dictionary learning (as many other applications) are the hand-made parts of the model, leading to arbitrary and sub-optimal results. Among them are the design of the tree (degree, depth...) and the choice of the supports.
 \subsection{Choice of the tree}
-The paper chooses to use a fixed tree structure, meaning that the tree (degree per node, depth) has been created \emph{ad-hoc} on a per-experiment basis, trying to mimic the frequency pyramid tiling of a curvelet decomposition. The number of leaves was also specifically chosen to match the number of atoms that was generated on the target image.
+The paper chooses to use a fixed tree structure, meaning that the tree (degree, depth) has been created \emph{ad-hoc} on a per-experiment basis, trying to mimic the frequency pyramid tiling of a curvelet decomposition. The number of leaves was also specifically chosen to match the number of atoms that was generated on the target image.
 
 But getting an actual adaptative dictionary update step implies that designing the tree is made optimally and as part of the optimization process. This is one of the internship research axis.
 
@@ -149,8 +149,9 @@ But getting an actual adaptative dictionary update step implies that designing t
 The kernels $h^e$ mentioned above are similar to traditional kernel filters used in signal processing, like the well-known averaging filter (fig. \ref{fig_example_kernel}. The two slight differences are that, for one, that instead of having fixed values (like $1/9$ for a $3\times3$ averaging filter), the values can be changed (those are actually the variables to be optimized); for two, the supports (the locations of the points of the kernel) are not fixed (the fig. \ref{fig_example_kernel} shows a support with 9 elements but with spaces between those elements).
 
 
+As described in \ref{sec_tree_model} and drawn in fig. \ref{fig_example_kernel}, the supports $s^e$ are part of the dictionary-as-a-tree model. In \cite{chabiron_toward_2015}, the authors experimentally show that using fixed supports for approximating curvelets is possible. For that specific purpose, the results turned to be good. But the whole model was supposed to be able to approximate any kind of image, hence the need for "adaptative" supports instead of hand-made ones.
 
-More formally, the support of the kernel $h^e$is defined as the element (i.e. the points) of $h^e$ that are free to be non-zero.
+
 
 And as for the tree design, the choice of where are located the elements of each kernel support has been made (so far) arbitrarily. The support of the $h^e$ kernel of fig. \ref{fig_example_kernel} shows an example of typical layout chosen for the experiments in \cite{chabiron_optimization_2016}. 
 
@@ -176,8 +177,8 @@ The figure \ref{fig_example_optimal_support} shows an example of what we think w
 
 
 \subsection{Adding an element}
-Our first thought on how to add an element to a support was to find the best kernel among the tree edges, and then pick the best point(s) of that support to be added. We thought the gradient of the objective function would give that information. This lead to the first batch of experimentation.
-...
+Our first thought on how to add an element to a support was to find the best kernel among the tree edges, and then pick the best point(s) of that support to be added. We thought the gradient of the objective function would probably give that information. 
+
 
 
 This experiment aims to simulate the choice of an atom by the OMP algorithm. As a short reminder, here is the step we are studying:
@@ -188,7 +189,7 @@ This experiment aims to simulate the choice of an atom by the OMP algorithm. As 
     \Output Code $x$ which is $k$-sparse
     \State \textbf{Initialization} $R^{(0)} = y$
     \While{$i \leq k$} \Comment note the fixed number of iterations
-      \State $l =  \argmax_{l = 1,\dots,l} |\left< d_l,R^{(i)} \right>|$ \label{omp_pick_correlation}
+      \State $l =  \arg\max_{l = 1,\dots,l} |\left< d_l,R^{(i)} \right>|$ \label{alg_omp_pick_correlation}
         \Comment{find atom with max. correlation with $R$}
       \State $R^{(i+1)} = R^{(i)}-x_l d_l^{(i)}$
       \State $\hat{y} = \hat{y}+\langle R^{(i)}, d_{l}^{(i)} \rangle d_{l}^{(i)}$
@@ -197,12 +198,12 @@ This experiment aims to simulate the choice of an atom by the OMP algorithm. As 
   \end{algorithmic}
 \end{algorithm}
 
-At \cref{omp_pick_correlation}, the algorithm chooses the column of the dictionary that matches the best the residual. This is where we thought this way of doing would serve our "add an element to one of the supports" algorithm.
+At \cref{alg_omp_pick_correlation}, the algorithm chooses the column of the dictionary that matches the best the residual. This is where we thought this way of doing would serve our "add an element to one of the supports" algorithm.
 
 % XXX define PALMTREE
 Our goal is to, between two iterations of the PALMTREE algorithm, add a new element to one of the supports. That would lead to an optimization-driven construction of the kernels instead of designing them by hand.
 
-But we have been questioning ourselves on the fairness of choosing an element to be added based the mere partial gradient. We remind that the \ref{omp_pick_correlation} is actually computing a gradient:
+But we have been questioning ourselves on the fairness of choosing an element to be added based the mere partial gradient. We remind that the \ref{alg_omp_pick_correlation} is actually computing a gradient:
 
 \begin{align*}
 l =& \argmax \left|\left< g_l,R^{(i)} \right>\right| \\
