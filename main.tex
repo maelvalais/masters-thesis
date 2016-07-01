@@ -6,24 +6,27 @@
 \date{Updated on \today}
 \title{Optimization of dictionaries structured in convolutional trees for sparse image representation - Master's Thesis}
 \begin{document}
-%\input{titlepage} % Uncomment to show title page
+\input{titlepage} % Uncomment to show title page
 \tableofcontents
 
 \chapter{Introduction}
 
 \section{The need for sparse representations}
-A sparse signal over some representation means that it can be written with as few information as possible – in other words, sparse means with many zeros. Many applications spanning from machine learning to image denoising heavily rely on the property that we can summarize – or more precisely approximate, or factorize – any signal using a proper representation. The job of transforming the raw\footnote{Any raw signal is actually represented by the canonical basis} signal to its sparse counterpart takes the form of an operator, often called dictionary or transform.
+
+A sparse signal over some representation means that it can be written with as few information as possible – in other words, sparse means with many zeros. Many applications spanning from machine learning to image denoising heavily rely on the property that we can summarize – or more precisely approximate, or factorize – any signal using a proper representation. The job of obtaining the raw\footnote{Any raw signal is actually represented by the canonical basis} signal from its sparse counterpart takes the form of an operator, often called dictionary or transform.
 
 The Fourier transform is an ideal example of such operators. In figure \ref{explefourier}, the left picture $y$ has been represented using the Fourier basis, which can be written as a matrix $D$. The right picture shows the coefficients $x$ such that
-$$x = D^Ty$$
+$$D^Ty = x$$
 \begin{figure}[!h]
 \subcaptionbox{A picture featuring a blackboard at INSA Toulouse}%
   [.49\linewidth]{\includegraphics[width=0.49\textwidth]{figures/exple_fourier_spacial.pdf}}
  \subcaptionbox{Frequential representation of the blackboard using Fourier transform. Middle coefficients are coding for general and constant features of the picture while the corner values are coding for the details. The multiple white lines, spanning from the middle to the borders, outline the discontinuities caused by the edges of the blackboard.}%
   [.49\linewidth]{\includegraphics[width=0.49\textwidth]{figures/exple_fourier_frequen.pdf}}
-  \caption{ ($Dx=y$) Example of decomposition of a signal $y$ using the dictionary $D$ made of Fourier series.} \label{explefourier}
+  \caption{ ($D^Ty=x$) Example of decomposition of a signal $y$ using the dictionary $D$ made of Fourier series.} \label{explefourier}
 \end{figure}
-But Fourier is quite different to our convolutional tree structure. Note that Fourier representation is exact thanks to its analytic form. This allows fast implementations, meaning that the transform is fast (computing the above picture using \texttt{fft2} on matlab is extremely fast). Also, due to the fact that it is a basis (thus bijective), the inverse transform exists and is unique. % XXX useless? 
+But the Fourier transform is quite different from our convolutional tree structure. The Fourier transform is a linear mapping and its associated matrix forms a basis. This implies bijectivity: every code $x$ has a unique image $y$. Also, Fourier's basis is orthogonal, meaning that the operator is stable
+
+Note that Fourier representation is exact thanks to its analytic form. This allows fast implementations, meaning that the transform is fast (computing the above picture using \texttt{fft2} on matlab is extremely fast). Also, due to the fact that it is a basis (thus bijective), the inverse transform exists and is unique. % XXX useless? 
 
 Also, we can see that the right picture doesn't seem to be sparse: many coefficients are non-zeros. Fourier is not adapted to every kind of signals, but can give good results in some cases.
 
@@ -86,7 +89,7 @@ then every kernel $h^e$ and support $s^e$ are also defined on $\mathcal{P}$ by $
 
 One columns of the dictionary $D$, usually named "atom", corresponds to one the convolution of successive kernels on a given branch identified by the leaf $l$. We will denote that successive convolution by
 \begin{flalign*}
-&& H^{l} = & h^r * \dots * h^l  && \text{$\triangleright$ column/atom $l$ of $D$}\\
+&& H^{l} = & h^r * \dots * h^l  && \text{$\triangleright$ column/atom $l$ of $D$} \\
 &&            = & h^{*l}
 \end{flalign*}
 
@@ -154,13 +157,13 @@ And as for the tree design, the choice of where are located the elements of each
 But our goal is to be able to approximate any kind of atoms, as \ac{KSVD} is able to do. Being able to choose what elements should be in the kernel supports as part of the optimization process is another goal during this internship.
 
 \begin{figure}[!ht] \centering
-\includegraphics[width=0.6\textwidth]{figures/example-optimized-support.pdf}
-\caption{On the left, a simple curvelet atom which serves as our target image. The right figure represents the positions of the support element for one of the kernels of the tree. The dashed squares represent the initial "fixed" support given in figure \ref{fig_example_kernel}. The gray squares show the positions of the support elements after having optimized: the elements have moved to the general direction of the curvelet.\label{fig_example_optimal_support}}
+\includegraphics[width=0.6\textwidth]{figures/add-rm-elmts-support.pdf}
+\caption{On the left, a simple curvelet atom which serves as target image. The right figure represents the locations of the support element for one of the kernels of the tree. The dashed squares represent the initial support given in figure \ref{fig_example_kernel}. The gray squares show the (supposedly) locations of the support elements after optimization. The elements have moved to the general direction of the curvelet.\label{fig_example_optimal_support}}
 \end{figure}
 
 \chapter{Experiments}
 
-\section{First axis: experimenting with adaptative supports}
+\section{First research axis: experimenting with adaptative supports}
 
 After being able to correctly add and remove support elements, the second phase was to think about what elements we would add or remove, and when (i.e. when during the PALMTREE algorithm).
 
@@ -172,7 +175,7 @@ Our first thought on how to add an element to a support was to find the best ker
 
 ...explain...
 
-\subsection{Experiment 1: what elements are worth adding}
+\subsection{Experiment 1: knowing what elements are worth adding}
 
 This experiment was using a single-branch tree of depth 4 (see fig. \ref{fig_xp_pts_worth_adding}). One of the four supports is picked for the whole experiment. This support will be called $s^e$.
 \begin{figure}[!ht]\centering
@@ -182,11 +185,10 @@ This experiment was using a single-branch tree of depth 4 (see fig. \ref{fig_xp_
 First, a full minimization with many iterations and retries is made to give a common starting point. Then, for every (not already at 1) element $i \in \mathcal{P}$  of the support $s^e$, the element is added to the support, and the minimization continues (with no retries to get the same conditions for every added point).
 The objective function of that minimization is then stored so that the location of $i$ is remembered. The element $i$ is then removed and we continue with $i+1$...
 
+As a result, we get an image that represent, for each pixel, the minimized objective function if an element were added at that specific location. This extremely slow method allows us to compare with faster methods (like just computing the gradient).
 
 
-
-
-
+\subsection{Experiment 2: use the gradient for choosing what should be added}
 This experiment aims to simulate the choice of an atom by the OMP algorithm. As a short reminder, here is the step we are studying:
 \begin{algorithm}[!ht] % XXX Finish algorithm
     \caption{MP (Matching Pursuit) algorithm for sparse approximation}
@@ -218,7 +220,7 @@ l =& \argmax \left|\left< g_l,R^{(i)} \right>\right| \\
 \end{align*}
 So: does the partial gradient \ref{eq_partial_gradient} give 
 \begin{align*}
-\Phi((h^e)_e) = \left\| \sum_{l\in\leaves} \code^l * h^{\CC(r,l)} \right\|^2
+\Phi((h^e)_e) = \left\| \sum_{l\in\leaves} x^l * h^{*l} \right\|^2
 \end{align*}
 \begin{align*} 
 \nabla_{h^{e'}}\Phi((h^e)_e) = 2 \widetilde{H^{e'}} * (h^{e'}*H^{e'}-y^{e'})
@@ -260,7 +262,7 @@ After & 0.004407 & 7.9\% \\ \bottomrule
 \addcontentsline{toc}{chapter}{Appendix}
 \appendix
 
-\chapter{Some "proofs" I should work on}
+\chapter{Some stuff I'm writing to remember things}
 
 \section{Why is sparse coding used for denoising?}
 
