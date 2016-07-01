@@ -6,7 +6,8 @@
 \date{Updated on \today}
 \title{Optimization of dictionaries structured in convolutional trees for sparse image representation - Master's Thesis}
 \begin{document}
-\input{titlepage} % Uncomment to show title page
+%\input{titlepage} % Uncomment to show title page
+\pagestyle{body}
 \tableofcontents
 
 \chapter{Introduction}
@@ -15,7 +16,7 @@
 
 A sparse signal over some representation means that it can be written with as few information as possible – in other words, sparse means with many zeros. Many applications spanning from machine learning to image denoising heavily rely on the property that we can summarize – or more precisely approximate, or factorize – any signal using a proper representation. The job of obtaining the raw\footnote{Any raw signal is actually represented by the canonical basis} signal from its sparse counterpart takes the form of an operator, often called dictionary or transform.
 
-The Fourier transform is an ideal example of such operators. In figure \ref{explefourier}, the left picture $y$ has been represented using the Fourier basis, which can be written as a matrix $D$. The right picture shows the coefficients $x$ such that
+The Fourier transform is an ideal example of such operators. In figure \ref{explefourier}, the left picture $y$ has been represented using a Fourier basis, which can be written as a matrix $D$. The right picture shows the coefficients $x$ such that
 $$D^Ty = x$$
 \begin{figure}[!h]
 \subcaptionbox{A picture featuring a blackboard at INSA Toulouse}%
@@ -24,11 +25,11 @@ $$D^Ty = x$$
   [.49\linewidth]{\includegraphics[width=0.49\textwidth]{figures/exple_fourier_frequen.pdf}}
   \caption{ ($D^Ty=x$) Example of decomposition of a signal $y$ using the dictionary $D$ made of Fourier series.} \label{explefourier}
 \end{figure}
-But the Fourier transform is quite different from our convolutional tree structure. The Fourier transform is a linear mapping and its associated matrix forms a basis. This implies bijectivity: every code $x$ has a unique image $y$. Also, Fourier's basis is orthogonal, meaning that the operator is stable
+But the Fourier transform is quite different from our convolutional tree structure. First, it's a linear mapping and its associated matrix forms a basis. This implies bijectivity: every code $x$ has a unique image $y$. Also, Fourier's basis is orthogonal, meaning that the operator is stable (it does amplify errors). Finally, the basis is normed, meaning that ...
 
-Note that Fourier representation is exact thanks to its analytic form. This allows fast implementations, meaning that the transform is fast (computing the above picture using \texttt{fft2} on matlab is extremely fast). Also, due to the fact that it is a basis (thus bijective), the inverse transform exists and is unique. % XXX useless? 
+More importantly, Fourier has interesting properties that allow fast implementations. For example, using \texttt{fft2} on matlab is extremely fast. Instead of computing an time-expensive $O(N^2)$\footnote{$N$ is the dimension of the "flatten" image, if we consider the image as a vector} matrix-vector product, the fast Fourier transform only require a $O(NlogN)$ time.
 
-Also, we can see that the right picture doesn't seem to be sparse: many coefficients are non-zeros. Fourier is not adapted to every kind of signals, but can give good results in some cases.
+The Fourier transform is widely used as an operator for sparse representations, mainly in fields dealing with regular signals that can be approximated by a sum of sines. But this operator does not do well on images: they contain many discontinuities and are far from being representable using sines. In \ref{fig_} Also, we can see that the right picture doesn't seem to be sparse: many coefficients are non-zeros.
 
 Many other non-adaptative dictionaries exist, like the cosine transform (used by JPEG), the wavelet transform (used by JPEG2000, heavily used for encoding movies in theaters) or the curvelet transform. And as for the Fourier transform, these operators are known to be fast.
 
@@ -52,7 +53,6 @@ As many of the concepts behind the PALMTREE algorithm developed in \cite{chabiro
 
 
 \section{\ac{KSVD} algorithm}
-
 
 K-SVD learns the dictionary by alternatively optimizing $x$ and $D$. Optimizing $x$ is the sparse coding phase, and optimizing $D$ is the dictionary update phase.
 
