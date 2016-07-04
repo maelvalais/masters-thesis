@@ -16,16 +16,20 @@
 
 A sparse signal over some representation means that it can be written with as few information as possible – in other words, sparse means with many zeros. Many applications spanning from machine learning to image denoising heavily rely on the property that we can summarize – or more precisely approximate, or factorize – any signal using a proper representation. The job of obtaining the raw\footnote{Any raw signal is actually represented by the canonical basis} signal from its sparse counterpart takes the form of an operator, often called dictionary or transform.
 
-The Fourier transform is an ideal example of such operators. In figure \ref{fig_fourier}, the left picture $y$ has been represented using a Fourier basis, which can be written as a matrix $D$. The right picture shows the coefficients $x$ such that
+This chapter will review the main existing dictionaries in use for sparse representation, spanning from non-adaptative transforms to learned dictionaries and going through the intermediate over-complete dictionaries.
+
+\section{Non-adaptative dictionaries}
+
+The Fourier transform is an classic example of operators used for sparsity. In figure \ref{fig_fourier}, the left picture $y$ has been represented using a Fourier basis, which can be written as a matrix $D$. The right picture shows the coefficients $x$ such that
 $$D^Ty = x$$
 
 
 \begin{figure}[!ht]
-\subcaptionbox{A picture featuring a blackboard at INSA Toulouse}%
+\subcaptionbox{Picture $y$ with many discontinuities.}%
   [.49\linewidth]{\includegraphics[width=0.49\textwidth]{figures/exple_fourier_spacial.pdf}}
- \subcaptionbox{Frequential representation of the blackboard using Fourier transform. Middle coefficients are coding for general and constant features of the picture while the corner values are coding for the details. The multiple white lines, spanning from the middle to the borders, outline the discontinuities caused by the edges of the blackboard.}%
+ \subcaptionbox{Result of applying the Fourier transform to $y$}%
   [.49\linewidth]{\includegraphics[width=0.49\textwidth]{figures/exple_fourier_frequen.pdf}}
-  \caption{ ($D^Ty=x$) Example of decomposition of a signal $y$ using the dictionary $D$ made of Fourier series.} \label{fig_fourier}
+  \caption{Decomposition $D^Ty=x$ of a signal $y$ using the dictionary $D$ made of Fourier series. In $x$, the middle coefficients are coding for "large" features while the corner values are coding for the details. The multiple white lines, spanning from the middle to the borders, outline the discontinuities caused by the edges of the blackboard; the coefficients are scattered (not sparse), which shows that Fourier has trouble when dealing with discontinuities.} \label{fig_fourier}
 \end{figure}
 
 But the Fourier transform is quite different from the representations we have in mind, namely the convolutional tree structure. First, it's a linear mapping and its associated matrix forms a basis. This implies bijectivity: every code $x$ has a unique image $y$. Also, Fourier's basis is orthogonal, meaning that the operator is stable (it does not amplify errors). Finally, the basis is normed, meaning that ... % TODO (HELP) explain normed basis
@@ -34,35 +38,39 @@ More importantly, Fourier has interesting properties that allow fast implementat
 
 The Fourier transform is widely used as an operator for sparse representations, mainly when dealing with smooth signals that can be approximated by a sum of sines. But this operator does not do well on images: they contain many discontinuities and are far from being representable using sines. Most of the coefficients of code $x$ in \cref{fig_fourier} are non-zero. But something worse happens on the edges of the blackboard: the white vertical and horizontal lines that are full of high-value coefficients are trying to code for the discontinuity, which is quite far from possible in Fourier basis.
 
-Many other non-adaptative\footnote{This is the term used when the transform operator is the same whatever the signal or image} dictionaries exist. The cosine transform, used for JPEG compression, belongs to that category. We can also cite the wavelet transform, used for the not-so-well known JPEG2000 but which is heavily used for encoding movies in theaters. The curvelet transform, . And as for the Fourier transform, these operators are known to be fast.
+Along with Fourier, many other non-adaptative dictionaries exist; we can mention the cosine transform which is at the core of JPEG compression. We can also cite the wavelet transform, used in JPEG2000 compression (for movies in theaters), and the curvelet transform, which a bit more tolerant to non-smooth images. And as for Fourier, wavelet and curvelet transforms both have fast implementations.
+
 
 \section{Adaptative dictionaries}
-As mentioned, analytically-based dictionaries do not produce sparse representations for every kind of signal, although allowing low computational time. Dictionary learning tries to address the adaptativeness issue. Instead of using basis matrices, we allow ourselves to use overcomplete dictionaries (more columns than lines) made of learned images (the atoms).
+Right before the first learned dictionaries, \cite{chen_atomic_2001} extended the basis-based dictionaries using multiple basis to form an over-complete dictionary. Doing so would increase the expressivity of such representations, although making the inverse transform less obvious. % TODO overcomplete -> ???
+
+Learned dictionaries take the same bet of over-completeness. But instead of choosing multiple fixed basis, we optimize the dictionary matrix so that the atoms (other name for the columns of the dictionary matrix) generate the sparsest representations for a given set of images.
+
+The \cref{fig_overcomplete_matrix} shows the matrix-vector product of a sparse code $x$ and a learned $D$, giving an approximation of $y$. For this example, $y$ will be represented by a linear combination of three atoms of $D$.
+
+
 \begin{figure}[!h] \centering
 \includegraphics[width=0.5\textwidth]{figures/sparsity-matrix.pdf}
-\caption{Matrix view of $Dx$ when $D$ is overcomplete (much more columns/atoms than lines, which is the dimension of the signal $y$) \label{fig_overcomplete_matrix}}
+\caption{Matrix view of $Dx$ when $D$ is over-complete (much more columns than lines). $y$ can be represented using a few atoms of $D$.} \label{fig_overcomplete_matrix}
 \end{figure}
-In figure \ref{fig_overcomplete_matrix}, the sparse code is multiplied to $D$ to give an approximation of $y$. Finding a good dictionary amounts to find the best atoms in $D$ such that every $y$ gives a good sparse representation – or code – $x$.
 
-More formally, the dictionary learning problem is defined by
-\begin{equation*}
-\begin{aligned}
-(DL) && \underset{D,x}{\min} \lambda \lVert x \rVert + \lVert Dx-y \rVert^2
-\end{aligned}
-\end{equation*}
-\ac{KSVD} is a very well known algorithm for dictionary learning. Instead of having a pre-determined $D$, we are going to learn it.
 
-As many of the concepts behind the PALMTREE algorithm developed in \cite{chabiron_optimization_2016} come from the K-SVD algorithm, the next section will introduce it.
-
+The optimization problem behind dictionary learning learning is defined as
+\begin{equation*} \label{eq_dict_learn} \begin{aligned}
+(DL) && \underset{D,x}{\min} \lambda \lVert x \rVert + \lVert Dx-y \rVert^2 
+\end{aligned} \end{equation*}
 
 \section{\ac{KSVD} algorithm}
+ % TODO Why KSVD != dict. learning problem 
+ 
+\ac{KSVD}, first introduced in \cite{aharon_k-svd:_2006}, is a well known algorithm for dictionary learning (except that it does not actually solve the above problem \cref{eq_dict_learn}). As many of the concepts behind the PALMTREE algorithm developed in \cite{chabiron_optimization_2016} come from the K-SVD algorithm, this section will introduce it.
 
 K-SVD learns the dictionary by alternatively optimizing $x$ and $D$. Optimizing $x$ is the sparse coding phase, and optimizing $D$ is the dictionary update phase.
 
 
 \begin{algorithm} % TODO Finish algorithm
     \caption{K-SVD (K-Singular Value Decomposition) algorithm for dictionary learning}
-  \begin{algorithmic}[1]
+  \begin{algorithmic}[0]
     \Input learning signals $(y_i)_{i=1..N}$ forming columns of $Y \in \mathbb{R}^{n \times N}$
     \Output dictionary $D \in \mathbb{R}^{n \times K}$ with $K>>n$
     \State \textbf{Initialization} Initialize $D^{(0)}$
