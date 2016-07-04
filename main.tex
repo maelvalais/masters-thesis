@@ -16,22 +16,25 @@
 
 A sparse signal over some representation means that it can be written with as few information as possible – in other words, sparse means with many zeros. Many applications spanning from machine learning to image denoising heavily rely on the property that we can summarize – or more precisely approximate, or factorize – any signal using a proper representation. The job of obtaining the raw\footnote{Any raw signal is actually represented by the canonical basis} signal from its sparse counterpart takes the form of an operator, often called dictionary or transform.
 
-The Fourier transform is an ideal example of such operators. In figure \ref{explefourier}, the left picture $y$ has been represented using a Fourier basis, which can be written as a matrix $D$. The right picture shows the coefficients $x$ such that
+The Fourier transform is an ideal example of such operators. In figure \ref{fig_fourier}, the left picture $y$ has been represented using a Fourier basis, which can be written as a matrix $D$. The right picture shows the coefficients $x$ such that
 $$D^Ty = x$$
-\begin{figure}[!h]
+
+
+\begin{figure}[!ht]
 \subcaptionbox{A picture featuring a blackboard at INSA Toulouse}%
   [.49\linewidth]{\includegraphics[width=0.49\textwidth]{figures/exple_fourier_spacial.pdf}}
  \subcaptionbox{Frequential representation of the blackboard using Fourier transform. Middle coefficients are coding for general and constant features of the picture while the corner values are coding for the details. The multiple white lines, spanning from the middle to the borders, outline the discontinuities caused by the edges of the blackboard.}%
   [.49\linewidth]{\includegraphics[width=0.49\textwidth]{figures/exple_fourier_frequen.pdf}}
-  \caption{ ($D^Ty=x$) Example of decomposition of a signal $y$ using the dictionary $D$ made of Fourier series.} \label{explefourier}
+  \caption{ ($D^Ty=x$) Example of decomposition of a signal $y$ using the dictionary $D$ made of Fourier series.} \label{fig_fourier}
 \end{figure}
-But the Fourier transform is quite different from our convolutional tree structure. First, it's a linear mapping and its associated matrix forms a basis. This implies bijectivity: every code $x$ has a unique image $y$. Also, Fourier's basis is orthogonal, meaning that the operator is stable (it does amplify errors). Finally, the basis is normed, meaning that ...
 
-More importantly, Fourier has interesting properties that allow fast implementations. For example, using \texttt{fft2} on matlab is extremely fast. Instead of computing an time-expensive $O(N^2)$\footnote{$N$ is the dimension of the "flatten" image, if we consider the image as a vector} matrix-vector product, the fast Fourier transform only require a $O(NlogN)$ time.
+But the Fourier transform is quite different from the representations we have in mind, namely the convolutional tree structure. First, it's a linear mapping and its associated matrix forms a basis. This implies bijectivity: every code $x$ has a unique image $y$. Also, Fourier's basis is orthogonal, meaning that the operator is stable (it does not amplify errors). Finally, the basis is normed, meaning that ... % TODO (HELP) explain normed basis
 
-The Fourier transform is widely used as an operator for sparse representations, mainly in fields dealing with regular signals that can be approximated by a sum of sines. But this operator does not do well on images: they contain many discontinuities and are far from being representable using sines. In \ref{fig_} Also, we can see that the right picture doesn't seem to be sparse: many coefficients are non-zeros.
+More importantly, Fourier has interesting properties that allow fast implementations. For example, applying the matlab function \texttt{fft2} on the \cref{fig_fourier} is extremely fast. Instead of computing an time-expensive $O(N^2)$\footnote{$N$ is the dimension of the "flattened" image, if we consider the image as a vector} matrix-vector product, the fast Fourier transform only require a $O(NlogN)$ time.
 
-Many other non-adaptative dictionaries exist, like the cosine transform (used by JPEG), the wavelet transform (used by JPEG2000, heavily used for encoding movies in theaters) or the curvelet transform. And as for the Fourier transform, these operators are known to be fast.
+The Fourier transform is widely used as an operator for sparse representations, mainly when dealing with smooth signals that can be approximated by a sum of sines. But this operator does not do well on images: they contain many discontinuities and are far from being representable using sines. Most of the coefficients of code $x$ in \cref{fig_fourier} are non-zero. But something worse happens on the edges of the blackboard: the white vertical and horizontal lines that are full of high-value coefficients are trying to code for the discontinuity, which is quite far from possible in Fourier basis.
+
+Many other non-adaptative\footnote{This is the term used when the transform operator is the same whatever the signal or image} dictionaries exist. The cosine transform, used for JPEG compression, belongs to that category. We can also cite the wavelet transform, used for the not-so-well known JPEG2000 but which is heavily used for encoding movies in theaters. The curvelet transform, . And as for the Fourier transform, these operators are known to be fast.
 
 \section{Adaptative dictionaries}
 As mentioned, analytically-based dictionaries do not produce sparse representations for every kind of signal, although allowing low computational time. Dictionary learning tries to address the adaptativeness issue. Instead of using basis matrices, we allow ourselves to use overcomplete dictionaries (more columns than lines) made of learned images (the atoms).
@@ -57,7 +60,7 @@ As many of the concepts behind the PALMTREE algorithm developed in \cite{chabiro
 K-SVD learns the dictionary by alternatively optimizing $x$ and $D$. Optimizing $x$ is the sparse coding phase, and optimizing $D$ is the dictionary update phase.
 
 
-\begin{algorithm} % XXX Finish algorithm
+\begin{algorithm} % TODO Finish algorithm
     \caption{K-SVD (K-Singular Value Decomposition) algorithm for dictionary learning}
   \begin{algorithmic}[1]
     \Input learning signals $(y_i)_{i=1..N}$ forming columns of $Y \in \mathbb{R}^{n \times N}$
@@ -69,7 +72,7 @@ K-SVD learns the dictionary by alternatively optimizing $x$ and $D$. Optimizing 
   \end{algorithmic}
 \end{algorithm}
 \section{The seek for fast transforms}
-... talk about the problem of need for small patches and resolution limits in KSVD ...
+... talk about the problem of need for small patches and resolution limits in KSVD % TODO KSVD patch sizes
 
 \section{PALMTREE algorithm}
 
@@ -136,13 +139,13 @@ $$\chi_{X_e}(h^e) = \begin{cases} 0 &\text{ if } h^e \in X^e \\ +\infty & \ \tex
 \end{align}
 
 \subsection{Interesting (FTL) properties}
-We may consider $D(x)$ as a polynomial form (see \ref{proof_ftl_polynomial}) ...
+We may consider $D(x)$ as a polynomial form (see \ref{proof_ftl_polynomial}) % TODO FTL is non-convex...
 
 \subsection{PALMTREE, the algorithm for solving (FTL)}
-...
+% TODO explain PALMTREE
 
 \section{Issues with PALMTREE algorithm and internship goals}
-As explained in \cite[p. 23]{chabiron_optimization_2016}, the main drawbacks to use this convolutional tree model for practical dictionary learning (as many other applications) are the hand-made parts of the model, leading to arbitrary and sub-optimal results. Among them are the design of the tree (degree, depth...) and the choice of the supports.
+As explained in \cite[p. 23]{chabiron_optimization_2016}, the main drawbacks to use this convolutional tree model for practical dictionary learning (as many other applications) are the hand-made parts of the model, leading to arbitrary and sub-optimal results. Among them are the design of the tree (degree, depth...) and the choice of the supports. % TODO "degree" not understandable
 \subsection{Choice of the tree}
 The paper chooses to use a fixed tree structure, meaning that the tree (degree, depth) has been created \emph{ad-hoc} on a per-experiment basis, trying to mimic the frequency pyramid tiling of a curvelet decomposition. The number of leaves was also specifically chosen to match the number of atoms that was generated on the target image.
 
@@ -173,7 +176,7 @@ The figure \ref{fig_example_optimal_support} shows an example of what we think w
 \subsection{Adding an element}
 Our first thought on how to add an element to a support was to find the best kernel among the tree edges, and then pick the best point(s) of that support to be added. We thought the gradient of the objective function would probably give that information. 
 
-...explain...
+% TODO explain 
 
 \subsection{Experiment 1: knowing what elements are worth adding}
 
@@ -183,14 +186,15 @@ This experiment was using a single-branch tree of depth 4 (see fig. \ref{fig_xp_
 \caption{a} \label{fig_xp_pts_worth_adding}
 \end{figure}
 First, a full minimization with many iterations and retries is made to give a common starting point. Then, for every (not already at 1) element $i \in \mathcal{P}$  of the support $s^e$, the element is added to the support, and the minimization continues (with no retries to get the same conditions for every added point).
-The objective function of that minimization is then stored so that the location of $i$ is remembered. The element $i$ is then removed and we continue with $i+1$...
+The objective function of that minimization is then stored so that the location of $i$ is remembered. The element $i$ is then removed and we continue with $i+1$ % TODO write algo + formula
+
 
 As a result, we get an image that represent, for each pixel, the minimized objective function if an element were added at that specific location. This extremely slow method allows us to compare with faster methods (like just computing the gradient).
 
 
 \subsection{Experiment 2: use the gradient for choosing what should be added}
 This experiment aims to simulate the choice of an atom by the OMP algorithm. As a short reminder, here is the step we are studying:
-\begin{algorithm}[!ht] % XXX Finish algorithm
+\begin{algorithm}[!ht] % TODO Finish algorithm
     \caption{MP (Matching Pursuit) algorithm for sparse approximation}
   \begin{algorithmic}[0]
     \Input signal $y \in \mathbb{R}^{n}$, dictionary $D \in \mathbb{R}^{n \times m}$ with $m>>n$, $x = 0_{\mathbb{R}^m}$
@@ -208,7 +212,7 @@ This experiment aims to simulate the choice of an atom by the OMP algorithm. As 
 
 At \cref{alg_omp_pick_correlation}, the algorithm chooses the column of the dictionary that matches the best the residual. This is where we thought this way of doing would serve our "add an element to one of the supports" algorithm.
 
-% XXX define PALMTREE
+% TODO define PALMTREE
 Our goal is to, between two iterations of the PALMTREE algorithm, add a new element to one of the supports. That would lead to an optimization-driven construction of the kernels instead of designing them by hand.
 
 But we have been questioning ourselves on the fairness of choosing an element to be added based the mere partial gradient. We remind that the \ref{alg_omp_pick_correlation} is actually computing a gradient:
@@ -256,7 +260,7 @@ After & 0.004407 & 7.9\% \\ \bottomrule
 \end{table}
 
 
-% XXX Proof not finished; this proof might be useless/overkill in my thesis...
+% TODO Proof not finished; this proof might be useless/overkill in my thesis...
 
 \clearpage
 \addcontentsline{toc}{chapter}{Appendix}
@@ -274,7 +278,7 @@ This is because the deviation in the $N$ dimensional space can be written as
 \begin{align*}
 \sigma^2(b) =& \mathbb{E}\left[\lVert b-\mathbb{E}(b) \rVert^2 \right]\\
 =& \mathbb{E}\left(\lVert b \rVert^2 \right)\\
-=& ... \\
+=& ... \\ % TODO finish useless proof
 =& \frac{1}{N}\lVert b \rVert^2
 \end{align*}
 which gives 
