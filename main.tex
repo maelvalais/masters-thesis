@@ -42,7 +42,7 @@ Along with Fourier, many other non-adaptative dictionaries exist; we can mention
 
 
 \section{Adaptative dictionaries}
-Right before the first learned dictionaries, \cite{chen_atomic_2001} extended the basis-based dictionaries using multiple basis to form an over-complete dictionary. Doing so would increase the expressivity of such representations, although making the inverse transform less obvious. % TODO overcomplete -> ???
+Right before the first learned dictionaries, \cite{chen_atomic_2001} extended the basis-based dictionaries using multiple basis to form an over-complete dictionary. Doing so would increase the expressivity of such representations, although making the inverse transform less obvious. % TODO overcomplete implies what?
 
 Learned dictionaries take the same bet of over-completeness. But instead of choosing multiple fixed basis, we optimize the dictionary matrix so that the atoms (other name for the columns of the dictionary matrix) generate the sparsest representations for a given set of images.
 
@@ -55,32 +55,65 @@ The \cref{fig_overcomplete_matrix} shows the matrix-vector product of a sparse c
 \end{figure}
 
 
-The optimization problem behind dictionary learning learning is defined as
-\begin{equation*} \label{eq_dict_learn} \begin{aligned}
-(DL) && \underset{D,x}{\min} \lambda \lVert x \rVert + \lVert Dx-y \rVert^2 
-\end{aligned} \end{equation*}
+Given a set of sample images $Y = [ y_1 y_2 \dots y_S ]$ (images are "flattened" into vectors $y_i$ of size $N$), the dictionary learning optimization problem is defined as
 
-\section{\ac{KSVD} algorithm}
- % TODO Why KSVD != dict. learning problem 
- 
-\ac{KSVD}, first introduced in \cite{aharon_k-svd:_2006}, is a well known algorithm for dictionary learning (except that it does not actually solve the above problem \cref{eq_dict_learn}). As many of the concepts behind the PALMTREE algorithm developed in \cite{chabiron_optimization_2016} come from the K-SVD algorithm, this section will introduce it.
+\begin{equation*}  \begin{aligned}
+(DL) && \underset{D,X}{\min} \lambda \lVert x \rVert_1 + \lVert DX-Y \rVert^2_2 
+\end{aligned} \label{eq_dict_learn} \end{equation*}
 
-K-SVD learns the dictionary by alternatively optimizing $x$ and $D$. Optimizing $x$ is the sparse coding phase, and optimizing $D$ is the dictionary update phase.
+% TODO WARNING! ||X||_1 doesn't exist, ||Y||_2 either
+with $\lVert . \rVert_2$ denoting the standard euclidian $l_2$ norm, $\lVert . \rVert_1$ the $l_1$ norm defined by $\lVert x \rVert_1 = \sum_{i,j} |x_i|$, $X = [ x_1 \dots x_s ]$ the matrix containing the sparse representations $x_i$ of size $K$ for all images in $Y$ and $D \in \mathcal{M}^{K \times N}$ the dictionary.
 
+\section{K-SVD algorithm}
 
-\begin{algorithm} % TODO Finish algorithm
-    \caption{K-SVD (K-Singular Value Decomposition) algorithm for dictionary learning}
+\ac{KSVD}, first introduced in \cite{aharon_k-svd:_2006}, is a well known algorithm for dictionary learning (except that it does not actually solve the above problem \cref{eq_dict_learn}). As many of the concepts behind the PALMTREE algorithm developed in \cite{chabiron_optimization_2016} come from the K-SVD algorithm, this section will introduce it. % TODO Why KSVD != dict. learning problem 
+
+Here is the problem that K-SVD is solving, which is a "stronger" version of (DL) in the sense that the level of sparsity in K-SVD is enforced:
+\begin{equation*}  \begin{aligned}
+(DL_{\text{strong}}) && \underset{D,X}{\min} & \lVert DX-Y \rVert^2_F \\
+&& s.t. & \lVert x_i \rVert_0 \le \gamma & \quad \forall i \text{ in } 1..S
+\end{aligned} \label{eq_dict_learn} \end{equation*}
+
+with $F$ the Frobenius norm and $x_i$ the i-th column of $X$.
+
+\ac{KSVD} learns the dictionary by alternatively optimizing $x$ and $D$. Optimizing $x$ is the sparse coding phase, and optimizing $D$ is the dictionary update phase.
+
+\begin{algorithm}
+    \caption{K-SVD (K-Singular Value Decomposition) algorithm for (DL)}
   \begin{algorithmic}[0]
-    \Input learning signals $(y_i)_{i=1..N}$ forming columns of $Y \in \mathbb{R}^{n \times N}$
-    \Output dictionary $D \in \mathbb{R}^{n \times K}$ with $K>>n$
-    \State \textbf{Initialization} Initialize $D^{(0)}$
-    \While{condition}
-	\State \dots
+    \Input signal samples $(y_i)_{i=1..N}$ forming columns of $Y \in \mathbb{R}^{S \times N}$
+    \Output dictionary $D \in \mathbb{R}^{K \times N}$ with $K>>N$
+    \State \textbf{Initialization} Initialize $D$ s.t. every column is $l^2$ normalized
+    \While{convergence}
+	\State For each image $i$, solve \Comment{Sparse coding step}
+		\begin{align}
+			\quad \min_{x_i} & \lVert y_i-Dx_i\rVert^2\\
+			s.t. & \lVert x_i \rVert_0 \le \gamma \notag
+		\end{align}
+	\State Set $D^{old} \leftarrow D$
+	\State For each atom $k$ of $D^{old}$, \Comment{Dictionary update step}
+	\begin{enumerate}[leftmargin=15mm,label=(\alph*)]
+		\item find the images $y_i$ that use the atom $d_k$, meaning $x_i^k \ne 0$ \label{item_atom_used}
+		\item compute the error matrix associated to this atom,
+		\begin{align}
+			E_k =& Y-\sum_{i\ne k} {d_i}^Tx_i
+		\end{align}
+		\item keep only columns of $E_k$ found in \ref{item_atom_used}
+		\item Apply SVD decomposition $E_k - U \Delta V^T$. The first column of $U$ becomes the new $d_k$. $x_k$ is updated using the first column of $V$ multiplied by $\Delta(1,1)$ (highest Eigen value)
+	\end{enumerate}
     \EndWhile
   \end{algorithmic}
 \end{algorithm}
 \section{The seek for fast transforms}
-... talk about the problem of need for small patches and resolution limits in KSVD % TODO KSVD patch sizes
+
+... talk about the problem of need for small patches and resolution limits in KSVD % TODO KSVD problems
+
+As K-SVD relies on the $O(NK)$ matrix-vector product and that a dictionary achieves sparsity as long as $K >> N$, we easily understand that $N$ cannot be big. When implemented, K-SVD atoms (called patches because of their size) are at most $16 \times 16$.
+
+Also, the K-SVD is translation-sensitive in the sense that multiple atoms of the dictionary are only different by translation. In PALMTREE, the "final" convolutions between the atoms $h^{*l}$ and $x^l$ adresses this issue.
+
+% TODO add KSVD image
+% TODO Malgouyres: talk about other models (???)
 
 \section{PALMTREE algorithm}
 
@@ -98,56 +131,74 @@ then every kernel $h^e$ and support $s^e$ are also defined on $\mathcal{P}$ by $
 \caption{(a) A well-known averaging kernel, which has fixed support ($3\times3$) and fixed values. (b) Example of a kernel $h^e$. The locations of the gray squares and the values (e.g. $.01$) actually change during PALMTREE. The shape of this $h^e$ (like a chessboard) has been shown experimentally to work well. \label{fig_example_kernel}}
 \end{figure}
 
-One columns of the dictionary $D$, usually named "atom", corresponds to one the convolution of successive kernels on a given branch identified by the leaf $l$. We will denote that successive convolution by
+One column of the dictionary $D$ corresponds to the convolution of successive kernels on a given branch identified by the leaf $l$. We will denote that successive convolution by
 \begin{flalign*}
 && H^{l} = & h^r * \dots * h^l  && \text{$\triangleright$ column/atom $l$ of $D$} \\
 &&            = & h^{*l}
 \end{flalign*}
 
-Figure \ref{fig_matrix_vs_tree} outlines the relation between the tree, the atoms $H^l$ and the matrix form. The dictionary can be written using this notation
-$$D = \begin{bmatrix}H^{l_1} & H^{l_2} & \dots & H^{l_L}\end{bmatrix}$$
-with $L$ the number of leaves in the tree. 
+Figure \ref{fig_matrix_vs_tree} outlines the relation between the tree and the matrix form. The dictionary can be written using the notation
 
-\begin{figure}[!h] \centering
-\includegraphics[width=0.9\textwidth]{figures/matrix-vs-tree.pdf} \caption{This figure shows how to go from the tree defined by its kernels $(h^e)_e$ to a matrix $D$. Note that this figure doesn't illustrates $Dx \approx y$ (standard matrix-vector product). Instead, it uses $D*x\approx y$ (convolutional product) which gives every possible translation for every atom.  \label{fig_matrix_vs_tree}}
+$$D = \begin{bmatrix}C^5 C^6\end{bmatrix} \begin{bmatrix}C^1 & C^2 & 0 & 0 \\0 & 0 & C^3 & C^4\end{bmatrix}$$
+
+with $C^i$ the block-circular matrix for $h^i$; it represents the final convolution $h^{*l}*x^l$ when using matrices.
+
+
+\begin{figure}[!ht] \centering
+	\includegraphics[width=0.8\textwidth]{figures/block-circular-matrix}
+	\caption{This figure shows how to go from the tree defined by its kernels $(h^e)_{e \in \mathcal{E}}$ to a matrix $D$} \label{fig_block_circular}
 \end{figure}
-Now that $D$ is correctly defined, let's talk about $x$, the sparse representation that approximates $y$. As seen above, we use a convolution instead of the standard matrix-vector product:
 
-$$D(x) = D*x \approx y$$
-Note that $x$ belongs to $\mathbb{R}^{L\times N}$, $D$ has dimensions $N \times L$ and $y$ belongs to $\mathbb{R}^N$. To sum up the whole $D(x)$ operation:
+%\begin{figure}[!ht] \centering
+%\includegraphics[width=0.9\textwidth]{figures/matrix-vs-tree.pdf} \caption{This figure shows how to go from the tree defined by its kernels $(h^e)_{e \in \mathcal{E}}$ to a matrix $D$. Note that this figure doesn't illustrates $Dx \approx y$ (standard matrix-vector product). Instead, it uses $D*x\approx y$ (convolutional product) which gives every possible translation for every atom.  \label{fig_matrix_vs_tree}}
+%\end{figure}
 
-$$
-D(x) = \sum_{l \in \leaves} x^{l} * h^{*l}
-$$
-where $h^{*l}$ denotes the successive convolution of every kernel on the branch that leads to leaf $l$. Figure \ref{fig_matrix_vs_tree} shows an example with the branch $l=4$.
+Using the matrix notation, the dictionary-as-a-tree $D$ applied to a code $x$ approximates $y$:
+
+
+$$Dx \approx y$$
+
+The code $x$ belongs to $\mathbb{R}^{L\times N}$. $D$ has dimensions $N \times L$ and $y$ belongs to $\mathbb{R}^N$. 
+
+Showing that $D$ can be written as a matrix allows to compare the performance of PALMTREE against a simple matrix-vector product. Here is the "PALMTREE way" of computing $Dx$:
+
+\begin{align}
+	Dx = \sum_{l \in \leaves} x^{l} * h^{*l}	 \label{eq_Dx_as_convolution}
+\end{align}
+
+where $h^{*l}$ denotes the successive convolution of every kernel on the branch that leads to leaf $l$.
+
+
 
 \section{The (FTL) problem}
 
 The dictionary update step is defined as 
 \begin{align}
-(FTL) \quad \underset{\substack{(h^\text{e})_{e}}}\min & \lVert D(x) - y \rVert_2^2 \label{eq_ftl_energy}\\
-\text{s.t. } & h^e_p = 0 \Rightarrow  s^e_p=0 \quad & \forall e \in 1..E, \forall p \in 1..N \label{eq_ftl_in_support} \\
- & \lVert h^e \rVert \le \gamma \label{eq_ftl_kernel_finite_nrj}
+(FTL) \quad \underset{\substack{(h^\text{e})_{e}}}\min & \lVert Dx - y \rVert_2^2 \label{eq_ftl_energy}\\
+\text{s.t. } & h^e_p = 0 \Rightarrow  s^e_p=0 \quad & \forall e \in \mathcal{E}, \forall p \in 1..N \label{eq_ftl_in_support} \\
+ & \lVert h^e \rVert \le \gamma & \forall e \in \mathcal{E}\label{eq_ftl_kernel_finite_nrj}
 \end{align}
 
-In the following, we will use the notation $(h^e)_{e}$ to denote $(h^e)_{e \in \mathcal{E}}$ . Also, the notation $\Phi((h^e)_{e})$ will denote the objective function (or energy) \ref{eq_ftl_energy}.
 The constraint \ref{eq_ftl_in_support} guarantees that each kernel $h^e$ only has non-zero values on its support $s^e$. \ref{eq_ftl_kernel_finite_nrj} constrains the overall energy of every support to be finite and prevents a specific kernel to "explode".
 
-\begin{figure}[!ht] \centering
-\includegraphics[width=0.8\textwidth]{figures/hk_tree.pdf}
-\caption{A view of $(h^e)_e$ that "condenses" the dictionary information. In the (FTL) problem, $(h^e)_e$ is the variable to be minimized. $x^l$is fixed at all time.}\label{fig_hk_tree}
-\end{figure}
+(FTL) can be rewritten as an unconstrained problem, shifting the constraint spaces $(D^e)_e$ to the objective function using the characteristic function $\chi_{D^e}$ defined for one edge $e$:
+$$\chi_{D_e}(h^e) = \begin{cases} 0 &\text{ if } h^e \in D^e \\ +\infty & \ \text{otherwise}\end{cases}$$
 
-(FTL) can be rewritten as an unconstrained problem, shifting the constraint spaces $(X^e)_e$ to the objective function using the characteristic function $\chi_{X^e}$defined for one edge $e$:
-$$\chi_{X_e}(h^e) = \begin{cases} 0 &\text{ if } h^e \in X^e \\ +\infty & \ \text{otherwise}\end{cases}$$
-(FTL) becomes
+(FTL) becomes:
 
 \begin{align}
-(FTL) \quad \underset{\substack{(h^\text{e})_{e}}}\min & \lVert D(x) - y \rVert_2^2 + \sum_{e}\chi_{X_e} (h^e)
+(FTL) \quad \underset{\substack{(h^\text{e})_{e}}}\min & \lVert D(x) - y \rVert_2^2 + \sum_{e}\chi_{D_e} (h^e)
 \end{align}
 
 \subsection{Interesting (FTL) properties}
-We may consider $D(x)$ as a polynomial form (see \ref{proof_ftl_polynomial}) % TODO FTL is non-convex...
+$Dx$ can be seen (in \cref{eq_Dx_as_convolution}) as a polynomial of degree $2\text{depth}(\mathcal{T})$. This implies that it is possibly extremely non-convex, but it is infinitely differentiable.
+
+$$\Phi((h^e)_{e \in \mathcal{E}}) = \lVert Dx-y \rVert^2_2$$
+
+The interesting thing is that $\Phi$ is differentiable when only one $h^e$ varies. % TODO
+
+% TODO \cref{proof_ftl_polynomial}) 
+% TODO FTL is non-convex...
 
 \subsection{PALMTREE, the algorithm for solving (FTL)}
 % TODO explain PALMTREE
@@ -171,6 +222,7 @@ But our goal is to be able to approximate any kind of atoms, as \ac{KSVD} is abl
 \includegraphics[width=0.6\textwidth]{figures/add-rm-elmts-support.pdf}
 \caption{On the left, a simple curvelet atom which serves as target image. The right figure represents the locations of the support element for one of the kernels of the tree. The dashed squares represent the initial support given in figure \ref{fig_example_kernel}. The gray squares show the (supposedly) locations of the support elements after optimization. The elements have moved to the general direction of the curvelet.\label{fig_example_optimal_support}}
 \end{figure}
+
 
 \chapter{Experiments}
 
@@ -232,10 +284,10 @@ l =& \argmax \left|\left< g_l,R^{(i)} \right>\right| \\
 \end{align*}
 So: does the partial gradient \ref{eq_partial_gradient} give 
 \begin{align*}
-\Phi((h^e)_e) = \left\| \sum_{l\in\leaves} x^l * h^{*l} \right\|^2
+\Phi((h^e)_{e \in \mathcal{E}}) = \left\| \sum_{l\in\leaves} x^l * h^{*l} \right\|^2
 \end{align*}
 \begin{align*} 
-\nabla_{h^{e'}}\Phi((h^e)_e) = 2 \widetilde{H^{e'}} * (h^{e'}*H^{e'}-y^{e'})
+\nabla_{h^{e'}}\Phi((h^e)_{e \in \mathcal{E}}) = 2 \widetilde{H^{e'}} * (h^{e'}*H^{e'}-y^{e'})
 \end{align*} \label{eq_partial_gradient}
 
 
