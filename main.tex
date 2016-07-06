@@ -365,6 +365,29 @@ which is much better than the previous distance, provided that $K<<N$.
 =& \sum_{k'=1}^{M} \sum_{l'=1}^{N} A_{k',l'} e^{2i\pi (k'\frac{m}{M}+l' \frac{n}{N})}
 \end{align*}
 
+Tests had been done solely on an already fully optimized tree, meaning that the "worth adding" matrix would be "close enough" to be close to the gradient...
+But after checking with multiple trees (more or less optimized), here is the thing: the gradient seems to be always giving more or less the right "global" direction (\cref{fig_xp_grad_iterations})
+
+\begin{figure}[!h]\centering
+\begin{subfigure}[b]{0.49\textwidth}\centering
+\includegraphics[width=\textwidth]{figures/xp_grad_iterations/xp_128x128_sc2_angl1_K3_S3_node4_objmatrix_bestvalues}
+\end{subfigure}
+\begin{subfigure}[b]{0.49\textwidth}\centering
+	\begin{subfigure}[b]{0.49\textwidth}\centering
+	\includegraphics[width=\textwidth]{figures/xp_grad_iterations/xp_128x128_sc2_angl1_K3_S3_node4_1thiteration_partgrad4_bestvalues}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}\centering
+	\includegraphics[width=\textwidth]{figures/xp_grad_iterations/xp_128x128_sc2_angl1_K3_S3_node4_8thiteration_partgrad4_bestvalues}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}\centering
+	\includegraphics[width=\textwidth]{figures/xp_grad_iterations/xp_128x128_sc2_angl1_K3_S3_node4_20thiteration_partgrad4_bestvalues}
+	\end{subfigure}
+		\begin{subfigure}[b]{0.49\textwidth}\centering
+	\includegraphics[width=\textwidth]{figures/xp_grad_iterations/xp_128x128_sc2_angl1_K3_S3_node4_partgrad4_bestvalues}
+	\end{subfigure}
+\end{subfigure}
+\end{figure}
+
 
 \printbibliography
 
