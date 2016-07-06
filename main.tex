@@ -6,21 +6,21 @@
 \date{Updated on \today}
 \title{Optimization of dictionaries structured in convolutional trees for sparse image representation - Master's Thesis}
 \begin{document}
-%\input{titlepage} % Uncomment to show title page
-%\pagestyle{body}
+\input{titlepage} % Uncomment to show title page
+\pagestyle{body}
 \tableofcontents
 
 \chapter{Introduction}
 
 \section{The need for sparse representations}
 
-A sparse signal over some representation means that it can be written with as few information as possible – in other words, sparse means with many zeros. Many applications spanning from machine learning to image denoising heavily rely on the property that we can summarize – or more precisely approximate, or factorize – any signal using a proper representation. The job of obtaining the raw\footnote{Any raw signal is actually represented by the canonical basis} signal from its sparse counterpart takes the form of an operator, often called dictionary or transform.
+A sparse signal over some representation means that it can be written with as few information as possible – in other words, sparse means with many zeros. Many applications spanning from machine learning to image denoising heavily rely on the property that we can summarize – or more precisely approximate – any signal using a proper representation. The job of obtaining the raw\footnote{Any raw signal is actually represented by the canonical basis} signal from its sparse counterpart takes the form of an operator, often called dictionary or transform.
 
 This chapter will review the main existing dictionaries in use for sparse representation, spanning from non-adaptative transforms to learned dictionaries and going through the intermediate over-complete dictionaries.
 
 \section{Non-adaptative dictionaries}
 
-The Fourier transform is an classic example of operators used for sparsity. In figure \ref{fig_fourier}, the left picture $y$ has been represented using a Fourier basis, which can be written as a matrix $D$. The right picture shows the coefficients $x$ such that
+The Fourier transform is a classical example of operators used for sparsity. In figure \ref{fig_fourier}, the left picture $y$ has been represented using a Fourier basis, which can be written as a matrix $D$. The right picture shows the coefficients $x$ such that
 $$D^Ty = x$$
 
 
@@ -145,7 +145,7 @@ with $C^i$ the block-circular matrix for $h^i$; it represents the final convolut
 
 
 \begin{figure}[!ht] \centering
-	\includegraphics[width=0.8\textwidth]{figures/block-circular-matrix}
+	\includegraphics[width=0.8\textwidth]{figures/block-circular-matrix.pdf}
 	\caption{This figure shows how to go from the tree defined by its kernels $(h^e)_{e \in \mathcal{E}}$ to a matrix $D$} \label{fig_block_circular}
 \end{figure}
 
@@ -240,10 +240,10 @@ Our first thought on how to add an element to a support was to find the best ker
 
 \subsection{Experiment 1: knowing what elements are worth adding}
 
-This experiment was using a single-branch tree of depth 4 (see fig. \ref{fig_xp_pts_worth_adding}). One of the four supports is picked for the whole experiment. This support will be called $s^e$.
+This experiment was using a single-branch tree of depth 4 (see fig. \ref{fig_single_branch}). One of the four supports is picked for the whole experiment. This support will be called $s^e$.
 \begin{figure}[!ht]\centering
 \includegraphics[width=0.8\textwidth]{figures/xp-pts-worth-adding.pdf}
-\caption{a} \label{fig_xp_pts_worth_adding}
+\caption{a} \label{fig_single_branch}
 \end{figure}
 First, a full minimization with many iterations and retries is made to give a common starting point. Then, for every (not already at 1) element $i \in \mathcal{P}$  of the support $s^e$, the element is added to the support, and the minimization continues (with no retries to get the same conditions for every added point).
 The objective function of that minimization is then stored so that the location of $i$ is remembered. The element $i$ is then removed and we continue with $i+1$ % TODO write algo + formula
@@ -296,18 +296,31 @@ So: does the partial gradient \ref{eq_partial_gradient} give
 After being able to add
 \subsection{Results}
 \begin{figure}[!h]\centering
-    \begin{subfigure}[b]{0.49\textwidth}\centering
-    \includegraphics[width=\textwidth]{figures/xp/xp_128x128_sc2_angl1_K3_S3_node2_target.png}
-    \end{subfigure}
 \begin{subfigure}[b]{0.49\textwidth}\centering
-\includegraphics[width=\textwidth]{figures/xp/xp_128x128_sc2_angl1_K3_S3_node2_approx.png}
+\includegraphics[width=\textwidth]{figures/xp/xp_128x128_sc2_angl1_K3_S3_node4_target.png}
+\caption{Target}
 \end{subfigure}
-   \begin{subfigure}[b]{0.49\textwidth}\centering
-    \includegraphics[width=\textwidth]{figures/xp/xp_128x128_sc2_angl1_K3_S3_node2_objmatrix.png}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.49\textwidth}\centering
-    \includegraphics[width=\textwidth]{figures/xp/xp_128x128_sc2_angl1_K3_S3_node2_partgrad2.png}
-    \end{subfigure}
+\begin{subfigure}[b]{0.49\textwidth}\centering
+\includegraphics[width=\textwidth]{figures/xp/xp_128x128_sc2_angl1_K3_S3_node4_approx.png}
+\caption{Approximation} \label{fig_simple_approx}
+\end{subfigure}
+\begin{subfigure}[b]{0.49\textwidth}\centering
+\includegraphics[width=\textwidth]{figures/xp/xp_128x128_sc2_angl1_K3_S3_node4_objmatrix.png}
+\caption{Worth-adding matrix}
+\end{subfigure}
+\begin{subfigure}[b]{0.49\textwidth}\centering
+\includegraphics[width=\textwidth]{figures/xp/xp_128x128_sc2_angl1_K3_S3_node4_partgrad4.png}
+\caption{Partial gradient}
+\end{subfigure}
+\begin{subfigure}[b]{0.49\textwidth}\centering
+\includegraphics[width=\textwidth]{figures/xp/xp_128x128_sc2_angl1_K3_S3_node4_objmatrix_bestvalues.png}
+\caption{Best values of above figure}
+\end{subfigure}
+\begin{subfigure}[b]{0.49\textwidth}\centering
+\includegraphics[width=\textwidth]{figures/xp/xp_128x128_sc2_angl1_K3_S3_node4_partgrad4_bestvalues.png}
+\caption{Best values of above figure}
+\end{subfigure}
+\caption{Minimization of a single branch tree with fixed supports. }
 \end{figure}
 
 \begin{table}[!h]\centering
@@ -320,7 +333,98 @@ After & 0.004407 & 7.9\% \\ \bottomrule
 \end{table}
 
 
-% TODO Proof not finished; this proof might be useless/overkill in my thesis...
+Tests had been done solely on an already fully optimized tree, meaning that the "worth adding" matrix would be "close enough" to be close to the gradient...
+But after checking with multiple trees (more or less optimized), here is the thing: the gradient seems to be always giving more or less the right "global" direction (\cref{fig_xp_grad_iterations})
+
+\begin{figure}[!h]\centering
+\begin{subfigure}[b]{0.49\textwidth}\centering
+\includegraphics[width=\textwidth]{figures/xp_grad_iterations/xp_128x128_sc2_angl1_K3_S3_node4_objmatrix_bestvalues.png}
+\caption{Worth-adding matrix}
+\end{subfigure}
+\begin{subfigure}[b]{0.49\textwidth}\centering
+	\begin{subfigure}[b]{0.49\textwidth}\centering
+	\includegraphics[width=\textwidth]{figures/xp_grad_iterations/xp_128x128_sc2_angl1_K3_S3_node4_1thiteration_partgrad4_bestvalues.png}
+	\caption{Grad. iter. 3}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}\centering
+	\includegraphics[width=\textwidth]{figures/xp_grad_iterations/xp_128x128_sc2_angl1_K3_S3_node4_8thiteration_partgrad4_bestvalues.png}
+	\caption{Grad. iter. 8}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}\centering
+	\includegraphics[width=\textwidth]{figures/xp_grad_iterations/xp_128x128_sc2_angl1_K3_S3_node4_20thiteration_partgrad4_bestvalues.png}
+	\caption{Grad. iter. 20}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}\centering
+	\includegraphics[width=\textwidth]{figures/xp_grad_iterations/xp_128x128_sc2_angl1_K3_S3_node4_partgrad4_bestvalues.png}
+	\caption{Grad. iter. 200}
+	\end{subfigure}
+\end{subfigure}
+\caption{Is the gradient giving the same information depending on the iteration? The conditions are the same as \cref{fig_simple_approx}. Only the best values are displayed.}
+\end{figure}
+
+\begin{figure}[!h]\centering
+\begin{subfigure}[b]{0.99\textwidth}\centering
+	\begin{subfigure}[b]{0.32\textwidth}\centering
+	\includegraphics[width=\textwidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4before_target.png}
+		\caption{Target image}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.32\textwidth}\centering
+	\includegraphics[width=\textwidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4before_approx.png}
+	\caption{Before adding}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.32\textwidth}\centering
+	\includegraphics[width=\textwidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4after_approx.png}
+	\caption{After adding}
+	\end{subfigure}
+\end{subfigure}
+\begin{subfigure}[b]{0.32\textwidth}\centering
+\includegraphics[width=\textwidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4before_objmatrix.png}
+\caption{Worth-adding matrix} \label{fig_worth_adding_mat}
+\end{subfigure}
+\begin{subfigure}[b]{0.32\textwidth}\centering
+\includegraphics[width=\textwidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4before_partgrad4.png}
+\caption{Gradient before} \label{fig_grad_before}
+\end{subfigure}
+\begin{subfigure}[b]{0.32\textwidth}\centering
+\includegraphics[width=\textwidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4after_partgrad4.png}
+\caption{Gradient after} \label{fig_grad_after}
+\end{subfigure}
+\begin{subfigure}[b]{0.32\textwidth}\centering
+\includegraphics[width=\textwidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4before_objmatrix_bestvalues.png}
+\caption{Best values of \ref{fig_worth_adding_mat}}
+\end{subfigure}
+\begin{subfigure}[b]{0.32\textwidth}\centering
+\includegraphics[width=\textwidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4before_partgrad4_bestvalues.png}
+\caption{Best values of \ref{fig_grad_before}}
+\end{subfigure}
+\begin{subfigure}[b]{0.32\textwidth}\centering
+\includegraphics[width=\textwidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4after_partgrad4_bestvalues.png}
+\caption{Best values of \ref{fig_grad_after}}
+\end{subfigure}
+\caption{Effect of adding one point to the support $s^4$. The "before" tree is already minimized. The "after" tree has been added a point where the "worth-adding matrix" were minimal, at $(4,127)$.} \label{fig_before_after_adding}
+\end{figure}
+
+The experiment \ref{fig_before_after_adding} tries to show how is evolving an already optimized tree when adding the "best-to-be-added" point to the support, using the location of minimum of\ref{fig_worth_adding_mat}.
+
+
+
+\begin{figure}[!h]\centering
+\begin{subfigure}[b]{0.4\textwidth}\centering
+	\begin{subfigure}[b]{1\textwidth}\centering
+	\includegraphics[width=\textwidth]{figures/variable_support/xp_128x128_sc2_angl1_K3_S3_node4_variable_support_target.png}
+	\end{subfigure}
+	\begin{subfigure}[b]{1\textwidth}\centering
+	\includegraphics[width=\textwidth]{figures/variable_support/xp_128x128_sc2_angl1_K3_S3_node4_variable_support_approx.png}
+	\end{subfigure}
+\end{subfigure}
+\begin{subfigure}[b]{0.4\textwidth}\centering
+\includegraphics[width=0.37\textwidth]{figures/variable_support/support.pdf}
+\end{subfigure}
+
+\caption{Minimization using a variable support. Starting from simple diracs, the best element (using greatest gradient) is added to one of the supports every 5 iterations, up to 36 elements (same number as the fixed support in \cref{fig_single_branch}).} \label{fig_variable_support}
+\end{figure}
+	
+%xp_128x128_sc2_angl1_K3_S3_node4_variable_support_partgrad4_bestvalues.png%xp_128x128_sc2_angl1_K3_S3_node4_variable_support_partgrad4.png%xp_128x128_sc2_angl1_K3_S3_node4_variable_support_partgrad3_bestvalues.png%xp_128x128_sc2_angl1_K3_S3_node4_variable_support_partgrad3.png%xp_128x128_sc2_angl1_K3_S3_node4_variable_support_partgrad2_bestvalues.png%xp_128x128_sc2_angl1_K3_S3_node4_variable_support_partgrad2.png%xp_128x128_sc2_angl1_K3_S3_node4_variable_support_partgrad1_bestvalues.png%xp_128x128_sc2_angl1_K3_S3_node4_variable_support_partgrad1.png%xp_128x128_sc2_angl1_K3_S3_node4_variable_support_target.png%xp_128x128_sc2_angl1_K3_S3_node4_variable_support_approx.png
 
 \clearpage
 \addcontentsline{toc}{chapter}{Appendix}
@@ -364,29 +468,7 @@ which is much better than the previous distance, provided that $K<<N$.
 =& \sum_{k''=-M+M}^{-1+M} \sum_{l''=-N+N}^{-1+N} A_{k'',l''} e^{2i\pi (k'\frac{m}{M}+l' \frac{n}{N})}\\
 =& \sum_{k'=1}^{M} \sum_{l'=1}^{N} A_{k',l'} e^{2i\pi (k'\frac{m}{M}+l' \frac{n}{N})}
 \end{align*}
-
-Tests had been done solely on an already fully optimized tree, meaning that the "worth adding" matrix would be "close enough" to be close to the gradient...
-But after checking with multiple trees (more or less optimized), here is the thing: the gradient seems to be always giving more or less the right "global" direction (\cref{fig_xp_grad_iterations})
-
-\begin{figure}[!h]\centering
-\begin{subfigure}[b]{0.49\textwidth}\centering
-\includegraphics[width=\textwidth]{figures/xp_grad_iterations/xp_128x128_sc2_angl1_K3_S3_node4_objmatrix_bestvalues}
-\end{subfigure}
-\begin{subfigure}[b]{0.49\textwidth}\centering
-	\begin{subfigure}[b]{0.49\textwidth}\centering
-	\includegraphics[width=\textwidth]{figures/xp_grad_iterations/xp_128x128_sc2_angl1_K3_S3_node4_1thiteration_partgrad4_bestvalues}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.49\textwidth}\centering
-	\includegraphics[width=\textwidth]{figures/xp_grad_iterations/xp_128x128_sc2_angl1_K3_S3_node4_8thiteration_partgrad4_bestvalues}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.49\textwidth}\centering
-	\includegraphics[width=\textwidth]{figures/xp_grad_iterations/xp_128x128_sc2_angl1_K3_S3_node4_20thiteration_partgrad4_bestvalues}
-	\end{subfigure}
-		\begin{subfigure}[b]{0.49\textwidth}\centering
-	\includegraphics[width=\textwidth]{figures/xp_grad_iterations/xp_128x128_sc2_angl1_K3_S3_node4_partgrad4_bestvalues}
-	\end{subfigure}
-\end{subfigure}
-\end{figure}
+% TODO Proof not finished; this proof might be useless/overkill in my thesis...
 
 
 \printbibliography
