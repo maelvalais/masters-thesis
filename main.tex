@@ -7,8 +7,6 @@
 \title{Optimization of dictionaries structured in convolutional trees for sparse image representation - Master's Thesis}
 \begin{document}
 \input{titlepage} % Uncomment to show title page
-\pagestyle{body}
-\tableofcontents
 
 \chapter{Introduction}
 
@@ -38,7 +36,7 @@ More importantly, Fourier has interesting properties that allow fast implementat
 
 The Fourier transform is widely used as an operator for sparse representations, mainly when dealing with smooth signals that can be approximated by a sum of sines. But this operator does not do well on images: they contain many discontinuities and are far from being representable using sines. Most of the coefficients of code $x$ in \cref{fig_fourier} are non-zero. But something worse happens on the edges of the blackboard: the white vertical and horizontal lines that are full of high-value coefficients are trying to code for the discontinuity, which is quite far from possible in Fourier basis.
 
-Along with Fourier, many other non-adaptative dictionaries exist; we can mention the cosine transform which is at the core of JPEG compression. We can also cite the wavelet transform, used in JPEG2000 compression (for movies in theaters), and the curvelet transform, which a bit more tolerant to non-smooth images. And as for Fourier, wavelet and curvelet transforms both have fast implementations.
+Along with Fourier, many other non-adaptative dictionaries exist; we can mention the cosine transform which is at the core of JPEG compression. We can also cite the wavelet transform, used in JPEG2000 compression (for movies in theaters), and the curvelet transform, which is more tolerant to non-smooth images. And as for Fourier, wavelet and curvelet transforms both have fast implementations.
 
 
 \section{Adaptative dictionaries}
@@ -212,7 +210,7 @@ But getting an actual adaptative dictionary update step implies that designing t
 
 \subsection{Choice of the kernel supports}
 
-As described in \ref{sec_tree_model}, the supports $s^e$ are part of the dictionary-as-a-tree model. In \cite{chabiron_toward_2015}, the authors experimentally show that using fixed supports for approximating curvelets is possible. For that specific purpose, the results turned to be good. But the whole model was supposed to be able to approximate any kind of image, hence the need for "adaptative" supports instead of hand-made ones. Figure \ref{fig_example_kernel} shows in dashed-line squares the hand-made support. The gray square show what we would expect from an "adaptive" support. Instead of keeping the same shape for every target atom, the supports evolves and get closer to the target shape.
+As described in \ref{sec_tree_model}, the supports $s^e$ are part of the dictionary-as-a-tree model. In \cite{chabiron_toward_2015}, the authors experimentally showed that using fixed supports for approximating curvelets is possible. For that specific purpose, the results turned to be good. But the whole model was supposed to be able to approximate any kind of image, hence the need for "adaptative" supports instead of hand-made ones. Figure \ref{fig_example_kernel} shows in dashed-line squares the hand-made support. The gray square show what we would expect from an "adaptive" support. Instead of keeping the same shape for every target atom, the supports evolves and get closer to the target shape.
 
 And as for the tree design, the choice of where are located the elements of each kernel support has been made (so far) arbitrarily. The support of the $h^e$ kernel of fig. \ref{fig_example_kernel} shows an example of typical layout chosen for the experiments in \cite{chabiron_optimization_2016}. 
 
@@ -289,6 +287,33 @@ So: does the partial gradient \ref{eq_partial_gradient} give
 \begin{align*} 
 \nabla_{h^{e'}}\Phi((h^e)_{e \in \mathcal{E}}) = 2 \widetilde{H^{e'}} * (h^{e'}*H^{e'}-y^{e'})
 \end{align*} \label{eq_partial_gradient}
+
+
+
+
+
+
+
+\section{Checking that the gradient is correct}
+We had some trouble when trying to compute the gradient on the full kernels $(h^e)_{e \in \mathcal{E}}$ (not only on the supports element locations). To be sure that the computed "full" gradient was correct, we compared it to a finite-diffences gradient:
+
+$$\lim_{\epsilon \rightarrow 0} \frac{E((h^e)_{e \in \mathcal{E}}+\epsilon e_i) - E((h^e)_{e \in \mathcal{E}}) }{\epsilon} =_? \nabla_i E((h^e)_{e \in \mathcal{E}})$$
+
+\begin{figure}[!ht]\centering
+\begin{subfigure}[b]{0.49\textwidth}\centering
+\includegraphics[width=\textwidth]{figures/verif_gradient/gradient.png}
+\end{subfigure}
+\begin{subfigure}[b]{0.49\textwidth}\centering
+\includegraphics[width=\textwidth]{figures/verif_gradient/finite-diff.png}
+\end{subfigure}
+\begin{subfigure}[b]{0.49\textwidth}\centering
+\includegraphics[width=1\textwidth]{figures/verif_gradient/rest.png}
+\end{subfigure}
+\begin{subfigure}[b]{0.49\textwidth}\centering
+\includegraphics[width=1\textwidth]{figures/verif_gradient/finite-diff-vs-grad.png}
+\end{subfigure}
+\caption{Checking that the "full-kernel" gradient is correct. We compare it to the finite-difference gradient and make the $\epsilon$ tend to 0.} \label{fig_verif_gradient}
+\end{figure}
 
 
 \section{Does the gradient give enough information to choose an element to be added to the support?}
@@ -420,20 +445,14 @@ The experiment \ref{fig_before_after_adding} tries to show how is evolving an al
 \begin{subfigure}[b]{0.4\textwidth}\centering
 \includegraphics[width=0.37\textwidth]{figures/variable_support/support.pdf}
 \end{subfigure}
-
 \caption{Minimization using a variable support. Starting from simple diracs, the best element (using greatest gradient) is added to one of the supports every 5 iterations, up to 36 elements (same number as the fixed support in \cref{fig_single_branch}).} \label{fig_variable_support}
 \end{figure}
-	
-%xp_128x128_sc2_angl1_K3_S3_node4_variable_support_partgrad4_bestvalues.png
-%xp_128x128_sc2_angl1_K3_S3_node4_variable_support_partgrad4.png
-%xp_128x128_sc2_angl1_K3_S3_node4_variable_support_partgrad3_bestvalues.png
-%xp_128x128_sc2_angl1_K3_S3_node4_variable_support_partgrad3.png
-%xp_128x128_sc2_angl1_K3_S3_node4_variable_support_partgrad2_bestvalues.png
-%xp_128x128_sc2_angl1_K3_S3_node4_variable_support_partgrad2.png
-%xp_128x128_sc2_angl1_K3_S3_node4_variable_support_partgrad1_bestvalues.png
-%xp_128x128_sc2_angl1_K3_S3_node4_variable_support_partgrad1.png
-%xp_128x128_sc2_angl1_K3_S3_node4_variable_support_target.png
-%xp_128x128_sc2_angl1_K3_S3_node4_variable_support_approx.png
+
+
+
+
+
+
 
 \clearpage
 \addcontentsline{toc}{chapter}{Appendix}

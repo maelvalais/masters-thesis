@@ -29,28 +29,14 @@
 * [ ] introduce omp and l1 regularization (sparse coding)
 
 
+* [ ] expliquer en quoi était 
+- gain par point ajouté
+- single step obj gain
 
+- essayer avec des cosinus
+- essayer avec un arbre de curvelets
 
-
----------------
-
-$$x=\psi\alpha $$ avec $\alpha$ parcimonieux, peut-on dire que $x$ est lui-aussi un signal "parcimonieux" ?
-
-
-$$\widetilde{H^{e'}} * (h^{e'} * H^{e'} - y^{e'})$$
-
-- $\widetilde{H^{e'}} * H^{e'}$ 
-
----------------
-
-Compute a gradient using finite differences:
-
-$$ 
- \frac{E(x+\epsilon e_i) - E(x) }{\epsilon}
- \underset{\epsilon \rightarrow 0}\rightarrow \nabla_i E(x)
-$$
-- $i$ is the i-th component of $x$. As $x = (h^e)\_e$, we will have $i = N \times F$ ($F$ is the number of leaves)
-
+- comparer les max des grad des différents h^e
 
 Réunion 1er juillet 2016
 ========================
