@@ -32,8 +32,9 @@ while read f; do
             if ! [ -d "$unused" ]; then 
                 mkdir "$unused"; 
             fi
-            mv "$file" "${unused}/`basename $file`"
+            cp --parents "$file" "${unused}"
+            rm "$file"
         fi
     fi
-done < <(find . -type f -exec file {} \; | grep "image data")
+done < <(find . -type f ! -path "*_figures*" -exec file {} \; | grep "image data")
 
