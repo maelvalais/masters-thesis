@@ -90,7 +90,6 @@ acs-*.bib
 *-gnuplottex-*
 
 # hyperref
-*.brf
 
 # knitr
 *-concordance.tex
@@ -123,7 +122,6 @@ _minted*
 *.mw
 
 # mylatexformat
-*.fmt
 
 # nomencl
 *.nlo
@@ -183,3 +181,4 @@ TSWLatexianTemp*
 
 # KBibTeX
 *~[0-9]*
+/main.pdf
