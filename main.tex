@@ -206,7 +206,7 @@ The interesting thing is that $\Phi$ is differentiable when only one $h^e$ varie
 \section{Issues with PALMTREE algorithm and internship goals}
 As explained in \cite[p. 23]{chabiron_optimization_2016}, the main drawbacks to use this convolutional tree model for practical dictionary learning (as many other applications) are the hand-made parts of the model, leading to arbitrary and sub-optimal results. Among them are the design of the tree (degree, depth...) and the choice of the supports. % TODO "degree" not understandable
 \subsection{Choice of the tree}
-The paper chooses to use a fixed tree structure, meaning that the tree (degree, depth) has been created \emph{ad-hoc} on a per-experiment basis, trying to mimic the frequency pyramid tiling of a curvelet decomposition. The number of leaves was also specifically chosen to match the number of atoms that was generated on the target image.
+The paper chooses to use a fixed tree structure, meaning that the tree (degree, depth) has been created \emph{ad-hoc} on a per-experiment basis, trying to mimic the frequency pyramid tiling of a curvelet decomposition. The number of leaves wasalso specifically chosen to match the number of atoms that was generated on the target image.
 
 But getting an actual adaptative dictionary update step implies that designing the tree is made optimally and as part of the optimization process. This is one of the internship research axis.
 
@@ -424,7 +424,16 @@ The experiment \ref{fig_before_after_adding} tries to show how is evolving an al
 \caption{Minimization using a variable support. Starting from simple diracs, the best element (using greatest gradient) is added to one of the supports every 5 iterations, up to 36 elements (same number as the fixed support in \cref{fig_single_branch}).} \label{fig_variable_support}
 \end{figure}
 	
-%xp_128x128_sc2_angl1_K3_S3_node4_variable_support_partgrad4_bestvalues.png%xp_128x128_sc2_angl1_K3_S3_node4_variable_support_partgrad4.png%xp_128x128_sc2_angl1_K3_S3_node4_variable_support_partgrad3_bestvalues.png%xp_128x128_sc2_angl1_K3_S3_node4_variable_support_partgrad3.png%xp_128x128_sc2_angl1_K3_S3_node4_variable_support_partgrad2_bestvalues.png%xp_128x128_sc2_angl1_K3_S3_node4_variable_support_partgrad2.png%xp_128x128_sc2_angl1_K3_S3_node4_variable_support_partgrad1_bestvalues.png%xp_128x128_sc2_angl1_K3_S3_node4_variable_support_partgrad1.png%xp_128x128_sc2_angl1_K3_S3_node4_variable_support_target.png%xp_128x128_sc2_angl1_K3_S3_node4_variable_support_approx.png
+%xp_128x128_sc2_angl1_K3_S3_node4_variable_support_partgrad4_bestvalues.png
+%xp_128x128_sc2_angl1_K3_S3_node4_variable_support_partgrad4.png
+%xp_128x128_sc2_angl1_K3_S3_node4_variable_support_partgrad3_bestvalues.png
+%xp_128x128_sc2_angl1_K3_S3_node4_variable_support_partgrad3.png
+%xp_128x128_sc2_angl1_K3_S3_node4_variable_support_partgrad2_bestvalues.png
+%xp_128x128_sc2_angl1_K3_S3_node4_variable_support_partgrad2.png
+%xp_128x128_sc2_angl1_K3_S3_node4_variable_support_partgrad1_bestvalues.png
+%xp_128x128_sc2_angl1_K3_S3_node4_variable_support_partgrad1.png
+%xp_128x128_sc2_angl1_K3_S3_node4_variable_support_target.png
+%xp_128x128_sc2_angl1_K3_S3_node4_variable_support_approx.png
 
 \clearpage
 \addcontentsline{toc}{chapter}{Appendix}
