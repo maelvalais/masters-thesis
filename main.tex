@@ -173,7 +173,7 @@ where $h^{*l}$ denotes the successive convolution of every kernel on the branch 
 The dictionary update step is defined as 
 \begin{align}
 (FTL) \quad \underset{\substack{(h^\text{e})_{e}}}\min & \lVert Dx - y \rVert_2^2 \label{eq_ftl_energy}\\
-\text{s.t. } & h^e_p = 0 \Rightarrow  s^e_p=0 \quad & \forall e \in \mathcal{E}, \forall p \in 1..N \label{eq_ftl_in_support} \\
+\text{s.t. } & s^e_p=0 \Rightarrow h^e_p = 0 \quad & \forall e \in \mathcal{E}, \forall p \in 1..N \label{eq_ftl_in_support} \\
  & \lVert h^e \rVert \le \gamma & \forall e \in \mathcal{E}\label{eq_ftl_kernel_finite_nrj}
 \end{align}
 
@@ -201,7 +201,7 @@ The interesting thing is that $\Phi$ is differentiable when only one $h^e$ varie
 \subsection{PALMTREE, the algorithm for solving (FTL)}
 % TODO explain PALMTREE
 
-\section{Issues with PALMTREE algorithm and internship goals}
+\section{Issues with PALMTREE algorithm}
 As explained in \cite[p. 23]{chabiron_optimization_2016}, the main drawbacks to use this convolutional tree model for practical dictionary learning (as many other applications) are the hand-made parts of the model, leading to arbitrary and sub-optimal results. Among them are the design of the tree (degree, depth...) and the choice of the supports. % TODO "degree" not understandable
 \subsection{Choice of the tree}
 The paper chooses to use a fixed tree structure, meaning that the tree (degree, depth) has been created \emph{ad-hoc} on a per-experiment basis, trying to mimic the frequency pyramid tiling of a curvelet decomposition. The number of leaves wasalso specifically chosen to match the number of atoms that was generated on the target image.
@@ -236,31 +236,26 @@ Our first thought on how to add an element to a support was to find the best ker
 
 % TODO explain 
 
-\subsection{Experiment 1: knowing what elements are worth adding}
-
-This experiment was using a single-branch tree of depth 4 (see fig. \ref{fig_single_branch}). One of the four supports is picked for the whole experiment. This support will be called $s^e$.
-\begin{figure}[!ht]\centering
-\includegraphics[width=0.8\textwidth]{figures/xp-pts-worth-adding.pdf}
-\caption{a} \label{fig_single_branch}
-\end{figure}
-First, a full minimization with many iterations and retries is made to give a common starting point. Then, for every (not already at 1) element $i \in \mathcal{P}$  of the support $s^e$, the element is added to the support, and the minimization continues (with no retries to get the same conditions for every added point).
-The objective function of that minimization is then stored so that the location of $i$ is remembered. The element $i$ is then removed and we continue with $i+1$ % TODO write algo + formula
 
 
-As a result, we get an image that represent, for each pixel, the minimized objective function if an element were added at that specific location. This extremely slow method allows us to compare with faster methods (like just computing the gradient).
 
 
-\subsection{Experiment 2: use the gradient for choosing what should be added}
-This experiment aims to simulate the choice of an atom by the OMP algorithm. As a short reminder, here is the step we are studying:
+
+\section{Using the gradient for adding support elements}
+
+The Orthogonal Matching Pursuit (OMP, detailed in \cref{alg_omp}) chooses which component $x_i$ should be "turned on" at each iteration, finding the atom $d_i$ that has the greatest correlation with the residual $R$. This step (cf. \cref{alg_omp_pick_correlation}) uses the gradient $\nabla \Phi(x)$, with $$\Phi(x) = \lVert Dx - y \rVert^2$$
+
+
 \begin{algorithm}[!ht] % TODO Finish algorithm
-    \caption{MP (Matching Pursuit) algorithm for sparse approximation}
+    \caption{Orthogonal Matching Pursuit (OMP) algorithm for sparse approximation}\label{alg_omp}
   \begin{algorithmic}[0]
-    \Input signal $y \in \mathbb{R}^{n}$, dictionary $D \in \mathbb{R}^{n \times m}$ with $m>>n$, $x = 0_{\mathbb{R}^m}$
-    \Output Code $x$ which is $k$-sparse
-    \State \textbf{Initialization} $R^{(0)} = y$
-    \While{$i \leq k$} \Comment note the fixed number of iterations
-      \State $l =  \arg\max_{l = 1,\dots,l} |\left< d_l,R^{(i)} \right>|$ \label{alg_omp_pick_correlation}
-        \Comment{find atom with max. correlation with $R$}
+    \Input signal $y$ of dimension $N$, dictionary of dim $N \times K$ with $K>>N$
+    \Output A $k$-sparse code $x$ of dimension $K$
+    \State \textbf{Initialization} $R^{(0)} = y$, $I=\{\}$
+    \While{$i \leq k$}
+      \State $l =  \underset{l = 1,\dots,l}{\arg\max} | \nabla \Phi(x) |$ \label{alg_omp_pick_correlation}\Comment{find atom with max. correlation with $R$}
+      \State $S = S \cup \{l\}$
+      \State $x = \underset{supp(x) \subset S}{\arg\max} \Phi(x)$
       \State $R^{(i+1)} = R^{(i)}-x_l d_l^{(i)}$
       \State $\hat{y} = \hat{y}+\langle R^{(i)}, d_{l}^{(i)} \rangle d_{l}^{(i)}$
       \State $i = i + 1$
@@ -268,36 +263,31 @@ This experiment aims to simulate the choice of an atom by the OMP algorithm. As 
   \end{algorithmic}
 \end{algorithm}
 
-At \cref{alg_omp_pick_correlation}, the algorithm chooses the column of the dictionary that matches the best the residual. This is where we thought this way of doing would serve our "add an element to one of the supports" algorithm.
+Our idea is to use the same principle when adding elements to supports $(s^e)_{e \in \mathcal{E}}$.
 
-% TODO define PALMTREE
-Our goal is to, between two iterations of the PALMTREE algorithm, add a new element to one of the supports. That would lead to an optimization-driven construction of the kernels instead of designing them by hand.
+The idea would be add a new element to one of the supports between two iterations of the PALMTREE algorithm, using the greatest gradient component information. That would lead to an optimization-driven construction of the kernels instead of designing them by hand.
 
-But we have been questioning ourselves on the fairness of choosing an element to be added based the mere partial gradient. We remind that the \ref{alg_omp_pick_correlation} is actually computing a gradient:
+But is it actually correct to choose the element to be added using a strictly local information (the gradient)? Also, how to get the "full" gradient as the current gradient is only computed on the points of the support?
 
+We will first review how the "full" gradient is computed and then describe a way to check that the gradient gives a good direction towards a critical point.
+
+\subsection{Computing the "full" gradient}
+Up to now, the gradient was computed using a convolution based on translations. It takes advantage of the sparsity of each kernel $h^e$ as well as the fact that the proximal operator is projecting every kernel onto its support, meaning that only a few elements have to be computed.
+
+
+
+Computing the gradient on every point $p \in \mathcal{P}$ of every 
+
+We basically chose to use the fast Fourier transform ($\mathcal{F}$) for computing the convolution on the whole kernels:
 \begin{align*}
-l =& \argmax \left|\left< g_l,R^{(i)} \right>\right| \\
-=& \argmax \left| D^TR^{(i)}\right| \\
-=& \argmax \left| D^T(D\alpha - u)\right| \\
+	\nabla_{h^{e'}} \Phi((h^e)_{e \in \mathcal{E}})&= \mathcal{F}^{-1}(\mathcal{F}(H^{{e'}})^* \text{.\^{}} \mathcal{F}(R))
 \end{align*}
-So: does the partial gradient \ref{eq_partial_gradient} give 
-\begin{align*}
-\Phi((h^e)_{e \in \mathcal{E}}) = \left\| \sum_{l\in\leaves} x^l * h^{*l} \right\|^2
-\end{align*}
-\begin{align*} 
-\nabla_{h^{e'}}\Phi((h^e)_{e \in \mathcal{E}}) = 2 \widetilde{H^{e'}} * (h^{e'}*H^{e'}-y^{e'})
-\end{align*} \label{eq_partial_gradient}
+with ${}^*$ denoting the adjoint operator, $\text{.\^{}}$ the point-wise product, $H^{f}$ the (todo) % TODO H^e?
 
-
-
-
-
-
-
-\section{Checking that the gradient is correct}
+\subsection{Is the gradient right?}
 We had some trouble when trying to compute the gradient on the full kernels $(h^e)_{e \in \mathcal{E}}$ (not only on the supports element locations). To be sure that the computed "full" gradient was correct, we compared it to a finite-diffences gradient:
 
-$$\lim_{\epsilon \rightarrow 0} \frac{E((h^e)_{e \in \mathcal{E}}+\epsilon e_i) - E((h^e)_{e \in \mathcal{E}}) }{\epsilon} =_? \nabla_i E((h^e)_{e \in \mathcal{E}})$$
+$$\lim_{\epsilon \rightarrow 0} \frac{E((h^e)_{e \in \mathcal{E}}+\epsilon e_i) - E((h^e)_{e \in \mathcal{E}}) }{\epsilon} \overset{=}{?} \nabla_i E((h^e)_{e \in \mathcal{E}})$$
 
 \begin{figure}[!ht]\centering
 \begin{subfigure}[b]{0.49\textwidth}\centering
@@ -312,14 +302,34 @@ $$\lim_{\epsilon \rightarrow 0} \frac{E((h^e)_{e \in \mathcal{E}}+\epsilon e_i) 
 \begin{subfigure}[b]{0.49\textwidth}\centering
 \includegraphics[width=1\textwidth]{figures/verif_gradient/finite-diff-vs-grad.png}
 \end{subfigure}
-\caption{Checking that the "full-kernel" gradient is correct. We compare it to the finite-difference gradient and make the $\epsilon$ tend to 0.} \label{fig_verif_gradient}
+\caption{Checking that the "full" gradient is correct. We compare it to the finite-difference gradient and make the $\epsilon$ tend to 0.} \label{fig_verif_gradient}
 \end{figure}
 
+\cref{fig_verif_gradient} compares the gradient using FFT to the finite-differences gradient (with $\epsilon=0.001$). The bottom left figure shows that the two gradients are very close in term of difference. The  right figure shows that the finite-differences gradient converges to the "full" gradient.
 
-\section{Does the gradient give enough information to choose an element to be added to the support?}
 
-After being able to add
-\subsection{Results}
+\subsection{The ideal elements to be added}\label{sec_gain_per_added_point}
+
+One way to know if the greatest component of the "full" gradient will be a good decision after many iterations, we designed the \cref{alg_gain_per_added_point} that tries every possible point added to one of the supports and see how much the objective function decreases.
+
+We called it \emph{gain-per-added-point} with the notation $g^f$ ($f$ is edge of the studied support). It represents for each point $p \in \mathcal{P}$ the minimized objective function if an element were added on support kernel $s^f$ at that specific location (cf. \cref{alg_gain_per_added_point}).
+
+
+\begin{algorithm}[!ht]
+    \caption{Gain-per-added-point for the support $s^f$} \label{alg_gain_per_added_point}
+  \begin{algorithmic}[0]
+    \Input One chosen edge $f$ and a tree $\mathcal{T}$
+    \Output $g^f$, the gain per added point for support $s^f$
+    \State $(k^e)_{e \in \mathcal{E}} = \underset{(h^e)_{e \in \mathcal{E}}}{\arg\min} \quad \Phi ((h^e)_{e \in \mathcal{E}})$ \quad s.t. $h^e \in D^e$ \quad $\forall e$ \Comment{common starting point}
+    \For{each point $p \in \mathcal{P}$}
+    	\State $s^f_p = 1$ \Comment{add element to support}
+    	\State $g^f_p = \underset{(k^e)_{e \in \mathcal{E}}}{\min} \quad \Phi ((k^e)_{e \in \mathcal{E}})$ \quad s.t. $k^e \in D^e$ \quad $\forall e$
+    	\State $s^f_p = 0$ \Comment{remove element to support}
+    \EndFor
+  \end{algorithmic}
+\end{algorithm}
+
+
 \begin{figure}[!h]\centering
 \begin{subfigure}[b]{0.49\textwidth}\centering
 \includegraphics[width=\textwidth]{figures/xp/xp_128x128_sc2_angl1_K3_S3_node4_target.png}
@@ -327,11 +337,11 @@ After being able to add
 \end{subfigure}
 \begin{subfigure}[b]{0.49\textwidth}\centering
 \includegraphics[width=\textwidth]{figures/xp/xp_128x128_sc2_angl1_K3_S3_node4_approx.png}
-\caption{Approximation} \label{fig_simple_approx}
+\caption{Approximation} \label{fig_gain_vs_grad_approx}
 \end{subfigure}
 \begin{subfigure}[b]{0.49\textwidth}\centering
 \includegraphics[width=\textwidth]{figures/xp/xp_128x128_sc2_angl1_K3_S3_node4_objmatrix.png}
-\caption{Worth-adding matrix}
+\caption{Gain-per-added-point matrix for $s^4$}
 \end{subfigure}
 \begin{subfigure}[b]{0.49\textwidth}\centering
 \includegraphics[width=\textwidth]{figures/xp/xp_128x128_sc2_angl1_K3_S3_node4_partgrad4.png}
@@ -345,18 +355,8 @@ After being able to add
 \includegraphics[width=\textwidth]{figures/xp/xp_128x128_sc2_angl1_K3_S3_node4_partgrad4_bestvalues.png}
 \caption{Best values of above figure}
 \end{subfigure}
-\caption{Minimization of a single branch tree with fixed supports. }
+\caption{Minimization of a single branch tree with fixed supports. This experiment uses a single-branch tree with 4 kernels.}\label{fig_gain_vs_grad}
 \end{figure}
-
-\begin{table}[!h]\centering
-\begin{tabular}{@{}lll@{}}\toprule
- & RMSE & Relative RMSE \\ \midrule
-Before & 0.004786 & 0\% \\
-After & 0.004407 & 7.9\% \\ \bottomrule
-\end{tabular}
-\caption{RMSE comparison when adding to the support on the \nth{2} edge. Note that for the "added point" RMSE, we took the minimum of all RMSE for every point possibly added. Here, the RMSE is at best increased by 7.9\%.}
-\end{table}
-
 
 Tests had been done solely on an already fully optimized tree, meaning that the "worth adding" matrix would be "close enough" to be close to the gradient...
 But after checking with multiple trees (more or less optimized), here is the thing: the gradient seems to be always giving more or less the right "global" direction (\cref{fig_xp_grad_iterations})
@@ -364,7 +364,7 @@ But after checking with multiple trees (more or less optimized), here is the thi
 \begin{figure}[!h]\centering
 \begin{subfigure}[b]{0.49\textwidth}\centering
 \includegraphics[width=\textwidth]{figures/xp_grad_iterations/xp_128x128_sc2_angl1_K3_S3_node4_objmatrix_bestvalues.png}
-\caption{Worth-adding matrix}
+\caption{Gain-per-added-point matrix}
 \end{subfigure}
 \begin{subfigure}[b]{0.49\textwidth}\centering
 	\begin{subfigure}[b]{0.49\textwidth}\centering
@@ -429,7 +429,12 @@ But after checking with multiple trees (more or less optimized), here is the thi
 \caption{Effect of adding one point to the support $s^4$. The "before" tree is already minimized. The "after" tree has been added a point where the "worth-adding matrix" were minimal, at $(4,127)$.} \label{fig_before_after_adding}
 \end{figure}
 
-The experiment \ref{fig_before_after_adding} tries to show how is evolving an already optimized tree when adding the "best-to-be-added" point to the support, using the location of minimum of\ref{fig_worth_adding_mat}.
+The experiment \ref{fig_before_after_adding} tries to show how is evolving an already optimized tree when adding the "best-to-be-added" point to the support, using the location of minimum of\ref{fig_worth_adding_mat}. 
+
+Note 1: in the "before" gradient (\cref{fig_grad_before}) every point of the support (the small squares) has a null gradient: in the direction of those nine points, the gradient is null, meaning that we are at an critical point. 
+
+Note 2: when adding a point to the support (materialized by a small square added close to the center of the support), the gradient highest values "shift" to the south-west. This shows that adding an element (meaning that we add a dimension to the solution, as in OMP) has an effect on every surrounding points.
+
 
 
 
@@ -479,8 +484,8 @@ When projected to the $K$ dimensional space, the noise deviation becomes
 $$\lVert b \rVert = \sigma\sqrt{K} $$
 which is much better than the previous distance, provided that $K<<N$. 
 
-\begin{figure}[!h]\centering
-\includegraphics[width=0.5\textwidth]{figures/sparse-reduce-noise.pdf}
+\begin{figure}[!ht]\centering
+\includegraphics[width=0.4\textwidth]{figures/sparse-reduce-noise.pdf}
 \caption{When projected onto a lower dimensional space, the standard derivation of the additive Gaussian noise $b \sim \mathcal{N}(0,\sigma^2)$ will be greatly reduced if $K<<N$. The sparser the representation the better the denoising. \label{sparse_reduce_noise}}
 \end{figure}
 

@@ -30,7 +30,7 @@
 
 
 * [ ] expliquer en quoi était 
-- gain par point ajouté
+- gain par point ajouté, per-added-point gain
 - single step obj gain
 
 - essayer avec des cosinus
