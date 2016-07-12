@@ -18,23 +18,23 @@ This chapter will review the main existing dictionaries in use for sparse repres
 
 \section{Non-adaptative dictionaries}
 
-The Fourier transform is a classical example of operators used for sparsity. In figure \ref{fig_fourier}, the left picture $y$ has been represented using a Fourier basis, which can be written as a matrix $D$. The right picture shows the coefficients $x$ such that
-$$D^Ty = x$$
+The Fourier transform is a classical example of operators used for sparsity. In figure \ref{fig_fourier}, the left picture $\y$ has been represented using a Fourier basis, which can be written as a matrix $\D$. The right picture shows the coefficients $\x$ such that
+$$\D^T\y = \x$$
 
 
 \begin{figure}[!ht]
-\subcaptionbox{Picture $y$ with many discontinuities.}%
+\subcaptionbox{Picture $\y$ with many discontinuities.}%
   [.49\linewidth]{\includegraphics[width=0.49\textwidth]{figures/exple_fourier_spacial.pdf}}
- \subcaptionbox{Result of applying the Fourier transform to $y$}%
+ \subcaptionbox{Result of applying the Fourier transform to $\y$}%
   [.49\linewidth]{\includegraphics[width=0.49\textwidth]{figures/exple_fourier_frequen.pdf}}
-  \caption{Decomposition $D^Ty=x$ of a signal $y$ using the dictionary $D$ made of Fourier series. In $x$, the middle coefficients are coding for "large" features while the corner values are coding for the details. The multiple white lines, spanning from the middle to the borders, outline the discontinuities caused by the edges of the blackboard; the coefficients are scattered (not sparse), which shows that Fourier has trouble when dealing with discontinuities.} \label{fig_fourier}
+  \caption{Decomposition $\D^T\y=\x$ of a signal $\y$ using the dictionary $\D$ made of Fourier series. In $\x$, the middle coefficients are coding for "large" features while the corner values are coding for the details. The multiple white lines, spanning from the middle to the borders, outline the discontinuities caused by the edges of the blackboard; the coefficients are scattered (not sparse), which shows that Fourier has trouble when dealing with discontinuities.} \label{fig_fourier}
 \end{figure}
 
-But the Fourier transform is quite different from the representations we have in mind, namely the convolutional tree structure. First, it's a linear mapping and its associated matrix forms a basis. This implies bijectivity: every code $x$ has a unique image $y$. Also, Fourier's basis is orthogonal, meaning that the operator is stable (it does not amplify errors). Finally, the basis is normed, meaning that ... % TODO (HELP) explain normed basis
+But the Fourier transform is quite different from the representations we have in mind, namely the convolutional tree structure. First, it is a linear mapping and its associated matrix forms a basis. This representation one-to-one in the sense that every code $\x$ has a unique image $\y$. Also, Fourier's basis is orthogonal, meaning that the operator is stable (it does not amplify errors). % TODO Finally, the basis is normed, meaning that...
 
-More importantly, Fourier has interesting properties that allow fast implementations. For example, applying the matlab function \texttt{fft2} on the \cref{fig_fourier} is extremely fast. Instead of computing an time-expensive $O(N^2)$\footnote{$N$ is the dimension of the "flattened" image, if we consider the image as a vector} matrix-vector product, the fast Fourier transform only require a $O(NlogN)$ time.
+More importantly, Fourier has interesting properties that allow fast implementations. For example, applying the Matlab function \texttt{fft2} on the \cref{fig_fourier} is extremely fast. Instead of computing an time-expensive $O(N^2)$\footnote{$N$ is the dimension of the concatenated image, if we consider the image as a vector} matrix-vector product, the fast Fourier transform only require a $O(NlogN)$ time.
 
-The Fourier transform is widely used as an operator for sparse representations, mainly when dealing with smooth signals that can be approximated by a sum of sines. But this operator does not do well on images: they contain many discontinuities and are far from being representable using sines. Most of the coefficients of code $x$ in \cref{fig_fourier} are non-zero. But something worse happens on the edges of the blackboard: the white vertical and horizontal lines that are full of high-value coefficients are trying to code for the discontinuity, which is quite far from possible in Fourier basis.
+The Fourier transform is widely used as an operator for sparse representations, mainly when dealing with smooth signals that can be approximated by a sum of sines. But this operator does not do well on images: they contain many discontinuities and are far from being representable using sines. Most of the coefficients of code $\x$ in \cref{fig_fourier} are non-zero. But something worse happens on the edges of the blackboard: the white vertical and horizontal lines that are full of high-value coefficients are trying to code for the discontinuity, which is quite far from possible in Fourier basis.
 
 Along with Fourier, many other non-adaptative dictionaries exist; we can mention the cosine transform which is at the core of JPEG compression. We can also cite the wavelet transform, used in JPEG2000 compression (for movies in theaters), and the curvelet transform, which is more tolerant to non-smooth images. And as for Fourier, wavelet and curvelet transforms both have fast implementations.
 
@@ -44,23 +44,23 @@ Right before the first learned dictionaries, \cite{chen_atomic_2001} extended th
 
 Learned dictionaries take the same bet of over-completeness. But instead of choosing multiple fixed basis, we optimize the dictionary matrix so that the atoms (other name for the columns of the dictionary matrix) generate the sparsest representations for a given set of images.
 
-The \cref{fig_overcomplete_matrix} shows the matrix-vector product of a sparse code $x$ and a learned $D$, giving an approximation of $y$. For this example, $y$ will be represented by a linear combination of three atoms of $D$.
+The \cref{fig_overcomplete_matrix} shows the matrix-vector product of a sparse code $\x$ and a learned $\D$, giving an approximation of $\y$. For this example, $\y$ will be represented by a linear combination of three atoms of $\D$.
 
 
-\begin{figure}[!h] \centering
-\includegraphics[width=0.5\textwidth]{figures/sparsity-matrix.pdf}
-\caption{Matrix view of $Dx$ when $D$ is over-complete (much more columns than lines). $y$ can be represented using a few atoms of $D$.} \label{fig_overcomplete_matrix}
+\begin{figure}[!ht] \centering
+\includegraphics[width=0.45\textwidth]{figures/sparsity-matrix.pdf}
+\caption{Matrix view of $\D\x$ when $\D$ is over-complete (much more columns than lines). $\y$ can be represented using a few atoms of $\D$.} \label{fig_overcomplete_matrix}
 \end{figure}
 
 
-Given a set of sample images $Y = [ y_1 y_2 \dots y_S ]$ (images are "flattened" into vectors $y_i$ of size $N$), the dictionary learning optimization problem is defined as
+Given a set of sample images $\displaystyle \Y = \begin{bmatrix} \y_1 & \dots & \y_S \end{bmatrix}$ (images are "flattened" into vectors $\y_i$ of size $N$), the dictionary learning optimization problem is defined as
 
-\begin{equation*}  \begin{aligned}
-(DL) && \underset{D,X}{\min} \lambda \lVert x \rVert_1 + \lVert DX-Y \rVert^2_2 
-\end{aligned} \label{eq_dict_learn} \end{equation*}
+\begin{align}\label{eq_dict_learn}
+	 (DL) && \underset{\D,\X}{\min}~ \lambda \lVert \x \rVert_1 + \lVert \D\X - \Y \rVert^2_2
+\end{align} 
 
 % TODO WARNING! ||X||_1 doesn't exist, ||Y||_2 either
-with $\lVert . \rVert_2$ denoting the standard euclidian $l_2$ norm, $\lVert . \rVert_1$ the $l_1$ norm defined by $\lVert x \rVert_1 = \sum_{i,j} |x_i|$, $X = [ x_1 \dots x_s ]$ the matrix containing the sparse representations $x_i$ of size $K$ for all images in $Y$ and $D \in \mathcal{M}^{K \times N}$ the dictionary.
+with $\lVert . \rVert_2$ denoting the euclidian norm, $\lVert . \rVert_1$ the $l_1$ norm defined by $\lVert \x \rVert_1 = \sum_{i,j} |\x_i|$, $\X = \begin{bmatrix} \x_1 & \dots & \x_s \end{bmatrix}$ the matrix containing the sparse representations $\x_i$ of size $K$ for all images in $\Y$ and $\D \in \mathcal{M}^{K \times N}$ the dictionary.
 
 \section{K-SVD algorithm}
 
@@ -68,36 +68,36 @@ with $\lVert . \rVert_2$ denoting the standard euclidian $l_2$ norm, $\lVert . \
 
 Here is the problem that K-SVD is solving, which is a "stronger" version of (DL) in the sense that the level of sparsity in K-SVD is enforced:
 \begin{equation*}  \begin{aligned}
-(DL_{\text{strong}}) && \underset{D,X}{\min} & \lVert DX-Y \rVert^2_F \\
-&& s.t. & \lVert x_i \rVert_0 \le \gamma & \quad \forall i \text{ in } 1..S
-\end{aligned} \label{eq_dict_learn} \end{equation*}
+(DL_{\text{strong}}) && \underset{\D,\X}{\min}~ & \lVert \D\X-\Y \rVert^2_F \\
+&& s.t.~& \lVert \x_i \rVert_0 \le \gamma & \quad \forall i \text{ in } 1..S
+\end{aligned} \label{eq_ksvd} \end{equation*}
 
-with $F$ the Frobenius norm and $x_i$ the i-th column of $X$.
+with $F$ the Frobenius norm and $\x_i$ the i-th column of $\X$.
 
-\ac{KSVD} learns the dictionary by alternatively optimizing $x$ and $D$. Optimizing $x$ is the sparse coding phase, and optimizing $D$ is the dictionary update phase.
+\ac{KSVD} learns the dictionary by alternatively optimizing $\x$ and $\D$. Optimizing $\x$ is the sparse coding phase, and optimizing $\D$ is the dictionary update phase.
 
 \begin{algorithm}
     \caption{K-SVD (K-Singular Value Decomposition) algorithm for (DL)}
   \begin{algorithmic}[0]
-    \Input signal samples $(y_i)_{i=1..N}$ forming columns of $Y \in \mathbb{R}^{S \times N}$
-    \Output dictionary $D \in \mathbb{R}^{K \times N}$ with $K>>N$
-    \State \textbf{Initialization} Initialize $D$ s.t. every column is $l^2$ normalized
+    \Input signal samples $(\y_i)_{i=1..N}$ forming columns of $\Y \in \mathbb{R}^{S \times N}$
+    \Output dictionary $\D \in \mathbb{R}^{K \times N}$ with $K>>N$
+    \State \textbf{Initialization} Initialize $\D$ s.t.~every column is $l^2$ normalized
     \While{convergence}
 	\State For each image $i$, solve \Comment{Sparse coding step}
 		\begin{align}
-			\quad \min_{x_i} & \lVert y_i-Dx_i\rVert^2\\
-			s.t. & \lVert x_i \rVert_0 \le \gamma \notag
+			\quad \min_{\x_i}~ & \lVert \y_i-\D\x_i\rVert^2\\
+			s.t.~& \lVert \x_i \rVert_0 \le \gamma \notag
 		\end{align}
-	\State Set $D^{old} \leftarrow D$
-	\State For each atom $k$ of $D^{old}$, \Comment{Dictionary update step}
+	\State Set $\D^{old} \leftarrow \D$
+	\State For each atom $k$ of $\D^{old}$, \Comment{Dictionary update step}
 	\begin{enumerate}[leftmargin=15mm,label=(\alph*)]
-		\item find the images $y_i$ that use the atom $d_k$, meaning $x_i^k \ne 0$ \label{item_atom_used}
+		\item find the images $\y_i$ that use the atom $\d_k$, meaning $\x_i^k \ne 0$ \label{item_atom_used}
 		\item compute the error matrix associated to this atom,
 		\begin{align}
-			E_k =& Y-\sum_{i\ne k} {d_i}^Tx_i
+			E_k =& Y-\sum_{i\ne k} {d_i}^T\x_i
 		\end{align}
-		\item keep only columns of $E_k$ found in \ref{item_atom_used}
-		\item Apply SVD decomposition $E_k - U \Delta V^T$. The first column of $U$ becomes the new $d_k$. $x_k$ is updated using the first column of $V$ multiplied by $\Delta(1,1)$ (highest Eigen value)
+		\item keep only columns of $\bm{E}_k$ found in \ref{item_atom_used}
+		\item Apply SVD decomposition $\bm{E}_k - \bm{U} \Delta V^T$. The first column of $\bm{U}$ becomes the new $\d_k$. $\x_k$ is updated using the first column of $\bm{V}$ multiplied by $\Delta(1,1)$ (highest Eigen value)
 	\end{enumerate}
     \EndWhile
   \end{algorithmic}
@@ -108,7 +108,7 @@ with $F$ the Frobenius norm and $x_i$ the i-th column of $X$.
 
 As K-SVD relies on the $O(NK)$ matrix-vector product and that a dictionary achieves sparsity as long as $K >> N$, we easily understand that $N$ cannot be big. When implemented, K-SVD atoms (called patches because of their size) are at most $16 \times 16$.
 
-Also, the K-SVD is translation-sensitive in the sense that multiple atoms of the dictionary are only different by translation. In PALMTREE, the "final" convolutions between the atoms $h^{*l}$ and $x^l$ adresses this issue.
+Also, the K-SVD is translation-sensitive in the sense that multiple atoms of the dictionary are only different by translation. In PALMTREE, the "final" convolutions between the atoms $h^{*l}$ and $\x^l$ adresses this issue.
 
 % TODO add KSVD image
 % TODO Malgouyres: talk about other models (???)
@@ -116,52 +116,43 @@ Also, the K-SVD is translation-sensitive in the sense that multiple atoms of the
 \section{PALMTREE algorithm}
 
 \subsection{Dictionary-as-a-tree model \label{sec_tree_model}}
-The current work, developed in \cite{chabiron_toward_2015} and \cite{chabiron_optimization_2016} propose a different way of structuring the matrix $D$. Instead of using "plain" atoms as columns and dealing with the matrix-vector product in $O(N^2)$, $D$ is defined by a tree structure $\mathcal{T}(\mathcal{V},\mathcal{E})$. 
+The current work, developed in \cite{chabiron_toward_2015} and \cite{chabiron_optimization_2016} propose a different way of structuring the matrix $\D$. Instead of using "plain" atoms as columns and dealing with the matrix-vector product in $O(N^2)$, $\D$ is defined by a tree structure $\T(\V,\E)$. 
 
-The root $r$ and leaves $l$ vertex in $\mathcal{V}$ allow to define a branch as the successive edges growing from the root to one of the leaves.
+The root $r$ and leaves $l$ vertex in $\V$ allow to define a branch as the successive edges growing from the root to one of the leaves.
 
-Every edge $e$ in $\mathcal{E}$ bears a kernel $h^e$ and a support $s^e$. If the target image $y$ has its pixels in a "flattened" one-dimensional space $\mathcal{P}$, with
-$$y : \mathcal{P} \rightarrow \mathbb{R}$$
-then every kernel $h^e$ and support $s^e$ are also defined on $\mathcal{P}$ by $h^e:\mathcal{P} \rightarrow \mathbb{R}$ and $s^e:\mathcal{P} \rightarrow \{0,1\}$. The figure \ref{fig_example_kernel} exhibits an example of standard kernel filter on the left, and a $h^e$kernel on the right. The numerical values are the values of $h^e$ while the gray squares are the locations where $h^e$ has the right to have values on (i.e. the support $s^e$).
+Every edge $e$ in $\E$ bears a kernel $\h^e$ and a support $\s^e$. If the target image $\y$ has its pixels in a "flattened" one-dimensional space $\P$, with
+$$\y : \P \rightarrow \mathbb{R}$$
+then every kernel $\h^e$ and support $\s^e$ are also defined on $\P$ by 
+$$\h^e:\P \rightarrow \mathbb{R}$$ 
+$$\s^e:\P \rightarrow \{0,1\}$$
+
+The figure \ref{fig_example_kernel} exhibits an example of standard kernel filter on the left, and a $\h^e$kernel on the right. The numerical values are the values of $\h^e$ while the gray squares are the locations where $\h^e$ has the right to have values on (i.e. the support $\s^e$).
 
 \begin{figure}[!ht]\centering
 \includegraphics[width=0.8\textwidth]{figures/example-kernel.pdf}
-\caption{(a) A well-known averaging kernel, which has fixed support ($3\times3$) and fixed values. (b) Example of a kernel $h^e$. The locations of the gray squares and the values (e.g. $.01$) actually change during PALMTREE. The shape of this $h^e$ (like a chessboard) has been shown experimentally to work well. \label{fig_example_kernel}}
+\caption{(a) A well-known averaging kernel, which has fixed support ($3\times3$) and fixed values. (b) Example of a kernel $\h^e$. The locations of the gray squares and the values (e.g. $.01$) actually change during PALMTREE. The shape of this $\h^e$ (like a chessboard) has been shown experimentally to work well. \label{fig_example_kernel}}
 \end{figure}
 
-One column of the dictionary $D$ corresponds to the convolution of successive kernels on a given branch identified by the leaf $l$. We will denote that successive convolution by
+One column of the dictionary $\D$ corresponds to the convolution of successive kernels on a given branch identified by the leaf $l$. We will denote that successive convolution by
 \begin{flalign*}
-&& H^{l} = & h^r * \dots * h^l  && \text{$\triangleright$ column/atom $l$ of $D$} \\
-&&            = & h^{*l}
+&& \h^{*l} = & \h^r * \dots * \h^l  && \text{$\triangleright$ atom $l$ of $\D$}
 \end{flalign*}
 
-Figure \ref{fig_matrix_vs_tree} outlines the relation between the tree and the matrix form. The dictionary can be written using the notation
-
-$$D = \begin{bmatrix}C^5 C^6\end{bmatrix} \begin{bmatrix}C^1 & C^2 & 0 & 0 \\0 & 0 & C^3 & C^4\end{bmatrix}$$
-
-with $C^i$ the block-circular matrix for $h^i$; it represents the final convolution $h^{*l}*x^l$ when using matrices.
 
 
-\begin{figure}[!ht] \centering
-	\includegraphics[width=0.8\textwidth]{figures/block-circular-matrix.pdf}
-	\caption{This figure shows how to go from the tree defined by its kernels $(h^e)_{e \in \mathcal{E}}$ to a matrix $D$} \label{fig_block_circular}
-\end{figure}
-
-%\begin{figure}[!ht] \centering
-%\includegraphics[width=0.9\textwidth]{figures/matrix-vs-tree.pdf} \caption{This figure shows how to go from the tree defined by its kernels $(h^e)_{e \in \mathcal{E}}$ to a matrix $D$. Note that this figure doesn't illustrates $Dx \approx y$ (standard matrix-vector product). Instead, it uses $D*x\approx y$ (convolutional product) which gives every possible translation for every atom.  \label{fig_matrix_vs_tree}}
-%\end{figure}
-
-Using the matrix notation, the dictionary-as-a-tree $D$ applied to a code $x$ approximates $y$:
 
 
-$$Dx \approx y$$
+Using the matrix notation, the dictionary-as-a-tree $\D$ applied to a code $\x$ approximates $\y$:
 
-The code $x$ belongs to $\mathbb{R}^{L\times N}$. $D$ has dimensions $N \times L$ and $y$ belongs to $\mathbb{R}^N$. 
 
-Showing that $D$ can be written as a matrix allows to compare the performance of PALMTREE against a simple matrix-vector product. Here is the "PALMTREE way" of computing $Dx$:
+$$\D\x \approx \y$$
+
+The code $\x$ belongs to $\mathbb{R}^{L\times N}$. $\D$ has dimensions $N \times L$ and $\y$ belongs to $\mathbb{R}^N$. 
+
+Showing that $\D$ can be written as a matrix allows to compare the performance of PALMTREE against a simple matrix-vector product. Here is the "PALMTREE way" of computing $\D\x$:
 
 \begin{align}
-	Dx = \sum_{l \in \leaves} x^{l} * h^{*l}	 \label{eq_Dx_as_convolution}
+	\D\x = \sum_{l \in \L} \x^l * \h^{*l}	 \label{eq_Dx_as_convolution}
 \end{align}
 
 where $h^{*l}$ denotes the successive convolution of every kernel on the branch that leads to leaf $l$.
@@ -172,28 +163,28 @@ where $h^{*l}$ denotes the successive convolution of every kernel on the branch 
 
 The dictionary update step is defined as 
 \begin{align}
-(FTL) \quad \underset{\substack{(h^\text{e})_{e}}}\min & \lVert Dx - y \rVert_2^2 \label{eq_ftl_energy}\\
-\text{s.t. } & s^e_p=0 \Rightarrow h^e_p = 0 \quad & \forall e \in \mathcal{E}, \forall p \in 1..N \label{eq_ftl_in_support} \\
- & \lVert h^e \rVert \le \gamma & \forall e \in \mathcal{E}\label{eq_ftl_kernel_finite_nrj}
+(FTL) \quad \underset{\substack{(\h^e)_{e}}}\min ~ & \lVert \D\x - \y \rVert_2^2 \label{eq_ftl_energy}\\
+\text{s.t.~} & \s^e_p=0 \Rightarrow \h^e_p = 0 \quad & \forall e \in \E, \forall p \in \P \label{eq_ftl_in_support} \\
+ & \lVert \h^e \rVert \le \gamma & \forall e \in \E\label{eq_ftl_kernel_finite_nrj}
 \end{align}
 
-The constraint \ref{eq_ftl_in_support} guarantees that each kernel $h^e$ only has non-zero values on its support $s^e$. \ref{eq_ftl_kernel_finite_nrj} constrains the overall energy of every support to be finite and prevents a specific kernel to "explode".
+The constraint \ref{eq_ftl_in_support} guarantees that each kernel $\h^e$ only has non-zero values on its support $\s^e$. \ref{eq_ftl_kernel_finite_nrj} constrains the overall energy of every support to be finite and prevents a specific kernel to "explode".
 
-(FTL) can be rewritten as an unconstrained problem, shifting the constraint spaces $(D^e)_e$ to the objective function using the characteristic function $\chi_{D^e}$ defined for one edge $e$:
-$$\chi_{D_e}(h^e) = \begin{cases} 0 &\text{ if } h^e \in D^e \\ +\infty & \ \text{otherwise}\end{cases}$$
+(FTL) can be rewritten as an unconstrained problem, shifting the constraint spaces $(D^e)_{e \in \E}$ to the objective function using the characteristic function $\chi_{D^e}$ defined for one edge $e$:
+$$\chi_{D_e}(\h^e) = \begin{cases} 0 &\text{ if } \h^e \in D^e \\ +\infty & \ \text{otherwise}\end{cases}$$
 
 (FTL) becomes:
 
 \begin{align}
-(FTL) \quad \underset{\substack{(h^\text{e})_{e}}}\min & \lVert D(x) - y \rVert_2^2 + \sum_{e}\chi_{D_e} (h^e)
+(FTL) \quad \underset{\substack{(\h^e)_{e}}}\min ~ & \lVert \D\x - \y \rVert_2^2 + \sum_{e}\chi_{D_e} (\h^e)
 \end{align}
 
 \subsection{Interesting (FTL) properties}
-$Dx$ can be seen (in \cref{eq_Dx_as_convolution}) as a polynomial of degree $2\text{depth}(\mathcal{T})$. This implies that it is possibly extremely non-convex, but it is infinitely differentiable.
+$\D\x$ can be seen (in \cref{eq_Dx_as_convolution}) as a polynomial of degree $2\text{depth}(\T)$. This implies that it is possibly extremely non-convex although being infinitely differentiable.
 
-$$\Phi((h^e)_{e \in \mathcal{E}}) = \lVert Dx-y \rVert^2_2$$
+$$\Phi((\h^e)_{e \in \E}) = \lVert \D\x-\y \rVert^2_2$$
 
-The interesting thing is that $\Phi$ is differentiable when only one $h^e$ varies. % TODO
+The interesting thing is that $\Phi$ is differentiable when only one $\h^e$ varies. % TODO
 
 % TODO \cref{proof_ftl_polynomial}) 
 % TODO FTL is non-convex...
@@ -210,9 +201,9 @@ But getting an actual adaptative dictionary update step implies that designing t
 
 \subsection{Choice of the kernel supports}
 
-As described in \ref{sec_tree_model}, the supports $s^e$ are part of the dictionary-as-a-tree model. In \cite{chabiron_toward_2015}, the authors experimentally showed that using fixed supports for approximating curvelets is possible. For that specific purpose, the results turned to be good. But the whole model was supposed to be able to approximate any kind of image, hence the need for "adaptative" supports instead of hand-made ones. Figure \ref{fig_example_kernel} shows in dashed-line squares the hand-made support. The gray square show what we would expect from an "adaptive" support. Instead of keeping the same shape for every target atom, the supports evolves and get closer to the target shape.
+As described in \ref{sec_tree_model}, the supports $\s^e$ are part of the dictionary-as-a-tree model. In \cite{chabiron_toward_2015}, the authors experimentally showed that using fixed supports for approximating curvelets is possible. For that specific purpose, the results turned to be good. But the whole model was supposed to be able to approximate any kind of image, hence the need for "adaptative" supports instead of hand-made ones. Figure \ref{fig_example_kernel} shows in dashed-line squares the hand-made support. The gray square show what we would expect from an "adaptive" support. Instead of keeping the same shape for every target atom, the supports evolves and get closer to the target shape.
 
-And as for the tree design, the choice of where are located the elements of each kernel support has been made (so far) arbitrarily. The support of the $h^e$ kernel of fig. \ref{fig_example_kernel} shows an example of typical layout chosen for the experiments in \cite{chabiron_optimization_2016}. 
+And as for the tree design, the choice of where are located the elements of each kernel support has been made (so far) arbitrarily. The support of the $\h^e$ kernel of fig. \ref{fig_example_kernel} shows an example of typical layout chosen for the experiments in \cite{chabiron_optimization_2016}. 
 
 But our goal is to be able to approximate any kind of atoms, as \ac{KSVD} is able to do. Being able to choose what elements should be in the kernel supports as part of the optimization process is another goal during this internship.
 
@@ -243,94 +234,87 @@ Our first thought on how to add an element to a support was to find the best ker
 
 \section{Using the gradient for adding support elements}
 
-The Orthogonal Matching Pursuit (OMP, detailed in \cref{alg_omp}) chooses which component $x_i$ should be "turned on" at each iteration, finding the atom $d_i$ that has the greatest correlation with the residual $R$. This step (cf. \cref{alg_omp_pick_correlation}) uses the gradient $\nabla \Phi(x)$, with $$\Phi(x) = \lVert Dx - y \rVert^2$$
+The Orthogonal Matching Pursuit (OMP, detailed in \cref{alg_omp}) chooses which component $\x_i$ should be "turned on" at each iteration, finding the atom $d_i$ that has the greatest correlation with the residual $R$. This step (cf. \cref{alg_omp_pick_correlation}) uses the gradient $\nabla \Phi(\x)$, with $$\Phi(\x) = \lVert \D\x - \y \rVert^2$$
 
 
-\begin{algorithm}[!ht] % TODO Finish algorithm
+\begin{algorithm}[!ht]
     \caption{Orthogonal Matching Pursuit (OMP) algorithm for sparse approximation}\label{alg_omp}
   \begin{algorithmic}[0]
-    \Input signal $y$ of dimension $N$, dictionary of dim $N \times K$ with $K>>N$
-    \Output A $k$-sparse code $x$ of dimension $K$
-    \State \textbf{Initialization} $R^{(0)} = y$, $I=\{\}$
+    \Input signal $\y$ of dimension $N$, dictionary of dim $N \times K$ with $K>>N$
+    \Output A $k$-sparse code $\x$ of dimension $K$
+    \State \textbf{Initialization} $\bm{r}^{(0)} = \y$, $I=\{\}$
     \While{$i \leq k$}
-      \State $l =  \underset{l = 1,\dots,l}{\arg\max} | \nabla \Phi(x) |$ \label{alg_omp_pick_correlation}\Comment{find atom with max. correlation with $R$}
+      \State $l =  \underset{l = 1,\dots,l}{\arg\max} | \nabla \Phi(\x) |$ \label{alg_omp_pick_correlation}\Comment{find atom with max. correlation with $R$}
       \State $S = S \cup \{l\}$
-      \State $x = \underset{supp(x) \subset S}{\arg\max} \Phi(x)$
-      \State $R^{(i+1)} = R^{(i)}-x_l d_l^{(i)}$
-      \State $\hat{y} = \hat{y}+\langle R^{(i)}, d_{l}^{(i)} \rangle d_{l}^{(i)}$
+      \State $\x = \underset{supp(\x) \subset S}{\arg\max} \Phi(\x)$
+      \State $\bm{r}^{(i+1)} = \bm{r}^{(i)}-\x_l d_l^{(i)}$
+      \State $\hat{\y} = \hat{\y}+\langle \bm{r}^{(i)}, \d_{l}^{(i)} \rangle \d_{l}^{(i)}$
       \State $i = i + 1$
     \EndWhile
   \end{algorithmic}
 \end{algorithm}
 
-Our idea is to use the same principle when adding elements to supports $(s^e)_{e \in \mathcal{E}}$.
-
-The idea would be add a new element to one of the supports between two iterations of the PALMTREE algorithm, using the greatest gradient component information. That would lead to an optimization-driven construction of the kernels instead of designing them by hand.
+Our idea is to use the same principle when adding elements to supports $(\s^e)_{e \in \E}$: add a new element to one of the supports between two iterations of the PALMTREE algorithm, using the greatest gradient component information.
 
 But is it actually correct to choose the element to be added using a strictly local information (the gradient)? Also, how to get the "full" gradient as the current gradient is only computed on the points of the support?
 
 We will first review how the "full" gradient is computed and then describe a way to check that the gradient gives a good direction towards a critical point.
 
 \subsection{Computing the "full" gradient}
-Up to now, the gradient was computed using a convolution based on translations. It takes advantage of the sparsity of each kernel $h^e$ as well as the fact that the proximal operator is projecting every kernel onto its support, meaning that only a few elements have to be computed.
+Up to now, the gradient was computed using a convolution based on translations. It takes advantage of the sparsity of each kernel $\h^e$ as well as the fact that the proximal operator is projecting every kernel onto its support, meaning that only a few elements have to be computed.
 
-
-
-Computing the gradient on every point $p \in \mathcal{P}$ of every 
-
-We basically chose to use the fast Fourier transform ($\mathcal{F}$) for computing the convolution on the whole kernels:
+We basically chose to use the fast Fourier transform ($\F$) for computing the convolution on the whole kernels:
 \begin{align*}
-	\nabla_{h^{e'}} \Phi((h^e)_{e \in \mathcal{E}})&= \mathcal{F}^{-1}(\mathcal{F}(H^{{e'}})^* \text{.\^{}} \mathcal{F}(R))
+	\nabla_{\h^f} \Phi((\h^e)_{e \in \E})&= \F^{-1}(\F(H^{e'})^* \text{.\^{}} \F(R))
 \end{align*}
 with ${}^*$ denoting the adjoint operator, $\text{.\^{}}$ the point-wise product, $H^{f}$ the (todo) % TODO H^e?
 
 \subsection{Is the gradient right?}
-We had some trouble when trying to compute the gradient on the full kernels $(h^e)_{e \in \mathcal{E}}$ (not only on the supports element locations). To be sure that the computed "full" gradient was correct, we compared it to a finite-diffences gradient:
+We had some trouble when trying to compute the gradient on the full kernels $(\h^e)_{e \in \E}$ (not only on the supports element locations). To be sure that the computed "full" gradient was correct, we compared it to a finite-diffences gradient:
 
-$$\lim_{\epsilon \rightarrow 0} \frac{E((h^e)_{e \in \mathcal{E}}+\epsilon e_i) - E((h^e)_{e \in \mathcal{E}}) }{\epsilon} \overset{=}{?} \nabla_i E((h^e)_{e \in \mathcal{E}})$$
+$$\lim_{\epsilon \rightarrow 0} \frac{\Phi((\h^e)_{e \in \E}+\epsilon e_i) - \Phi ((\h^e)_{e \in \E}) }{\epsilon} ~\overset{?}{=}~ \nabla_i \Phi ((\h^e)_{e \in \E})$$
 
 \begin{figure}[!ht]\centering
-\begin{subfigure}[b]{0.49\textwidth}\centering
+\begin{subfigure}[b]{0.40\textwidth}\centering
 \includegraphics[width=\textwidth]{figures/verif_gradient/gradient.png}
 \end{subfigure}
-\begin{subfigure}[b]{0.49\textwidth}\centering
+\begin{subfigure}[b]{0.40\textwidth}\centering
 \includegraphics[width=\textwidth]{figures/verif_gradient/finite-diff.png}
 \end{subfigure}
-\begin{subfigure}[b]{0.49\textwidth}\centering
+\begin{subfigure}[b]{0.40\textwidth}\centering
 \includegraphics[width=1\textwidth]{figures/verif_gradient/rest.png}
 \end{subfigure}
-\begin{subfigure}[b]{0.49\textwidth}\centering
+\begin{subfigure}[b]{0.40\textwidth}\centering
 \includegraphics[width=1\textwidth]{figures/verif_gradient/finite-diff-vs-grad.png}
 \end{subfigure}
 \caption{Checking that the "full" gradient is correct. We compare it to the finite-difference gradient and make the $\epsilon$ tend to 0.} \label{fig_verif_gradient}
 \end{figure}
 
-\cref{fig_verif_gradient} compares the gradient using FFT to the finite-differences gradient (with $\epsilon=0.001$). The bottom left figure shows that the two gradients are very close in term of difference. The  right figure shows that the finite-differences gradient converges to the "full" gradient.
-
+Figure \ref{fig_verif_gradient} compares the FFT-computed gradient to the finite-differences gradient (with $\epsilon=0.001$). The bottom left figure shows that the two gradients are very close in term of difference. The right figure shows that the finite-differences gradient converges to the "full" gradient, which confirms that our "full" gradient is correct.
 
 \subsection{The ideal elements to be added}\label{sec_gain_per_added_point}
 
-One way to know if the greatest component of the "full" gradient will be a good decision after many iterations, we designed the \cref{alg_gain_per_added_point} that tries every possible point added to one of the supports and see how much the objective function decreases.
+One way to know if the "full" gradient leads to a good solution after many iterations, we designed the \cref{alg_gain_per_added_point} that tries every possible point added to one of the supports and see how much the objective function decreases. We named the resulting matrix \emph{gain-per-added-point} with the notation $\g^f$ ($f$ is edge of the studied support).
 
-We called it \emph{gain-per-added-point} with the notation $g^f$ ($f$ is edge of the studied support). It represents for each point $p \in \mathcal{P}$ the minimized objective function if an element were added on support kernel $s^f$ at that specific location (cf. \cref{alg_gain_per_added_point}).
-
+$\g^f$ represents for each point $p \in \P$ the minimized objective function if an element were added on support kernel $\s^f$ at that specific location (cf. \cref{alg_gain_per_added_point}).
 
 \begin{algorithm}[!ht]
-    \caption{Gain-per-added-point for the support $s^f$} \label{alg_gain_per_added_point}
+    \caption{Gain-per-added-point for the support $\s^f$} \label{alg_gain_per_added_point}
   \begin{algorithmic}[0]
-    \Input One chosen edge $f$ and a tree $\mathcal{T}$
-    \Output $g^f$, the gain per added point for support $s^f$
-    \State $(k^e)_{e \in \mathcal{E}} = \underset{(h^e)_{e \in \mathcal{E}}}{\arg\min} \quad \Phi ((h^e)_{e \in \mathcal{E}})$ \quad s.t. $h^e \in D^e$ \quad $\forall e$ \Comment{common starting point}
-    \For{each point $p \in \mathcal{P}$}
-    	\State $s^f_p = 1$ \Comment{add element to support}
-    	\State $g^f_p = \underset{(k^e)_{e \in \mathcal{E}}}{\min} \quad \Phi ((k^e)_{e \in \mathcal{E}})$ \quad s.t. $k^e \in D^e$ \quad $\forall e$
-    	\State $s^f_p = 0$ \Comment{remove element to support}
+    \Input One chosen edge $f$ and a tree $\T$
+    \Output $\g^f$, the gain per added point for support $\s^f$
+    \State $(\k^e)_{e \in \E} = \underset{(\h^e)_{e \in \E}}{\arg\min}~ \Phi ((\h^e)_{e \in \E})$ \quad s.t.~$\h^e \in D^e$ \quad $\forall e \in \E$ \Comment{common starting point}
+    \For{each point $p \in \P$}
+    	\State $\s^f_p = 1$ \Comment{add element to support}
+    	\State $\g^f_p = \underset{(\k^e)_{e \in \E}}{\min}~ \Phi ((\k^e)_{e \in \E})$ \quad s.t.~$\k^e \in D^e$ \quad $\forall e \in \E$
+    	\State $\s^f_p = 0$ \Comment{remove element to support}
     \EndFor
   \end{algorithmic}
 \end{algorithm}
 
+The figure \ref{fig_gain_vs_grad} compares (c) the gain-per-added-point of $s^4$ to (d) the absolute value of the partial gradient w.r.t $h^4$ after a full minimization. It is interesting to see that they share the same direction and shape. After selecting 20 of their best values in (e) and (f), we notice that they almost match, which reinforces our hypothesis that the gradient could give the right information for widening supports.
 
-\begin{figure}[!h]\centering
+\begin{figure}[!ht]\centering
 \begin{subfigure}[b]{0.49\textwidth}\centering
 \includegraphics[width=\textwidth]{figures/xp/xp_128x128_sc2_angl1_K3_S3_node4_target.png}
 \caption{Target}
@@ -341,11 +325,11 @@ We called it \emph{gain-per-added-point} with the notation $g^f$ ($f$ is edge of
 \end{subfigure}
 \begin{subfigure}[b]{0.49\textwidth}\centering
 \includegraphics[width=\textwidth]{figures/xp/xp_128x128_sc2_angl1_K3_S3_node4_objmatrix.png}
-\caption{Gain-per-added-point matrix for $s^4$}
+\caption{Gain-per-added-point for $s^4$}
 \end{subfigure}
 \begin{subfigure}[b]{0.49\textwidth}\centering
 \includegraphics[width=\textwidth]{figures/xp/xp_128x128_sc2_angl1_K3_S3_node4_partgrad4.png}
-\caption{Partial gradient}
+\caption{Partial gradient w.r.t $h^4$}
 \end{subfigure}
 \begin{subfigure}[b]{0.49\textwidth}\centering
 \includegraphics[width=\textwidth]{figures/xp/xp_128x128_sc2_angl1_K3_S3_node4_objmatrix_bestvalues.png}
@@ -358,36 +342,9 @@ We called it \emph{gain-per-added-point} with the notation $g^f$ ($f$ is edge of
 \caption{Minimization of a single branch tree with fixed supports. This experiment uses a single-branch tree with 4 kernels.}\label{fig_gain_vs_grad}
 \end{figure}
 
-Tests had been done solely on an already fully optimized tree, meaning that the "worth adding" matrix would be "close enough" to be close to the gradient...
-But after checking with multiple trees (more or less optimized), here is the thing: the gradient seems to be always giving more or less the right "global" direction (\cref{fig_xp_grad_iterations})
+\subsection{Visual gain when adding an element}
 
-\begin{figure}[!h]\centering
-\begin{subfigure}[b]{0.49\textwidth}\centering
-\includegraphics[width=\textwidth]{figures/xp_grad_iterations/xp_128x128_sc2_angl1_K3_S3_node4_objmatrix_bestvalues.png}
-\caption{Gain-per-added-point matrix}
-\end{subfigure}
-\begin{subfigure}[b]{0.49\textwidth}\centering
-	\begin{subfigure}[b]{0.49\textwidth}\centering
-	\includegraphics[width=\textwidth]{figures/xp_grad_iterations/xp_128x128_sc2_angl1_K3_S3_node4_1thiteration_partgrad4_bestvalues.png}
-	\caption{Grad. iter. 3}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.49\textwidth}\centering
-	\includegraphics[width=\textwidth]{figures/xp_grad_iterations/xp_128x128_sc2_angl1_K3_S3_node4_8thiteration_partgrad4_bestvalues.png}
-	\caption{Grad. iter. 8}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.49\textwidth}\centering
-	\includegraphics[width=\textwidth]{figures/xp_grad_iterations/xp_128x128_sc2_angl1_K3_S3_node4_20thiteration_partgrad4_bestvalues.png}
-	\caption{Grad. iter. 20}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.49\textwidth}\centering
-	\includegraphics[width=\textwidth]{figures/xp_grad_iterations/xp_128x128_sc2_angl1_K3_S3_node4_partgrad4_bestvalues.png}
-	\caption{Grad. iter. 200}
-	\end{subfigure}
-\end{subfigure}
-\caption{Is the gradient giving the same information depending on the iteration? The conditions are the same as \cref{fig_simple_approx}. Only the best values are displayed.}
-\end{figure}
-
-\begin{figure}[!h]\centering
+\begin{figure}[!ht]\centering
 \begin{subfigure}[b]{0.99\textwidth}\centering
 	\begin{subfigure}[b]{0.32\textwidth}\centering
 	\includegraphics[width=\textwidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4before_target.png}
@@ -404,7 +361,7 @@ But after checking with multiple trees (more or less optimized), here is the thi
 \end{subfigure}
 \begin{subfigure}[b]{0.32\textwidth}\centering
 \includegraphics[width=\textwidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4before_objmatrix.png}
-\caption{Worth-adding matrix} \label{fig_worth_adding_mat}
+\caption{Gain-per-added-point matrix} \label{fig_gain_matrix}
 \end{subfigure}
 \begin{subfigure}[b]{0.32\textwidth}\centering
 \includegraphics[width=\textwidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4before_partgrad4.png}
@@ -416,7 +373,7 @@ But after checking with multiple trees (more or less optimized), here is the thi
 \end{subfigure}
 \begin{subfigure}[b]{0.32\textwidth}\centering
 \includegraphics[width=\textwidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4before_objmatrix_bestvalues.png}
-\caption{Best values of \ref{fig_worth_adding_mat}}
+\caption{Best values of \ref{fig_gain_matrix}}
 \end{subfigure}
 \begin{subfigure}[b]{0.32\textwidth}\centering
 \includegraphics[width=\textwidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4before_partgrad4_bestvalues.png}
@@ -426,19 +383,51 @@ But after checking with multiple trees (more or less optimized), here is the thi
 \includegraphics[width=\textwidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4after_partgrad4_bestvalues.png}
 \caption{Best values of \ref{fig_grad_after}}
 \end{subfigure}
-\caption{Effect of adding one point to the support $s^4$. The "before" tree is already minimized. The "after" tree has been added a point where the "worth-adding matrix" were minimal, at $(4,127)$.} \label{fig_before_after_adding}
+\caption{Effect of adding one point to the support $s^4$. The "before" tree is already minimized. The "after" tree has been added a point where the gain-per-added-point matrix were minimal.} \label{fig_before_after_adding}
 \end{figure}
 
-The experiment \ref{fig_before_after_adding} tries to show how is evolving an already optimized tree when adding the "best-to-be-added" point to the support, using the location of minimum of\ref{fig_worth_adding_mat}. 
+The experiment shown in \cref{fig_before_after_adding} is based on the results of \cref{fig_gain_vs_grad_approx}, where figures (a,b,d,e,g,h) are the same as the previous experiment. The figures (c,j,i) show what  happens if we add the minimum point of gain-per-added-point to $s^4$ and continue the minimization.
 
-Note 1: in the "before" gradient (\cref{fig_grad_before}) every point of the support (the small squares) has a null gradient: in the direction of those nine points, the gradient is null, meaning that we are at an critical point. 
+In the "before" gradient (\cref{fig_grad_before}) every point of the support (the small squares) has a null gradient: in the direction of those nine points, the gradient is null, meaning that we are at an critical point.
 
-Note 2: when adding a point to the support (materialized by a small square added close to the center of the support), the gradient highest values "shift" to the south-west. This shows that adding an element (meaning that we add a dimension to the solution, as in OMP) has an effect on every surrounding points.
+We can observe that adding a point to the support (materialized by the \nth{10} small square), the highest gradient values "shift" to the south-west. Adding a point to the support has an effect on every surrounding points.
+
+\subsection{Local versus far away information}
+
+The experiment in \cref{fig_gain_vs_grad} has only been done on a fully minimized tree, meaning that the gain-per-added-point would be "close" to what the gradient would indicate. But we could wonder if the gradient stays the same throughout all iterations; compared to the converged gain-per-added-point which is a "far away" information, the gradient might not lead to that gain.
+
+The experiment shown in \cref{fig_iter_gain_vs_grad} compares the best values of gain-per-added-point to gradients snapshots taken during the minimization. This is reassuring: whatever the iteration, the gradient best values keep close to the gain-per-added-point best values.
+
+\begin{figure}[!ht]\centering
+\begin{subfigure}[b]{0.49\textwidth}\centering
+\includegraphics[width=\textwidth]{figures/xp_grad_iterations/xp_128x128_sc2_angl1_K3_S3_node4_objmatrix_bestvalues.png}
+\caption{Gain-per-added-point matrix}
+\end{subfigure}
+\begin{subfigure}[b]{0.49\textwidth}\centering
+	\begin{subfigure}[b]{0.49\textwidth}\centering
+	\includegraphics[width=\textwidth]{figures/xp_grad_iterations/xp_128x128_sc2_angl1_K3_S3_node4_1thiteration_partgrad4_bestvalues.png}
+	\caption{Grad. iter. 1}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}\centering
+	\includegraphics[width=\textwidth]{figures/xp_grad_iterations/xp_128x128_sc2_angl1_K3_S3_node4_8thiteration_partgrad4_bestvalues.png}
+	\caption{Grad. iter. 8}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}\centering
+	\includegraphics[width=\textwidth]{figures/xp_grad_iterations/xp_128x128_sc2_angl1_K3_S3_node4_20thiteration_partgrad4_bestvalues.png}
+	\caption{Grad. iter. 20}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}\centering
+	\includegraphics[width=\textwidth]{figures/xp_grad_iterations/xp_128x128_sc2_angl1_K3_S3_node4_partgrad4_bestvalues.png}
+	\caption{Grad. iter. 200}
+	\end{subfigure}
+\end{subfigure}
+\caption{Is the gradient giving the same information depending on the iteration? The conditions are the same as \cref{fig_simple_approx}. Only the best values are displayed.}\label{fig_iter_gain_vs_grad}
+\end{figure}
 
 
 
 
-\begin{figure}[!h]\centering
+\begin{figure}[!ht]\centering
 \begin{subfigure}[b]{0.4\textwidth}\centering
 	\begin{subfigure}[b]{1\textwidth}\centering
 	\includegraphics[width=\textwidth]{figures/variable_support/xp_128x128_sc2_angl1_K3_S3_node4_variable_support_target.png}
@@ -463,13 +452,24 @@ Note 2: when adding a point to the support (materialized by a small square added
 \addcontentsline{toc}{chapter}{Appendix}
 \appendix
 
-\chapter{Some stuff I'm writing to remember things}
+\chapter{Miscellaneous}
+\section{Link between convolutional tree and matrix $\D$}
+
+Figure \ref{fig_block_circular} outlines the relation between the tree and the matrix form. The dictionary can be written using the notation
+
+$$\D = \begin{bmatrix}C^5 & C^6\end{bmatrix} \begin{bmatrix}C^1 & C^2 & 0 & 0 \\0 & 0 & C^3 & C^4\end{bmatrix}$$
+with $C^i$ the block-circular matrix for $\h^i$; it represents the final convolution $\h^{*l}*\x^l$ when using matrices.
+
+\begin{figure}[!ht] \centering
+	\includegraphics[width=0.8\textwidth]{figures/block-circular-matrix.pdf}
+	\caption{This figure shows how to go from the tree defined by its kernels $(\h^e)_{e \in \E}$ to a matrix $\D$} \label{fig_block_circular}
+\end{figure}
 
 \section{Why is sparse coding used for denoising?}
 
-The figure \ref{sparse_reduce_noise} shows a noisy signal $y$ living in a high-dimensional $N$ and defined by
-$$y=\hat{y} + b$$
-with $b$ following a centered Gaussian distribution $\mathcal{N}(0,\sigma^2I)$ and $\hat{y}$ the noise-less signal. We see that the distance $||b||$ is always lower than the projected distance.
+The figure \ref{sparse_reduce_noise} shows a noisy signal $\y$ living in a high-dimensional $N$ and defined by
+$$\y=\hat{\y} + b$$
+with $b$ following a centered Gaussian distribution $\mathcal{N}(0,\sigma^2I)$ and $\hat{\y}$ the noise-less signal. We see that the distance $||b||$ is always lower than the projected distance.
 
 This is because the deviation in the $N$ dimensional space can be written as
 \begin{align*}

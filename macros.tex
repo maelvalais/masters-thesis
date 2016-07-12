@@ -1,4 +1,28 @@
 % MACROS
+\newcommand {\V} {\mathcal V} % vertex set
+\newcommand {\E} {\mathcal E} % edges set
+\renewcommand {\L} {\mathcal L} % leaves set
+
+\newcommand {\x} {\bm x} % code
+\newcommand {\X} {\bm X} % matrix of columns of codes x
+\newcommand {\y} {\bm{y}} % the target image
+\newcommand {\Y} {\bm{Y}} % matrix of columns of y
+\newcommand {\g} {\bm{g}} % gain-per-added-point
+\newcommand {\s} {\bm{s}} % support
+\newcommand {\h} {\bm{h}} % kernel (main notation)
+\renewcommand {\k} {\bm{k}} % kernel (secondary notation)
+\renewcommand {\P} {\mathcal P} % space where lives codes x
+\newcommand {\T}{\mathcal T} % tree
+\newcommand {\D} {\mathbf D}
+\renewcommand {\d} {\mathbf d}
+
+\newcommand {\hall} {\h^e _{e \in \E}}
+\newcommand {\multiconv}[1] { \mathbf h^{#1}\, }
+
+% Fourier
+\newcommand {\F} {\mathcal F}
+\newcommand {\norm}[2] {\left\| #1 \right\| _{#2}}
+\newcommand {\defeq} {\triangleq}
 
 % Couleurs pour les corrections
 \newcommand {\JY}[1] {\textcolor{red}{#1}}
@@ -18,7 +42,7 @@
 \newcommand {\CC} {\mathbb C}
 \newcommand {\RR} {\mathbb R}
 \newcommand {\RP} {\mathbb R^{\mathcal P}}
-\newcommand {\RPE} {\mathbb R^{\mathcal P \times |\edges |}}
+\newcommand {\RPE} {\mathbb R^{\mathcal P \times |\E |}}
 \newcommand {\codeset} {\mathbb R^{\mathcal P \times \leaves}}
 \newcommand {\Dset} {\mathbb R^{\mathcal P \times (\mathcal P \#\leaves) }}
 \newcommand {\ZZ} {\mathbb Z}
@@ -29,11 +53,7 @@
 \renewcommand {\SS} {{\mathcal S}} % applis supports
 \newcommand {\SA} {{\mathbb S}} % support accessible
 
-% Fonctions
-\newcommand {\f}[1] { {\mathcal F}\left( #1 \right) }
-\newcommand {\F}[1] { {\mathcal F^{-1}}\left( #1 \right) }
-\newcommand {\norm}[2] {\left\| #1 \right\| _{#2}}
-\newcommand {\defeq} {\triangleq}
+
 
 % Opérateurs
 \DeclareMathOperator {\sign} {sign}
@@ -60,29 +80,7 @@
 % Raccourcis
 \newtheorem{prop}{Proposition}[section]
 
-\newcommand {\nodes} {\mathcal N}
-\newcommand {\edges} {\mathcal E}
-\newcommand {\leaves} {\mathcal L}
-\newcommand {\NL} {\#\leaves}
-\newcommand {\hall} {h^e _{e \in \edges}}
-%\newcommand {\multiconv}[1] { \bigstar_{\substack{#1}}\, }
-\newcommand {\multiconv}[1] { \mathbf h^{#1}\, }
-\newcommand {\tpath}[1] {\mathcal{C}(#1)}
-\newcommand {\code} {\mathbf x}
-\newcommand {\data} {\mathbf y}
-\newcommand {\dataex} {\mathbf b}
-\newcommand {\databis} {\mathbf y^e}
-\newcommand {\D} {\mathbf D}
-\newcommand {\Hs} {\mathbf A}
-\newcommand {\Ha} {\mathbf H}
-\newcommand {\Haf} {\hat{\mathbf H}}
-\newcommand {\Hab} {\bar{\mathbf H}}
-\newcommand {\res} {\mathbf r}
 
-\newcommand {\tree}{\mathcal T}
-\newcommand{\subtree}[1]{\tree^{#1}}
-
-\newcommand {\stopalgo}{\epsilon}
 
 % autres MACROS
 \newcommand {\hkall} {(h^k)_{1 \leq k \leq K}}
