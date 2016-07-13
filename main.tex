@@ -12,37 +12,50 @@
 
 \section{The need for sparse representations}
 
-A sparse signal over some representation means that it can be written with as few information as possible – in other words, sparse means with many zeros. Many applications spanning from machine learning to image denoising heavily rely on the property that we can summarize – or more precisely approximate – any signal using a proper representation. The job of obtaining the raw\footnote{Any raw signal is actually represented by the canonical basis} signal from its sparse counterpart takes the form of an operator, often called dictionary or transform.
+A sparse signal over some representation means that it can be written with as few information as possible – in other words, sparse means with many zeros. Many applications ranging from machine learning to image denoising heavily rely on the property that we can summarize (or more exactly approximate) any signal using a proper sparse representation. The job of obtaining the raw\footnote{Any raw signal is actually represented by the canonical basis} signal from its sparse counterpart takes the form of an operator, often called dictionary or transform.
 
-This chapter will review the main existing dictionaries in use for sparse representation, spanning from non-adaptative transforms to learned dictionaries and going through the intermediate over-complete dictionaries.
+This chapter will review the main existing dictionaries that have been used for sparse representation, from non-adaptative transforms to learned dictionaries and through the intermediate over-complete dictionaries.
 
-\section{Non-adaptative dictionaries}
+\section{Basis dictionaries}
 
 The Fourier transform is a classical example of operators used for sparsity. In figure \ref{fig_fourier}, the left picture $\y$ has been represented using a Fourier basis, which can be written as a matrix $\D$. The right picture shows the coefficients $\x$ such that
 $$\D^T\y = \x$$
-
 
 \begin{figure}[!ht]
 \subcaptionbox{Picture $\y$ with many discontinuities.}%
   [.49\linewidth]{\includegraphics[width=0.49\textwidth]{figures/exple_fourier_spacial.pdf}}
  \subcaptionbox{Result of applying the Fourier transform to $\y$}%
   [.49\linewidth]{\includegraphics[width=0.49\textwidth]{figures/exple_fourier_frequen.pdf}}
-  \caption{Decomposition $\D^T\y=\x$ of a signal $\y$ using the dictionary $\D$ made of Fourier series. In $\x$, the middle coefficients are coding for "large" features while the corner values are coding for the details. The multiple white lines, spanning from the middle to the borders, outline the discontinuities caused by the edges of the blackboard; the coefficients are scattered (not sparse), which shows that Fourier has trouble when dealing with discontinuities.} \label{fig_fourier}
+  \caption{Decomposition $\D^T\y=\x$ of a signal $\y$ using the dictionary $\D$ made of Fourier series. In $\x$, the middle coefficients are coding "large" features while the corner values are coding the details. The multiple white lines, ranging from the middle to the borders, outline the discontinuities caused by the blackboard edges; these coefficients are scattered (hence not sparse), which shows that the Fourier basis has representation problems in presence of discontinuities.} \label{fig_fourier}
 \end{figure}
 
-But the Fourier transform is quite different from the representations we have in mind, namely the convolutional tree structure. First, it is a linear mapping and its associated matrix forms a basis. This representation one-to-one in the sense that every code $\x$ has a unique image $\y$. Also, Fourier's basis is orthogonal, meaning that the operator is stable (it does not amplify errors). % TODO Finally, the basis is normed, meaning that...
+However, the Fourier transform is quite different from the representations we have in mind, namely the convolutional tree structure. First, it is a linear mapping and its corresponding matrix forms a basis. This representation is one-to-one in the sense that every code $\x$ is associated with a unique image $\y$. This basis is also orthogonal, meaning that the operator is stable (it does not amplify errors). % TODO Finally, the basis is normed, meaning that...
 
-More importantly, Fourier has interesting properties that allow fast implementations. For example, applying the Matlab function \texttt{fft2} on the \cref{fig_fourier} is extremely fast. Instead of computing an time-expensive $O(N^2)$\footnote{$N$ is the dimension of the concatenated image, if we consider the image as a vector} matrix-vector product, the fast Fourier transform only require a $O(NlogN)$ time.
+More importantly, Fourier has interesting properties that allow fast implementations. For example, applying the Matlab function \texttt{fft2} to the \cref{fig_fourier} is extremely fast. If we assume $N$ to be the dimension of the concatenated\footnotemark[1] image, Instead of computing a time-expensive $O(N^2)$ matrix-vector product, the fast Fourier transform only requires a $O(NlogN)$ computational cost.
 
-The Fourier transform is widely used as an operator for sparse representations, mainly when dealing with smooth signals that can be approximated by a sum of sines. But this operator does not do well on images: they contain many discontinuities and are far from being representable using sines. Most of the coefficients of code $\x$ in \cref{fig_fourier} are non-zero. But something worse happens on the edges of the blackboard: the white vertical and horizontal lines that are full of high-value coefficients are trying to code for the discontinuity, which is quite far from possible in Fourier basis.
-
-Along with Fourier, many other non-adaptative dictionaries exist; we can mention the cosine transform which is at the core of JPEG compression. We can also cite the wavelet transform, used in JPEG2000 compression (for movies in theaters), and the curvelet transform, which is more tolerant to non-smooth images. And as for Fourier, wavelet and curvelet transforms both have fast implementations.
+\footnotetext[1]{For easier reading, we consider images as one-dimensional vectors. A $16 \times 16$ image would give a vector of dimension 256.}
 
 
-\section{Adaptative dictionaries}
-Right before the first learned dictionaries, \cite{chen_atomic_2001} extended the basis-based dictionaries using multiple basis to form an over-complete dictionary. Doing so would increase the expressivity of such representations, although making the inverse transform less obvious. % TODO overcomplete implies what?
+The Fourier transform is widely used as an operator for sparse representations, mainly when dealing with smooth signals that can be approximated by a sum of sinusoids. However, this operator does not generally perform well on images since they contain many discontinuities that are far from being representable using sinusoids.
 
-Learned dictionaries take the same bet of over-completeness. But instead of choosing multiple fixed basis, we optimize the dictionary matrix so that the atoms (other name for the columns of the dictionary matrix) generate the sparsest representations for a given set of images.
+As an example, most of the coefficients of the code $\x$ in \cref{fig_fourier} are non-zero. The worst performance happens on the edges of the blackboard: the white vertical and horizontal lines that are full of high-value coefficients are trying to code the discontinuity, which is difficult to obtain with a Fourier basis.
+
+Along with Fourier, many other non-adaptative dictionaries exist; we can mention the cosine transform which is at the core of JPEG compression. We can also cite the wavelet transform, used in JPEG2000 compression (for movies in theaters), and the curvelet transform, which is more tolerant to non-smooth images. Note that fast implementations are also available for wavelet and curvelet transforms.
+
+
+\section{Frame-based dictionaries}
+
+The basis-based dictionaries were generalized by using multiple bases to form an over-complete dictionary (called \emph{frame}) in \cite{chen_atomic_2001}. Combining a canonical basis with a cosine basis would allow to represent both punctual details and sine waves.
+
+This method, although offering excellent performances for compressed sensing thanks to the fast implementations of the concatenated bases, still lacks adaptativity. Another approach coming from the data-science community adresses this problem: the dictionary learning.
+
+\section{Learnt dictionaries}
+
+Like fixed-basis frames, learnt dictionaries are over-complete. Instead of being fixed, atoms are based on a learning set of images 
+$$\Y = \begin{bmatrix} \y_1 & \dots & \y_S \end{bmatrix}$$
+where $\Y$ is the concatenation of $S$ images $\y_i$ of dimension $N$.
+
+To learn $\D$, we alternatively optimize the codes $\X$ and the dictionary $\D$ so that the atoms $\d_i$ (the columns of $\D$) generate the sparsest representations  $\x_i$ approximating the image $y_i$. %TODO a
 
 The \cref{fig_overcomplete_matrix} shows the matrix-vector product of a sparse code $\x$ and a learned $\D$, giving an approximation of $\y$. For this example, $\y$ will be represented by a linear combination of three atoms of $\D$.
 
@@ -53,7 +66,7 @@ The \cref{fig_overcomplete_matrix} shows the matrix-vector product of a sparse c
 \end{figure}
 
 
-Given a set of sample images $\displaystyle \Y = \begin{bmatrix} \y_1 & \dots & \y_S \end{bmatrix}$ (images are "flattened" into vectors $\y_i$ of size $N$), the dictionary learning optimization problem is defined as
+Given a set of sample images $\displaystyle \Y = \begin{bmatrix} \y_1 & \dots & \y_S \end{bmatrix}$, the dictionary learning optimization problem is defined as
 
 \begin{align}\label{eq_dict_learn}
 	 (DL) && \underset{\D,\X}{\min}~ \lambda \lVert \x \rVert_1 + \lVert \D\X - \Y \rVert^2_2
