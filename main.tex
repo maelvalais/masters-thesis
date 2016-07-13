@@ -288,16 +288,13 @@ We had some trouble when trying to compute the gradient on the full kernels $(\h
 $$\lim_{\epsilon \rightarrow 0} \frac{\Phi((\h^e)_{e \in \E}+\epsilon e_i) - \Phi ((\h^e)_{e \in \E}) }{\epsilon} ~\overset{?}{=}~ \nabla_i \Phi ((\h^e)_{e \in \E})$$
 
 \begin{figure}[!ht]\centering
-\begin{subfigure}[b]{0.40\textwidth}\centering
+\begin{subfigure}[b]{0.299\textwidth}\centering
 \includegraphics[width=\textwidth]{figures/verif_gradient/gradient.png}
 \end{subfigure}
-\begin{subfigure}[b]{0.40\textwidth}\centering
+\begin{subfigure}[b]{0.299\textwidth}\centering
 \includegraphics[width=\textwidth]{figures/verif_gradient/finite-diff.png}
 \end{subfigure}
-\begin{subfigure}[b]{0.40\textwidth}\centering
-\includegraphics[width=1\textwidth]{figures/verif_gradient/rest.png}
-\end{subfigure}
-\begin{subfigure}[b]{0.40\textwidth}\centering
+\begin{subfigure}[b]{0.299\textwidth}\centering
 \includegraphics[width=1\textwidth]{figures/verif_gradient/finite-diff-vs-grad.png}
 \end{subfigure}
 \caption{Checking that the "full" gradient is correct. We compare it to the finite-difference gradient and make the $\epsilon$ tend to 0.} \label{fig_verif_gradient}
