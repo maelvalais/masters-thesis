@@ -1,5 +1,6 @@
 _figures/
-figures/
+# ignore pdfs only at the root of my project
+/*.pdf
 # Created by https://www.gitignore.io/api/latex
 
 ### LaTeX ###
