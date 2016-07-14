@@ -190,7 +190,7 @@ But getting an actual adaptative dictionary update step implies that designing t
 
 \subsubsection{Choice of the kernel supports}
 
-As described in \ref{sec_tree_model}, the supports $\s^e$ are part of the dictionary-as-a-tree model. In \cite{chabiron_toward_2015}, the authors experimentally showed that using fixed supports for approximating curvelets is possible. For that specific purpose, the results turned to be good. But the whole model was supposed to be able to approximate any kind of image, hence the need for "adaptative" supports instead of hand-made ones. Figure \ref{fig_example_kernel} shows in dashed-line squares the hand-made support. The gray square show what we would expect from an "adaptive" support. Instead of keeping the same shape for every target atom, the supports evolves and get closer to the target shape.
+As described in \cref{sec_tree_model}, the supports $\s^e$ are part of the dictionary-as-a-tree model. In \cite{chabiron_toward_2015}, the authors experimentally showed that using fixed supports for approximating curvelets is possible. For that specific purpose, the results turned to be good. But the whole model was supposed to be able to approximate any kind of image, hence the need for "adaptative" supports instead of hand-made ones. Figure \ref{fig_example_kernel} shows in dashed-line squares the hand-made support. The gray square show what we would expect from an "adaptive" support. Instead of keeping the same shape for every target atom, the supports evolves and get closer to the target shape.
 
 And as for the tree design, the choice of where are located the elements of each kernel support has been made (so far) arbitrarily. The support of the $\h^e$ kernel of fig. \ref{fig_example_kernel} shows an example of typical layout chosen for the experiments in \cite{chabiron_optimization_2016}. 
 
@@ -199,25 +199,72 @@ However, our goal is to be able to approximate any kind of atoms, as \ac{KSVD} i
 \section{Learning the supports}
 [todo: I explain what my contribution will be...]
 
-\Cref{fig_example_optimal_support} shows an example of what we think would happen when allowing to add and remove elements: the support would shape itself to better match the target atom (in fig.\ref{fig_example_optimal_support}, the atom shown is actually the whole target image).
+\Cref{fig_fixed_vs_expected} shows an example of what we think would happen when allowing to add and remove elements: the support would shape itself to better match the target atom (in fig.\ref{fig_fixed_vs_expected}, the atom shown is actually the whole target image).
 
-\begin{figure}[!ht] \centering
-\includegraphics[width=0.6\textwidth]{figures/add-rm-elmts-support.pdf}
-\caption{On the left, a simple curvelet atom which serves as target image. The right figure represents the locations of the support element for one of the kernels of the tree. The dashed squares represent the initial support given in figure \ref{fig_example_kernel}. The gray squares show the (supposedly) locations of the support elements after optimization. The elements have moved to the general direction of the curvelet.\label{fig_example_optimal_support}}
+\begin{figure}[!ht]\centering
+\begin{subfigure}[b]{0.32\textwidth}\centering
+	\includegraphics[width=\textwidth]{figures/manual-better-support/target.pdf}
+	\caption{}
+\end{subfigure}
+\begin{subfigure}[b]{0.32\textwidth}\centering
+	\includegraphics[width=0.5\textwidth]{figures/manual-better-support/support.pdf}
+	\caption{Generic kernel}
+\end{subfigure}
+\begin{subfigure}[b]{0.32\textwidth}\centering
+	\includegraphics[width=\textwidth]{figures/manual-better-support/support-better.pdf}
+	\caption{Better fitted kernel}
+\end{subfigure}
+\caption{On the left, a simple curvelet atom which serves as target image. The right figure represents the locations of the support element for one of the kernels of the tree. The dashed squares represent the initial support given in figure \ref{fig_example_kernel}. The gray squares show the (supposedly) locations of the support elements after optimization. The elements have moved to the general direction of the curvelet.} \label{fig_fixed_vs_expected}
 \end{figure}
 
-
+\begin{figure}[!ht]\centering
+\begin{subfigure}[b]{0.09\textwidth}\centering
+	\includegraphics[width=\textwidth]{figures/exple-better-support/tree_classic.pdf}
+	\caption{}
+\end{subfigure}
+\begin{subfigure}[b]{0.39\textwidth}\centering
+	\includegraphics[width=\textwidth]{figures/exple-better-support/xp_128x128_sc2_angl1_K3_S3_node4classic_approx.png}
+	\caption{}
+\end{subfigure}
+\begin{subfigure}[b]{0.09\textwidth}\centering
+	\includegraphics[width=\textwidth]{figures/exple-better-support/tree_expected.pdf}
+	\caption{}
+\end{subfigure}
+\begin{subfigure}[b]{0.39\textwidth}\centering
+	\includegraphics[width=\textwidth]{figures/exple-better-support/xp_128x128_sc2_angl1_K3_S3_node4expected_approx.png}
+	\caption{}
+\end{subfigure}
+\caption{a} \label{fig_fixed_vs_expected}
+\end{figure}
 
 \chapter{Experiments}
 
 \section{Optimization of supports}
 
-After being able to correctly add and remove support elements, the second phase was to think about what elements we would add or remove, and when (i.e. when during the PALMTREE algorithm).
+[redo: After being able to correctly add and remove support elements, the second phase was to think about what elements we would add or remove, and when (i.e. when during the PALMTREE algorithm).]
 
 
 \subsection{Adding an element}
-Our first thought on how to add an element to a support was to find the best kernel among the tree edges, and then pick the best point(s) of that support to be added. We thought the gradient of the objective function would probably give that information. 
+[redo: Our first thought on how to add an element to a support was to find the best kernel among the tree edges, and then pick the best point(s) of that support to be added. We thought the gradient of the objective function would probably give that information.]
 
+\section{Experiment protocol}
+The follwing experiments are using a fixed single-branch tree of depth 4 (see fig. \ref{fig_gain_n4}). The gain-per-added-point matrix is always computed with respect to one of the four supports $\s^e$.
+
+\begin{figure}[!ht]\centering
+\begin{subfigure}[b]{0.32\textwidth}\centering
+	\includegraphics[width=\textwidth]{figures/xp_explain/target.pdf}
+	\caption{}
+\end{subfigure}
+\begin{subfigure}[b]{0.32\textwidth}\centering
+	\includegraphics[width=\textwidth]{figures/xp_explain/dictionary.pdf}
+	\caption{}
+\end{subfigure}
+\begin{subfigure}[b]{0.32\textwidth}\centering
+	\includegraphics[width=\textwidth]{figures/xp_explain/code.pdf}
+	\caption{}
+\end{subfigure}
+\caption{a} \label{fig_xp_explain}
+\end{figure}
 
 \section{Using the gradient for adding support elements}
 
@@ -234,7 +281,7 @@ The Orthogonal Matching Pursuit (OMP, detailed in \cref{alg_omp}) chooses which 
       \State $l =  \underset{l = 1,\dots,l}{\arg\max} | \nabla \Phi(\x) |$ \label{alg_omp_pick_correlation}\Comment{find atom with max. correlation with $R$}
       \State $S = S \cup \{l\}$
       \State $\x = \underset{supp(\x) \subset S}{\arg\max} \Phi(\x)$
-      \State $\bm{r}^{(i+1)} = \bm{r}^{(i)}-\x_l d_l^{(i)}$
+      \State $\bm{r}^{(i+1)} = \bm{r}^{(i)}-\x_l^T \d_l^{(i)}$
       \State $\hat{\y} = \hat{\y}+\langle \bm{r}^{(i)}, \d_{l}^{(i)} \rangle \d_{l}^{(i)}$
       \State $i = i + 1$
     \EndWhile
@@ -246,6 +293,7 @@ Our idea is to use the same principle when adding elements to supports $(\s^e)_{
 But is it actually correct to choose the element to be added using a strictly local information (the gradient)? Also, how to get the "full" gradient as the current gradient is only computed on the points of the support?
 
 We will first review how the "full" gradient is computed and then describe a way to check that the gradient gives a good direction towards a critical point.
+
 
 \subsection{Computing the "full" gradient}
 Up to now, the gradient was computed using a convolution based on translations. It takes advantage of the sparsity of each kernel $\h^e$ as well as the fact that the proximal operator is projecting every kernel onto its support, meaning that only a few elements have to be computed.
@@ -300,27 +348,27 @@ $\g^f$ represents for each point $p \in \P$ the minimized objective function if 
 
 \begin{figure}[!ht]\centering
 \begin{subfigure}[b]{0.49\textwidth}\centering
-\includegraphics[width=\textwidth]{figures/xp/n4/xp_128x128_sc2_angl1_K3_S3_node4_target.png}
+\includegraphics[width=\linewidth]{figures/xp/n4/xp_128x128_sc2_angl1_K3_S3_node4_target.png}
 \caption{Target $\y$}
 \end{subfigure}
-\begin{subfigure}[b]{0.49\textwidth}\centering
-\includegraphics[width=\textwidth]{figures/xp/n4/xp_128x128_sc2_angl1_K3_S3_node4_approx.png}
+\begin{subfigure}[b]{0.49\linewidth}\centering
+\includegraphics[width=\linewidth]{figures/xp/n4/xp_128x128_sc2_angl1_K3_S3_node4_approx.png}
 \caption{Approximation $\D\x$} \label{fig_gain_n4_approx}
 \end{subfigure}
-\begin{subfigure}[b]{0.49\textwidth}\centering
-\includegraphics[width=\textwidth]{figures/xp/n4/xp_128x128_sc2_angl1_K3_S3_node4_objmatrix.png}
+\begin{subfigure}[b]{0.49\linewidth}\centering
+\includegraphics[width=\linewidth]{figures/xp/n4/xp_128x128_sc2_angl1_K3_S3_node4_objmatrix.png}
 \caption{Gain-per-added-point for $\s^4$}
 \end{subfigure}
-\begin{subfigure}[b]{0.49\textwidth}\centering
-\includegraphics[width=\textwidth]{figures/xp/n4/xp_128x128_sc2_angl1_K3_S3_node4_partgrad4.png}
+\begin{subfigure}[b]{0.49\linewidth}\centering
+\includegraphics[width=\linewidth]{figures/xp/n4/xp_128x128_sc2_angl1_K3_S3_node4_partgrad4.png}
 \caption{Partial gradient w.r.t $\h^4$}
 \end{subfigure}
-\begin{subfigure}[b]{0.49\textwidth}\centering
-\includegraphics[width=\textwidth]{figures/xp/n4/xp_128x128_sc2_angl1_K3_S3_node4_objmatrix_bestvalues.png}
+\begin{subfigure}[b]{0.49\linewidth}\centering
+\includegraphics[width=\linewidth]{figures/xp/n4/xp_128x128_sc2_angl1_K3_S3_node4_objmatrix_bestvalues.png}
 \caption{Best values of above figure}
 \end{subfigure}
-\begin{subfigure}[b]{0.49\textwidth}\centering
-\includegraphics[width=\textwidth]{figures/xp/n4/xp_128x128_sc2_angl1_K3_S3_node4_partgrad4_bestvalues.png}
+\begin{subfigure}[b]{0.49\linewidth}\centering
+\includegraphics[width=\linewidth]{figures/xp/n4/xp_128x128_sc2_angl1_K3_S3_node4_partgrad4_bestvalues.png}
 \caption{Best values of above figure}
 \end{subfigure}
 \caption{Minimization of a single branch tree with fixed supports. This experiment uses a single-branch tree with 4 kernels.}\label{fig_gain_n4}
@@ -328,20 +376,20 @@ $\g^f$ represents for each point $p \in \P$ the minimized objective function if 
 
 
 \begin{figure}[!ht]\centering
-	\begin{subfigure}[b]{0.24\textwidth}\centering
-	\includegraphics[width=\textwidth]{figures/xp/n1/xp_128x128_sc2_angl1_K3_S3_node1_objmatrix_bestvalues.png}
+	\begin{subfigure}[b]{0.24\linewidth}\centering
+	\includegraphics[width=\linewidth]{figures/xp/n1/xp_128x128_sc2_angl1_K3_S3_node1_objmatrix_bestvalues.png}
 	\caption{$\s^1$ gain}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.24\textwidth}\centering
-	\includegraphics[width=\textwidth]{figures/xp/n1/xp_128x128_sc2_angl1_K3_S3_node1_partgrad1_bestvalues.png}
+	\begin{subfigure}[b]{0.24\linewidth}\centering
+	\includegraphics[width=\linewidth]{figures/xp/n1/xp_128x128_sc2_angl1_K3_S3_node1_partgrad1_bestvalues.png}
 	\caption{$\h^1$ gradient}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.24\textwidth}\centering
-	\includegraphics[width=\textwidth]{figures/xp/n2/xp_128x128_sc2_angl1_K3_S3_node2_objmatrix_bestvalues.png}
+	\begin{subfigure}[b]{0.24\linewidth}\centering
+	\includegraphics[width=\linewidth]{figures/xp/n2/xp_128x128_sc2_angl1_K3_S3_node2_objmatrix_bestvalues.png}
 	\caption{$\s^2$ gain}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.24\textwidth}\centering
-	\includegraphics[width=\textwidth]{figures/xp/n2/xp_128x128_sc2_angl1_K3_S3_node2_partgrad2_bestvalues.png}
+	\begin{subfigure}[b]{0.24\linewidth}\centering
+	\includegraphics[width=\linewidth]{figures/xp/n2/xp_128x128_sc2_angl1_K3_S3_node2_partgrad2_bestvalues.png}
 	\caption{$\h^2$ gradient}
 	\end{subfigure}
 \caption{Two other edges (1 and 2) for experiment in \cref{fig_gain_n4}. The image $\y$ and its approximation $\D\x$ are identical to \cref{fig_gain_n4}.}\label{fig_gain_n1_n2}
@@ -372,40 +420,40 @@ $\g^f$ represents for each point $p \in \P$ the minimized objective function if 
 \subsubsection{Visual gain when adding an element}
 
 \begin{figure}[!ht]\centering
-\begin{subfigure}[b]{0.32\textwidth}\centering
-\includegraphics[width=\textwidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4before_target.png}
+\begin{subfigure}[b]{0.32\linewidth}\centering
+\includegraphics[width=\linewidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4before_target.png}
 	\caption{Target image}
 \end{subfigure}
-\begin{subfigure}[b]{0.32\textwidth}\centering
-\includegraphics[width=\textwidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4before_approx.png}
+\begin{subfigure}[b]{0.32\linewidth}\centering
+\includegraphics[width=\linewidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4before_approx.png}
 \caption{Before adding}
 \end{subfigure}
-\begin{subfigure}[b]{0.32\textwidth}\centering
-\includegraphics[width=\textwidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4after_approx.png}
+\begin{subfigure}[b]{0.32\linewidth}\centering
+\includegraphics[width=\linewidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4after_approx.png}
 \caption{After adding}
 \end{subfigure}
-\begin{subfigure}[b]{0.32\textwidth}\centering
-\includegraphics[width=\textwidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4before_objmatrix.png}
+\begin{subfigure}[b]{0.32\linewidth}\centering
+\includegraphics[width=\linewidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4before_objmatrix.png}
 \caption{Gain-per-added-point} \label{fig_gain_matrix}
 \end{subfigure}
-\begin{subfigure}[b]{0.32\textwidth}\centering
-\includegraphics[width=\textwidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4before_partgrad4.png}
+\begin{subfigure}[b]{0.32\linewidth}\centering
+\includegraphics[width=\linewidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4before_partgrad4.png}
 \caption{Gradient before} \label{fig_grad_before}
 \end{subfigure}
-\begin{subfigure}[b]{0.32\textwidth}\centering
-\includegraphics[width=\textwidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4after_partgrad4.png}
+\begin{subfigure}[b]{0.32\linewidth}\centering
+\includegraphics[width=\linewidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4after_partgrad4.png}
 \caption{Gradient after} \label{fig_grad_after}
 \end{subfigure}
-\begin{subfigure}[b]{0.32\textwidth}\centering
-\includegraphics[width=\textwidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4before_objmatrix_bestvalues.png}
+\begin{subfigure}[b]{0.32\linewidth}\centering
+\includegraphics[width=\linewidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4before_objmatrix_bestvalues.png}
 \caption{Best values of \ref{fig_gain_matrix}}
 \end{subfigure}
-\begin{subfigure}[b]{0.32\textwidth}\centering
-\includegraphics[width=\textwidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4before_partgrad4_bestvalues.png}
+\begin{subfigure}[b]{0.32\linewidth}\centering
+\includegraphics[width=\linewidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4before_partgrad4_bestvalues.png}
 \caption{Best values of \ref{fig_grad_before}}
 \end{subfigure}
-\begin{subfigure}[b]{0.32\textwidth}\centering
-\includegraphics[width=\textwidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4after_partgrad4_bestvalues.png}
+\begin{subfigure}[b]{0.32\linewidth}\centering
+\includegraphics[width=\linewidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4after_partgrad4_bestvalues.png}
 \caption{Best values of \ref{fig_grad_after}}
 \end{subfigure}
 \caption{Effect of adding one point to the support $\s^4$. The "before" tree is already minimized. The "after" tree has been added a point where the gain-per-added-point matrix were minimal.} \label{fig_before_after_adding}
@@ -424,25 +472,25 @@ The experiment in \cref{fig_gain_n4} has only been done on a fully minimized tre
 The experiment shown in \cref{fig_iter_gain_vs_grad} compares the best values of gain-per-added-point to gradients snapshots taken during the minimization. This is reassuring: whatever the iteration, the gradient best values keep close to the gain-per-added-point best values.
 
 \begin{figure}[!ht]\centering
-\begin{subfigure}[b]{0.49\textwidth}\centering
-\includegraphics[width=\textwidth]{figures/xp_grad_iterations/xp_128x128_sc2_angl1_K3_S3_node4_objmatrix_bestvalues.png}
+\begin{subfigure}[b]{0.49\linewidth}\centering
+\includegraphics[width=\linewidth]{figures/xp_grad_iterations/xp_128x128_sc2_angl1_K3_S3_node4_objmatrix_bestvalues.png}
 \caption{Gain-per-added-point matrix}
 \end{subfigure}
-\begin{subfigure}[b]{0.49\textwidth}\centering
-	\begin{subfigure}[b]{0.49\textwidth}\centering
-	\includegraphics[width=\textwidth]{figures/xp_grad_iterations/xp_128x128_sc2_angl1_K3_S3_node4_1thiteration_partgrad4_bestvalues.png}
+\begin{subfigure}[b]{0.49\linewidth}\centering
+	\begin{subfigure}[b]{0.49\linewidth}\centering
+	\includegraphics[width=\linewidth]{figures/xp_grad_iterations/xp_128x128_sc2_angl1_K3_S3_node4_1thiteration_partgrad4_bestvalues.png}
 	\caption{Grad. iter. 1}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.49\textwidth}\centering
-	\includegraphics[width=\textwidth]{figures/xp_grad_iterations/xp_128x128_sc2_angl1_K3_S3_node4_8thiteration_partgrad4_bestvalues.png}
+	\begin{subfigure}[b]{0.49\linewidth}\centering
+	\includegraphics[width=\linewidth]{figures/xp_grad_iterations/xp_128x128_sc2_angl1_K3_S3_node4_8thiteration_partgrad4_bestvalues.png}
 	\caption{Grad. iter. 8}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.49\textwidth}\centering
-	\includegraphics[width=\textwidth]{figures/xp_grad_iterations/xp_128x128_sc2_angl1_K3_S3_node4_20thiteration_partgrad4_bestvalues.png}
+	\begin{subfigure}[b]{0.49\linewidth}\centering
+	\includegraphics[width=\linewidth]{figures/xp_grad_iterations/xp_128x128_sc2_angl1_K3_S3_node4_20thiteration_partgrad4_bestvalues.png}
 	\caption{Grad. iter. 20}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.49\textwidth}\centering
-	\includegraphics[width=\textwidth]{figures/xp_grad_iterations/xp_128x128_sc2_angl1_K3_S3_node4_partgrad4_bestvalues.png}
+	\begin{subfigure}[b]{0.49\linewidth}\centering
+	\includegraphics[width=\linewidth]{figures/xp_grad_iterations/xp_128x128_sc2_angl1_K3_S3_node4_partgrad4_bestvalues.png}
 	\caption{Grad. iter. 200}
 	\end{subfigure}
 \end{subfigure}
@@ -479,6 +527,7 @@ The experiment shown in \cref{fig_iter_gain_vs_grad} compares the best values of
 
 \chapter{Miscellaneous}
 
+\end{document}
 
 \section{Link between convolutional tree and matrix $\D$} \label{sec_matrix_vs_tree}
 
