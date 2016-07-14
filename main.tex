@@ -31,7 +31,7 @@ $$\D^T\y = \x$$
 
 However, the Fourier transform is quite different from the representations we have in mind, namely the convolutional tree structure. First, it is a linear mapping and its corresponding matrix forms a basis. This representation is one-to-one in the sense that every code $\x$ is associated with a unique image $\y$. This basis is also orthogonal, meaning that the operator is stable (it does not amplify errors). % TODO Finally, the basis is normed, meaning that...
 
-More importantly, Fourier has interesting properties that allow fast implementations. For example, applying the Matlab function \texttt{fft2} to the \cref{fig_fourier} is extremely fast. If we assume $N$ to be the dimension of the concatenated\footnotemark[1] image, Instead of computing a time-expensive $O(N^2)$ matrix-vector product, the fast Fourier transform only requires a $O(NlogN)$ computational cost.
+More importantly, Fourier has interesting properties that allow fast implementations. For example, applying the Matlab function \texttt{fft2} to the \cref{fig_fourier} is extremely fast. If we assume $N$ to be the dimension of the concatenated\footnotemark[1] image, instead of computing a time-expensive $O(N^2)$ matrix-vector product, the fast Fourier transform only requires a $O(NlogN)$ computational cost.
 
 \footnotetext[1]{For easier reading, we consider images as one-dimensional vectors. A $16 \times 16$ image would give a vector of dimension 256.}
 
@@ -62,7 +62,7 @@ where $\X$ is the concatenation of $S$ column vectors $\x_i$ (the codes) of dime
 \begin{align}
 \underset{\D,\X}{\min}~ \lambda \lVert \X \rVert_1 + \lVert \D\X-\Y \rVert^2_F \tag{$DL$} \label{eq_dl}
 \end{align}
-where $\lVert . \rVert_F$ denotes the Frobenius norm and $\lVert . \rVert_1$ is the $l_1$ norm defined by \todo{correct?} $\lVert \x \rVert_1 = \sum_{i,j} |\x_i|$.
+where $\lVert . \rVert_F$ denotes the Frobenius norm and $\lVert . \rVert_1$ is the $l_1$ norm defined by $\lVert \X \rVert_1 = \sum_{i,j} |\x_i|$.
 
 Many algorithms solving \eqref{eq_dl} alternatively optimize the dictionary $\D$ and the codes $\X$ so that atoms of $\D$ generate the sparsest representation $\x_i$ approximating the sample $\y_i$ for all $i = 1,\dots,S$:
 $$\D\X \approx \Y$$
@@ -70,7 +70,7 @@ $$\D\X \approx \Y$$
 \Cref{fig_overcomplete_matrix} gives an idea of what it means to approximate an image $\y$ using the matrix-vector product of a sparse code $\x$ and a learned dictionary $\D$. For this example, $\y$ is represented by a linear combination of three atoms of $\D$: $\x$ is 3-sparse.
 
 \begin{figure}[!ht] \centering
-\includegraphics[width=0.45\textwidth]{figures/sparsity-matrix.pdf}
+\includegraphics[width=0.80\textwidth]{figures/sparsity-matrix.pdf}
 \caption{Matrix view of $\D\x$ when $\D$ is over-complete (much more columns than lines).}\label{fig_overcomplete_matrix}
 \end{figure}
 
@@ -80,14 +80,16 @@ $$\D\X \approx \Y$$
 
 Among the many existing alternating algorithms for dictionary learning like the Online dictionary learning algorithm or the K-means algorithm, the \ac{KSVD} algorithm is well known for its state-of-the-art performances in image denoising. Introduced in \cite{aharon_k-svd:_2006}, K-SVD is responsible for many concepts behind the PALMTREE algorithm developed in \cite{chabiron_optimization_2016}. This section summarizes the key elements of the K-SVD algorithm.
 
-\ac{KSVD} does not actually solve \eqref{eq_dl}; instead, it gives a solution for a "stronger" problem in the sense that the level of sparsity in K-SVD is enforced by $\gamma$:
+\ac{KSVD} does not actually solve \eqref{eq_dl}; instead, it gives a solution for a "stronger" problem in the sense that the level of sparsity in K-SVD is enforced by $\gamma$ in
 \begin{align*}
 \underset{\D,\X}{\min}~ & \lVert \D\X-\Y \rVert^2_F \tag{$DL_2$}\label{eq_dl_ksvd} \\
 s.t.~& \lVert \x_i \rVert_0 \le \gamma \quad \forall i \text{ in } 1,\dots,S
 \end{align*}
 where $\lVert . \rVert_F$ denotes the Frobenius norm and $\lVert . \rVert_0$ is the pseudo-norm $l_0$ (also known as "counting function").
 
-The \emph{Sparse Coding step}\footnote{See \cref{sec_ksvd}, \cpageref{sec_ksvd}} optimizes along $\x$; this step basically uses OMP \cref{alg_omp} or any other pursuit algorithm. The \emph{Dictionary Update step} optimizes along $\D$. This is the step the authors of \cite{chabiron_optimization_2016} worked on.
+The \emph{Sparse Coding step} optimizes along $\x$; this step basically uses OMP \cref{alg_omp} or any other pursuit algorithm. The \emph{Dictionary Update step} optimizes along $\D$. This is the step the authors of \cite{chabiron_optimization_2016} worked on. Note that the full K-SVD algorithm is in \cref{sec_ksvd}, \cpageref{sec_ksvd}.
+
+
 
 % TODO add KSVD example of image
 
@@ -96,7 +98,7 @@ As the learned K-SVD dictionary relies on the $O(NK)$ matrix-vector product and 
 
 Dictionaries with bigger atoms are known as multi-resolution (also called multi-scale), meaning that the atoms can contain either details or large features in images.
 
-Talk about \cite{magoarou_learning_2015} (Elad team) and \cite{sulam_trainlets:_2016} (Gribonval team).
+[Talk about \cite{magoarou_learning_2015} (Elad team) and \cite{sulam_trainlets:_2016} (Gribonval team)]
 
 \subsection{Atoms redundancy} \label{sec_atoms_redund}
 The K-SVD algorithm is not translation-invariant in the sense that multiple atoms of the dictionary can have the same detail but slightly translated. The authors of \cite{mailhe_shift-invariant_2008} worked on making the update step invariant by translation, but it still needs a lot of tuning and finding the right parameters. 
@@ -194,33 +196,27 @@ And as for the tree design, the choice of where are located the elements of each
 
 However, our goal is to be able to approximate any kind of atoms, as \ac{KSVD} is able to do. Being able to choose what elements should be in the kernel supports as part of the optimization process is another goal during this internship.
 
+\section{Learning the supports}
+[todo: I explain what my contribution will be...]
+
+\Cref{fig_example_optimal_support} shows an example of what we think would happen when allowing to add and remove elements: the support would shape itself to better match the target atom (in fig.\ref{fig_example_optimal_support}, the atom shown is actually the whole target image).
+
 \begin{figure}[!ht] \centering
 \includegraphics[width=0.6\textwidth]{figures/add-rm-elmts-support.pdf}
 \caption{On the left, a simple curvelet atom which serves as target image. The right figure represents the locations of the support element for one of the kernels of the tree. The dashed squares represent the initial support given in figure \ref{fig_example_kernel}. The gray squares show the (supposedly) locations of the support elements after optimization. The elements have moved to the general direction of the curvelet.\label{fig_example_optimal_support}}
 \end{figure}
 
-\section{Learning the supports}
-[todo: I explain what my contribution will be...]
-
 
 
 \chapter{Experiments}
 
-\section{First research axis: experimenting with adaptative supports}
+\section{Optimization of supports}
 
 After being able to correctly add and remove support elements, the second phase was to think about what elements we would add or remove, and when (i.e. when during the PALMTREE algorithm).
-
-The figure \ref{fig_example_optimal_support} shows an example of what we think would happen when allowing to add and remove elements: the support would shape itself to better match the target atom (in fig.\ref{fig_example_optimal_support}, the atom shown is actually the whole target image).
 
 
 \subsection{Adding an element}
 Our first thought on how to add an element to a support was to find the best kernel among the tree edges, and then pick the best point(s) of that support to be added. We thought the gradient of the objective function would probably give that information. 
-
-% TODO explain 
-
-
-
-
 
 
 \section{Using the gradient for adding support elements}
@@ -373,7 +369,7 @@ $\g^f$ represents for each point $p \in \P$ the minimized objective function if 
 \end{figure}
 
 
-\subsection{Visual gain when adding an element}
+\subsubsection{Visual gain when adding an element}
 
 \begin{figure}[!ht]\centering
 \begin{subfigure}[b]{0.32\textwidth}\centering
