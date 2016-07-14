@@ -6,13 +6,11 @@
 \usepackage{indentfirst} % alinea on paragraphs
 \usepackage[babel=true]{csquotes}
 \usepackage{graphicx}
-\usepackage[fleqn]{amsmath} % fleqn = align blocs on the left
+\usepackage[]{amsmath} % fleqn = align blocs on the left
 \usepackage{siunitx} % SI units
 \usepackage{amssymb} % for convolution sign
 %\usepackage{moreverb} % for c, cpp snippets
 \usepackage{enumitem} % for more indent in itemize
-\usepackage{bm} % \bm{} for bold font in text and math modes
-\usepackage[pdfusetitle]{hyperref} % for linkable refs and title in pdf meta
 
 %\usepackage[english,boxed,lined,onelanguage]{algorithm2e}
 %\SetAlCapSkip{1em} % Margin between algo and caption
@@ -21,7 +19,7 @@
 
 %\usepackage[toc,page]{appendix}
 \usepackage{fancyhdr} % For titlepage \lhead, \rhead... 
-\usepackage[backend=biber,style=ieee,date=long,maxbibnames=5,language=english]{biblatex}
+\usepackage[backend=biber,style= alphabetic,date=long,maxbibnames=5,language=english]{biblatex} % style=ieee for final thesis
 \bibliography{master-thesis.bib}
 
 % To suppress fields in my .bib, try 
@@ -59,7 +57,10 @@
 \usepackage{etoolbox} % For toggle function (to hide titlepage)
 \usepackage[acronym,toc,shortcuts]{glossaries}
 \usepackage{nth} % 1st, 3rd, 4th...
-\usepackage[english]{cleveref}
+\usepackage{bm} % \bm{} for bold font in text and math modes
+\usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
+\usepackage[pdfusetitle]{hyperref} % for linkable refs and title in pdf meta
+\usepackage[english,capitalise]{cleveref} % capitalise = Fig. instead of fig.
 %\makeglossary
 %\makeindex
 

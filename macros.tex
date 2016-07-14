@@ -1,26 +1,27 @@
 % MACROS
-\newcommand {\V} {\mathcal V} % vertex set
-\newcommand {\E} {\mathcal E} % edges set
+\newcommand   {\V} {\mathcal V} % vertex set
+\newcommand   {\E} {\mathcal E} % edges set
 \renewcommand {\L} {\mathcal L} % leaves set
-
-\newcommand {\x} {\bm x} % code
-\newcommand {\X} {\bm X} % matrix of columns of codes x
-\newcommand {\y} {\bm y} % the target image
-\newcommand {\Y} {\bm Y} % matrix of columns of y
-\newcommand {\g} {\bm g} % gain-per-added-point
-\newcommand {\s} {\bm s} % support
-\newcommand {\h} {\bm h} % kernel (main notation)
-\renewcommand {\k} {\bm k} % kernel (secondary notation)
+\newcommand   {\x} {\bm{x}} % code
+\newcommand   {\X} {\bm{X}} % matrix of columns of codes x
+\newcommand   {\y} {\bm{y}} % the target image
+\newcommand   {\Y} {\bm{Y}} % matrix of columns of y
+\newcommand   {\g} {\bm{g}} % gain-per-added-point
+\newcommand   {\s} {\bm{s}} % support
+\newcommand   {\h} {\bm{h}} % kernel (main notation)
+\renewcommand {\k} {\bm{k}} % kernel (secondary notation)
+\newcommand   {\D} {\mathbf{D}}
+\renewcommand {\d} {\bm{d}}
 \renewcommand {\P} {\mathcal P} % space where lives codes x
-\newcommand {\T}{\mathcal T} % tree
-\newcommand {\D} {\bm D}
-\renewcommand {\d} {\bm d}
+\newcommand   {\T} {\mathcal T} % tree
 
-\newcommand {\hall} {\h^e _{e \in \E}}
-\newcommand {\multiconv}[1] { \mathbf h^{#1}\, }
+\newcommand {\Dspace} {{\mathcal D}} % D^e, constraint set
+
+\newcommand {\hall} {{\h^e _{e \in \E}}}
+\newcommand {\multiconv}[1] {{ \h^{#1}\, }}
 
 % Fourier
-\newcommand {\F} {\mathcal F}
+\newcommand {\F} {{\mathcal F}}
 \newcommand {\norm}[2] {\left\| #1 \right\| _{#2}}
 \newcommand {\defeq} {\triangleq}
 
@@ -37,7 +38,6 @@
 \newcommand {\black}[1] {\textcolor{black}{#1}}
 
 % Espaces mathématiques
-\newcommand {\DPUN} {{\mathcal D}}
 \newcommand {\DTREE} {{\mathcal D}^e}
 \newcommand {\CC} {\mathbb C}
 \newcommand {\RR} {\mathbb R}
