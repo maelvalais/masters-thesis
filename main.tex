@@ -31,16 +31,16 @@ $$\D^T\y = \x$$
 
 However, the Fourier transform is quite different from the representations we have in mind, namely the convolutional tree structure. First, it is a linear mapping and its corresponding matrix forms a basis. This representation is one-to-one in the sense that every code $\x$ is associated with a unique image $\y$. This basis is also orthogonal, meaning that the operator is stable (it does not amplify errors). % TODO Finally, the basis is normed, meaning that...
 
-More importantly, Fourier has interesting properties that allow fast implementations. For example, applying the Matlab function \texttt{fft2} to the \cref{fig_fourier} is extremely fast. If we assume $N$ to be the dimension of the concatenated\footnotemark[1] image, instead of computing a time-expensive $O(N^2)$ matrix-vector product, the fast Fourier transform only requires a $O(NlogN)$ computational cost.
+More importantly, Fourier has interesting properties that allow fast implementations. For example, applying the Matlab function \texttt{fft2} to the \cref{fig_fourier} is extremely fast. If we assume $N$ to be the dimension of the concatenated\footnotemark[2] image, instead of computing a time-expensive $O(N^2)$ matrix-vector product, the fast Fourier transform only requires a $O(NlogN)$ computational cost.
 
-\footnotetext[1]{For easier reading, we consider images as one-dimensional vectors. A $16 \times 16$ image would give a vector of dimension 256.}
+\footnotetext[2]{For easier reading, we consider images as one-dimensional vectors. A $16 \times 16$ image would give a vector of dimension 256.}
 
 
 The Fourier transform is widely used as an operator for sparse representations, mainly when dealing with smooth signals that can be approximated by a sum of sinusoids. However, this operator does not generally perform well on images since they contain many discontinuities that are far from being representable using sinusoids.
 
 As an example, most of the coefficients of the code $\x$ in \cref{fig_fourier} are non-zero. The worst performance happens on the edges of the blackboard: the white vertical and horizontal lines that are full of high-value coefficients are trying to code the discontinuity, which is difficult to obtain with a Fourier basis.
 
-Along with Fourier, many other non-adaptative dictionaries exist; we can mention the cosine transform which is at the core of JPEG compression. We can also cite the wavelet transform, used in JPEG2000 compression (for movies in theaters), and the curvelet transform, which is more tolerant to non-smooth images. Note that fast implementations are also available for wavelet and curvelet transforms.
+Along with Fourier, many other non-adaptative dictionaries exist; we can mention the cosine transform which is at the core of JPEG compression. We can also cite the wavelet transform, used in JPEG2000 compression (for movies in theaters), and the curvelet transform, which is more tolerant to non-smooth images. Note that cosine, wavelet and curvelet transforms are stable and also have fast implementations.
 
 
 \section{Frame-based dictionaries}
@@ -123,9 +123,11 @@ The work studied in \cite{chabiron_toward_2015} and \cite{chabiron_optimization_
 \caption{View of a convolutional tree; the $\h^e$ and $\s^e$ are what define $\D$}\label{fig_tree}
 \end{figure}
 
-The target image $\y$ as well as the kernels $\h^e$ and supports $\s^e$ are vectors of dimension $N$. The supports $\s^e$ are only made of 0 (corresponding value in $\h^e$ must be 0) or 1 (corresponding value in $\h^e$ can be non-zero).
+The target image $\y$ as well as the kernels $\h^e$ and supports $\s^e$ are vectors of dimension $N$. The supports $\s^e$ are only made of 0 (corresponding value in $\h^e$ must be 0) or 1 (corresponding value in $\h^e$ can be non-zero). The code $\x$ is a "big" vector of dimension $K$ with $K = N \times Leaves$; $\D$ is a matrix of dimensions $N \times K$ and $\y$ is a vector of dimension $N$.
 
-The figure \ref{fig_example_kernel} displays examples of a standard kernel (left) and a kernel $\h^e$ (middle) associated with its support $\s^e$ (right). The gray squares represent the "ones" of the support while the kernel is represented by values.
+In the following, we will use interchangeably the pixel set $1,\dots,N$ and image space definition $\P$.
+
+The \cref{fig_example_kernel} displays examples of a standard kernel (left) and a kernel $\h^e$ (middle) associated with its support $\s^e$ (right). The gray squares represent the "ones" of the support while the kernel is represented by values.
 
 \begin{figure}[!ht]\centering
 \begin{subfigure}[b]{0.20\textwidth}\centering
@@ -134,7 +136,7 @@ The figure \ref{fig_example_kernel} displays examples of a standard kernel (left
 \end{subfigure}
 \begin{subfigure}[b]{0.79\textwidth}\centering
 \includegraphics[width=0.80\textwidth]{figures/kernel-h_e.pdf}
-\caption{Kernel $\h^e$ (left) and its associated support $\s^e$ (right)}\label{fig_example_kernel}
+\caption{Kernel $\h^e$ (left) and its associated support $\s^e$ (right).}\label{fig_example_kernel}
 \end{subfigure}
 \end{figure}
 
@@ -144,67 +146,70 @@ $$\h^{*l} = \h^r * \dots * \h^l$$
 Using the matrix notation\footnote{See \cref{sec_matrix_vs_tree}}, the dictionary-as-a-tree $\D$ applied to a code $\x$ approximates $\y$ as follows
 $$\D\x \approx \y$$
 
-The code $\x$ is a "big" vector of dimension $K$ with $K = N \times Leaves$; $\D$ is a matrix of dimensions $N \times K$ and $\y$ is a vector of dimension $N$. 
-
-Showing that $\D$ can be written as a matrix allows to compare the performance of this dictionary against a simple matrix-vector product (see \cref{sec_matrix_vs_tree}). Here is the dictionary-as-a-tree way of computing $\D\x$:
+The dictionary $\D$ can be written as a matrix (showed in \cref{sec_matrix_vs_tree}). This allows us to compare the performance of this dictionary against a simple matrix-vector product. Here is the dictionary-as-a-tree way of computing $\D\x$:
 
 \begin{align}
 	\D\x = \sum_{l \in \L} \x^l * \h^{*l}	 \label{eq_Dx_as_convolution}
 \end{align}
 
-$\D\x$ can be seen as a polynomial of degree $2 \times \text{depth}(\T)$. This implies that it is possibly extremely non-convex although being infinitely differentiable.
+The product $\D\x$ can be seen as a polynomial of degree $2 \times \text{depth}(\T)$. This implies that it is possibly extremely non-convex although being infinitely differentiable.
 
 \subsection{The (FTL) problem}
 
-The dictionary update step is defined as 
+The dictionary update step is defined as
 \begin{align}
 \underset{\substack{(\h^e)_{e}}}\min ~ & \lVert \D\x - \y \rVert_2^2 \tag{$FTL$} \label{eq_ftl}\\
 \text{s.t.~} & \s^e_p=0 \Rightarrow \h^e_p = 0 \quad & \forall p=1,\dots,N ,~\forall e \in \E \label{eq_ftl_in_support} \\
  & \lVert \h^e \rVert \le \gamma & \forall e \in \E\label{eq_ftl_kernel_finite_nrj}
-\end{align}
+\end{align} The constraint in (\ref{eq_ftl_in_support}) guarantees that each kernel $\h^e$ has its non-zero values on the points of its support $\s^e$. Constraint (\ref{eq_ftl_kernel_finite_nrj}) ensures that the overall energy of every support is finite and prevents a specific kernel to "explode".
 
-The constraint \ref{eq_ftl_in_support} guarantees that each kernel $\h^e$ has its non-zero values on the points of its support $\s^e$. Constraint \ref{eq_ftl_kernel_finite_nrj} makes sure that the overall energy of every support is finite and prevents a specific kernel to "explode".
+\eqref{eq_ftl} can be rewritten as an unconstrained problem by introducing a characteristic function $\chi_{\Dspace^e}$ defined for each edge $e$ as follows
 
-\eqref{eq_ftl} can be rewritten as an unconstrained problem, shifting the constraint spaces $(\Dspace^e)_{e \in \E}$ to the objective function using the characteristic function $\chi_{\Dspace^e}$ defined for one edge $e$ as
-$$\chi_{\Dspace^e}(\h^e) = \begin{cases} 0 &\text{ if } \h^e \in \Dspace^e \\ +\infty & \ \text{otherwise}\end{cases}$$
+\begin{align*}
+	\chi_{\Dspace^e}(\h^e) = \begin{cases} 0 &\text{ if } \h^e \in \Dspace^e \\ +\infty & \ \text{otherwise}\end{cases} & \quad \text{with} \quad \Dspace^e = \begin{Bmatrix} \s^e_p=0 \Rightarrow \h^e_p = 0 \quad \forall p=1,\dots,N\\ \text{and }\lVert \h^e \rVert \le \gamma \end{Bmatrix}
+\end{align*}
 
-\eqref{eq_ftl} can then be rewritten as
+The unconstrained problem is
 \begin{align}
 \underset{\substack{(\h^e)_{e}}}\min ~ & \lVert \D\x - \y \rVert_2^2 + \sum_{e}\chi_{D_e} (\h^e) \tag{$FTL_2$} \label{eq_ftl2}
 \end{align}
 
 For later references, the objective function of \eqref{eq_ftl} will be denoted as
 \begin{align}
-\Phi((\h^e)_{e \in \E}) = \lVert \D\x-\y \rVert^2_2
+\Phi[(\h^e)_{e \in \E}] = \lVert \D\x-\y \rVert^2_2
 \end{align}
 
-\subsection{The PALMTREE algorithm}
+\subsubsection{Interesting properties of \eqref{eq_ftl}}
+
+The convolution of sparse kernels in \eqref{eq_ftl} leads to theoretically extremely performant dictionaries. The computational cost of $\D\x$ is reduced\footnote{This is the simplified complexity. See \cref{sec_palmtree} for the actual complexity.} to $$O(|\E| N log N)$$ (with $|\E|$ the number of edges), which is very close to the performance of the fast Fourier transform.
+
+However, $\D\x$ is possibly extremely non-convex (as mentioned in \cref{sec_tree_model}), suggesting that the optimization of \eqref{eq_ftl} is vain and that we would end up trapped by its many suboptimal critical points. Beyond proving that this problem is actually tractable, the authors of \cite{chabiron_optimization_2016} made the fascinating discovery that optimizing \eqref{eq_ftl} is possible and that the solutions given by PALMTREE were encouraging.
+
+\subsection{The PALMTREE algorithm}\label{sec_palmtree}
 [...todo...]
 
 \subsection{Drawbacks}
-As explained in \cite[p. 23]{chabiron_optimization_2016}, the main drawbacks to use this convolutional tree model for practical dictionary learning (as many other applications) are the hand-made parts of the model, leading to arbitrary and sub-optimal results. Among them are the design of the tree (degree, depth...) and the choice of the supports. % TODO "degree" not understandable
+As explained in \cite[p. 23]{chabiron_optimization_2016}, the main drawbacks to use this convolutional tree model for practical dictionary learning (as many other applications) are the hand-made parts of the model, leading to arbitrary and sub-optimal results. Among them are the design of the tree (number of children per node, depth) and the choice of the supports.
 \subsubsection{Choice of the tree}
-The paper chooses to use a fixed tree structure, meaning that the tree (degree, depth) has been created \emph{ad-hoc} on a per-experiment basis, trying to mimic the frequency pyramid tiling of a curvelet decomposition. The number of leaves wasalso specifically chosen to match the number of atoms that was generated on the target image.
+The paper chooses to use a fixed tree structure, meaning that the tree has been created \emph{ad-hoc} on a per-experiment basis, trying to mimic the frequency pyramid tiling of a curvelet decomposition. The number of leaves was also specifically chosen to match the number of atoms that was generated on the target image.
 
-But getting an actual adaptative dictionary update step implies that designing the tree is made optimally and as part of the optimization process. This is one of the internship research axis.
+But getting an actual adaptative dictionary update step implies that designing the tree is made optimally and as part of the optimization process. This research axis has not been explored in this work and will be part of future studies.
 
-\subsubsection{Choice of the kernel supports}
+\subsubsection{Choice of the supports}
 
-As described in \cref{sec_tree_model}, the supports $\s^e$ are part of the dictionary-as-a-tree model. In \cite{chabiron_toward_2015}, the authors experimentally showed that using fixed supports for approximating curvelets is possible. For that specific purpose, the results turned to be good. But the whole model was supposed to be able to approximate any kind of image, hence the need for "adaptative" supports instead of hand-made ones. Figure \ref{fig_example_kernel} shows in dashed-line squares the hand-made support. The gray square show what we would expect from an "adaptive" support. Instead of keeping the same shape for every target atom, the supports evolves and get closer to the target shape.
+As described in \cref{sec_tree_model}, the supports $\s^e$ are part of the dictionary-as-a-tree model. In \cite{chabiron_toward_2015}, the authors experimentally showed that using fixed supports for approximating is possible many kinds of atoms (curvelets, cosines). For the specific purpose of approximating existing atoms, the results turned out to be very promising. However, the proposed model was supposed to be able to approximate any kind of image.
 
-And as for the tree design, the choice of where are located the elements of each kernel support has been made (so far) arbitrarily. The support of the $\h^e$ kernel of fig. \ref{fig_example_kernel} shows an example of typical layout chosen for the experiments in \cite{chabiron_optimization_2016}. 
-
-However, our goal is to be able to approximate any kind of atoms, as \ac{KSVD} is able to do. Being able to choose what elements should be in the kernel supports as part of the optimization process is another goal during this internship.
+So far, the supports have been handcrafted. \Cref{fig_example_kernel} shows an example of typical support layout chosen for the experiments in \cite{chabiron_optimization_2016}. We propose in this work to make the supports "adaptative", i.e. learning them during the optimization process.
 
 \section{Learning the supports}
 [todo: I explain what my contribution will be...]
 
-\Cref{fig_fixed_vs_expected} shows an example of what we think would happen when allowing to add and remove elements: the support would shape itself to better match the target atom (in fig.\ref{fig_fixed_vs_expected}, the atom shown is actually the whole target image).
+\Cref{fig_fixed_vs_expected} shows an example of what we think would happen when allowing to add and remove elements: the support (b) would shape itself into (c) to better match the target atom.
 
 \begin{figure}[!ht]\centering
 \begin{subfigure}[b]{0.32\textwidth}\centering
 	\includegraphics[width=\textwidth]{figures/manual-better-support/target.pdf}
-	\caption{}
+	\caption{}\label{fig_fixed_vs_expected_y}
 \end{subfigure}
 \begin{subfigure}[b]{0.32\textwidth}\centering
 	\includegraphics[width=0.5\textwidth]{figures/manual-better-support/support.pdf}
@@ -212,10 +217,14 @@ However, our goal is to be able to approximate any kind of atoms, as \ac{KSVD} i
 \end{subfigure}
 \begin{subfigure}[b]{0.32\textwidth}\centering
 	\includegraphics[width=\textwidth]{figures/manual-better-support/support-better.pdf}
-	\caption{Better fitted kernel}
+	\caption{Expected kernel}
 \end{subfigure}
-\caption{On the left, a simple curvelet atom which serves as target image. The right figure represents the locations of the support element for one of the kernels of the tree. The dashed squares represent the initial support given in figure \ref{fig_example_kernel}. The gray squares show the (supposedly) locations of the support elements after optimization. The elements have moved to the general direction of the curvelet.} \label{fig_fixed_vs_expected}
+\caption{Generic versus expected kernels. (a) is the target image made of one curvelet. (b) gives the locations of the support for one of the kernels of the tree. (c) shows a hand-made kernel that we expect to give better results as it follows the general direction of the curvelet}\label{fig_fixed_vs_expected}
 \end{figure}
+
+\Cref{fig_xp_fixed_vs_expected} experimentally confirms the assumption made in \Cref{fig_fixed_vs_expected}. We switched $\s^4$ from a generic support to a hand-made support that follows the general direction of $\y$ (\cref{fig_fixed_vs_expected_y}). The RMSE\footnotemark[1] is decreased by -16\% (lower is better).
+
+\footnotetext[1]{Root mean square error. Let $\y^1$ and $\y^2$ two images of concatenated into a vector of dimension $N$, then $RMSE(\y^1,\y^2) = \frac{1}{N} \sqrt{\sum_{i=1}^N (y^1_i - y^2_i)^2}$}
 
 \begin{figure}[!ht]\centering
 \begin{subfigure}[b]{0.09\textwidth}\centering
@@ -224,7 +233,7 @@ However, our goal is to be able to approximate any kind of atoms, as \ac{KSVD} i
 \end{subfigure}
 \begin{subfigure}[b]{0.39\textwidth}\centering
 	\includegraphics[width=\textwidth]{figures/exple-better-support/xp_128x128_sc2_angl1_K3_S3_node4classic_approx.pdf}
-	\caption{}
+	\caption{$\D\x$ with generic supports}
 \end{subfigure}
 \begin{subfigure}[b]{0.09\textwidth}\centering
 	\includegraphics[width=\textwidth]{figures/exple-better-support/tree_expected.pdf}
@@ -232,41 +241,38 @@ However, our goal is to be able to approximate any kind of atoms, as \ac{KSVD} i
 \end{subfigure}
 \begin{subfigure}[b]{0.39\textwidth}\centering
 	\includegraphics[width=\textwidth]{figures/exple-better-support/xp_128x128_sc2_angl1_K3_S3_node4expected_approx.pdf}
-	\caption{}
+	\caption{$\D\x$ with hand-made $\s^4$}
 \end{subfigure}
-\caption{a} \label{fig_fixed_vs_expected}
+\caption{Visual enhancement when adapting a support.} \label{fig_xp_fixed_vs_expected}
 \end{figure}
+
+
+
 
 \chapter{Experiments}
 
-\section{Optimization of supports}
-
-[redo: After being able to correctly add and remove support elements, the second phase was to think about what elements we would add or remove, and when (i.e. when during the PALMTREE algorithm).]
-
-
-\subsection{Adding an element}
-[redo: Our first thought on how to add an element to a support was to find the best kernel among the tree edges, and then pick the best point(s) of that support to be added. We thought the gradient of the objective function would probably give that information.]
+This chapter covers the protocols and results of the various experiments aiming to learning the supports during the PALMTREE algorithm.
 
 \section{Experiment protocol}
-The follwing experiments are using a fixed single-branch tree of depth 4 (see fig. \ref{fig_gain_n4}). The gain-per-added-point matrix is always computed with respect to one of the four supports $\s^e$.
+The following experiments are using a fixed single-branch tree of depth 4 associated with $\y$, $\h^e$, $\s^e$ and $\x^e$ of size $128 \times 128$. The figures only display the central $64 \times 64$ pixels as shown in \cref{fig_xp_explain}. The gain-per-added-point matrix (introduced in \cref{sec_gain_per_added_point}) is always computed with respect to one of the four supports $\s^e$.
 
 \begin{figure}[!ht]\centering
 \begin{subfigure}[b]{0.32\textwidth}\centering
-	\includegraphics[width=\textwidth]{figures/xp_explain/target.pdf}
+	\includegraphics[width=0.9\textwidth]{figures/xp_explain/target.pdf}
 	\caption{}
 \end{subfigure}
 \begin{subfigure}[b]{0.32\textwidth}\centering
-	\includegraphics[width=\textwidth]{figures/xp_explain/dictionary.pdf}
+	\includegraphics[width=0.9\textwidth]{figures/xp_explain/dictionary.pdf}
 	\caption{}
 \end{subfigure}
 \begin{subfigure}[b]{0.32\textwidth}\centering
-	\includegraphics[width=\textwidth]{figures/xp_explain/code.pdf}
+	\includegraphics[width=0.9\textwidth]{figures/xp_explain/code.pdf}
 	\caption{}
 \end{subfigure}
-\caption{a} \label{fig_xp_explain}
+\caption{Image $\y$, dictionary $\D$ and $\x$ used in experiments. $\y$ and $\x$ are given, $\D$ is learned.} \label{fig_xp_explain}
 \end{figure}
 
-\section{Using the gradient for adding support elements}
+\section{Using the gradient for choosing the elements to add}
 
 The Orthogonal Matching Pursuit (OMP, detailed in \cref{alg_omp}) chooses which component $\x_i$ should be "turned on" at each iteration, finding the atom $d_i$ that has the greatest correlation with the residual $R$. This step (cf. \cref{alg_omp_pick_correlation}) uses the gradient $\nabla \Phi(\x)$, with $$\Phi(\x) = \lVert \D\x - \y \rVert^2$$
 
@@ -304,8 +310,8 @@ We basically chose to use the fast Fourier transform ($\F$) for computing the co
 \end{align*}
 with ${}^*$ denoting the adjoint operator, $\text{.\^{}}$ the point-wise product, $\h^{f}$ the (todo) % TODO H^e?
 
-\subsection{Is the gradient right?}
-We had some trouble when trying to compute the gradient on the full kernels $(\h^e)_{e \in \E}$ (not only on the supports element locations). To be sure that the computed "full" gradient was correct, we compared it to a finite-diffences gradient:
+\subsection{Asserting the "full" gradient}
+We had some trouble when trying to compute the gradient on the full kernels $(\h^e)_{e \in \E}$ (not only on the supports element locations). To be sure that the computed "full" gradient was correct, we compared it to a finite-diffence gradient:
 
 $$\lim_{\epsilon \rightarrow 0} \frac{\Phi((\h^e)_{e \in \E}+\epsilon e_i) - \Phi ((\h^e)_{e \in \E}) }{\epsilon} ~\overset{?}{=}~ \nabla_i \Phi ((\h^e)_{e \in \E})$$
 
@@ -324,7 +330,7 @@ $$\lim_{\epsilon \rightarrow 0} \frac{\Phi((\h^e)_{e \in \E}+\epsilon e_i) - \Ph
 
 Figure \ref{fig_verif_gradient} compares the FFT-computed gradient to the finite-differences gradient (with $\epsilon=0.001$). The bottom left figure shows that the two gradients are very close in term of difference. The right figure shows that the finite-differences gradient converges to the "full" gradient, which confirms that our "full" gradient is correct.
 
-\subsection{The ideal elements to be added}\label{sec_gain_per_added_point}
+\subsection{Gain-per-added-point to the support}\label{sec_gain_per_added_point}
 
 One way to know if the "full" gradient leads to a good solution after many iterations, we designed the \cref{alg_gain_per_added_point} that tries every possible point added to one of the supports and see how much the objective function decreases. We named the resulting matrix \emph{gain-per-added-point} with the notation $\g^f$ ($f$ is the edge of the studied support).
 
@@ -531,7 +537,6 @@ The experiment shown in \cref{fig_iter_gain_vs_grad} compares the best values of
 \section{Link between convolutional tree and dictionary matrix}\label{sec_matrix_vs_tree} % $\bm{D} in \section{} bugs
 
 Figure \ref{fig_block_circular} outlines the relation between the tree and the matrix form. The dictionary can be written using the notation
-
 $$\D = \begin{bmatrix}C^5 & C^6\end{bmatrix} \begin{bmatrix}C^1 & C^2 & 0 & 0 \\0 & 0 & C^3 & C^4\end{bmatrix}$$
 with $C^i$ the block-circular matrix for $\h^i$; it represents the final convolution $\h^{*l}*\x^l$ when using matrices.
 
