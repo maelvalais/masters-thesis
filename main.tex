@@ -53,7 +53,7 @@ This method, although offering excellent performances for compressed sensing tha
 
 Like fixed-basis frames, learned dictionaries are over-complete. Instead of being fixed, atoms are based on a learning set of sample images
 $$\Y = \begin{bmatrix} \y_1 & \dots & \y_S \end{bmatrix}$$
-where $\Y$ is the concatenation of $S$ column vectors $\y_i$ (the images) of dimension $N$. The dictionary $\D$ is made of $K$ columns $\d_i$ (the atoms) such that the number of atoms is way larger than the dimension of a single image $\y_i$ ($ \gg K \gg N$):
+where $\Y$ is the concatenation of $S$ column vectors $\y_i$ (the images) of dimension $N$. The dictionary $\D$ is made of $K$ columns $\d_i$ (the atoms) such that the number of atoms is way larger than the dimension of a single image $\y_i$ ($K \gg N$):
 $$\D = \begin{bmatrix} \d_1 & \dots & \d_K \end{bmatrix}$$
 
 The codes $\X$ are defined by
@@ -106,7 +106,7 @@ The dictionary in (c) can now be used for denoising the noisy image (a). If we w
 	\includegraphics[width=0.7\textwidth]{figures/ksvd/dictionary.pdf}
 	\caption{Learned $\D$}\label{fig_ksvd_dict}
 \end{subfigure}
-\caption{Learning $\D$ on image patches using K-SVD.}\label{fig_ksvd_dict}
+\caption{Learning $\D$ on image patches using K-SVD.}\label{fig_ksvd}
 \end{figure}
 
 
@@ -520,7 +520,7 @@ The experiment shown in \cref{fig_iter_gain_vs_grad} compares the best values of
 	\caption{Grad. iter. 200}
 	\end{subfigure}
 \end{subfigure}
-\caption{Is the gradient giving the same information depending on the iteration? The conditions are the same as \cref{fig_simple_approx}. Only the best values are displayed.}\label{fig_iter_gain_vs_grad}
+\caption{Is the gradient giving the same information depending on the iteration? The conditions are the same as \cref{fig_gain_n4}}. Only the best values are displayed.}\label{fig_iter_gain_vs_grad}
 \end{figure}
 
 
