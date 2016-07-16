@@ -12,13 +12,13 @@
 
 \section{The need for sparse representations}
 
-A sparse signal over some representation means that it can be written with as few information as possible – in other words, sparse means with many zeros. Many applications ranging from machine learning to image denoising heavily rely on the property that we can summarize (or more exactly approximate) any signal using a proper sparse representation. The job of obtaining the raw\footnote{Any raw signal is actually represented by the canonical basis} signal from its sparse counterpart takes the form of an operator, often called dictionary or transform.
+A sparse signal over some representation means that it can be expressed using only a few elements of the representation – in other words, sparse means with many zeros. Many applications ranging from machine learning to image denoising heavily rely on the property that we can summarize (or more exactly approximate) any signal using a proper sparse representation. The job of obtaining the raw\footnote{Any raw signal is actually represented by the canonical basis} signal from its sparse counterpart can be written in terms of an operator, often called \emph{dictionary} or \emph{transform}.
 
 This chapter will review the main existing dictionaries that have been used for sparse representation, from non-adaptative transforms to learned dictionaries and through the intermediate over-complete dictionaries.
 
 \section{Basis dictionaries}
 
-The Fourier transform is a classical example of operators used for sparsity. In figure \ref{fig_fourier}, the left picture $\y$ has been represented using a Fourier basis, which can be written as a matrix $\D$. The right picture shows the coefficients $\x$ such that
+The Discret Fourier Transform (DFT) is a classical example of operators used for sparsity. The DFT can be written as a matrix $\D$, where $\D$ denotes the dictionary. Finding the Fourier representation – which we will refer as the \emph{code} $\x$ – of an image $\y$ amounts to compute
 $$\D^T\y = \x$$
 
 \begin{figure}[!ht]
@@ -31,14 +31,14 @@ $$\D^T\y = \x$$
 
 However, the Fourier transform is quite different from the representations we have in mind, namely the convolutional tree structure. First, it is a linear mapping and its corresponding matrix forms a basis. This representation is one-to-one in the sense that every code $\x$ is associated with a unique image $\y$. This basis is also orthogonal, meaning that the operator is stable (it does not amplify errors). % TODO Finally, the basis is normed, meaning that...
 
-More importantly, Fourier has interesting properties that allow fast implementations. For example, applying the Matlab function \texttt{fft2} to the \cref{fig_fourier} is extremely fast. If we assume $N$ to be the dimension of the concatenated\footnotemark[2] image, instead of computing a time-expensive $O(N^2)$ matrix-vector product, the fast Fourier transform only requires a $O(NlogN)$ computational cost.
+More importantly, Fourier has interesting properties that allow fast implementations. For example, applying the Matlab function \texttt{fft2} to the \cref{fig_fourier} takes less than a millisecond. If we assume $N$ to be the dimension of the concatenated\footnotemark[2] image, instead of computing a time-expensive $O(N^2)$ matrix-vector product, the fast Fourier transform only requires a $O(NlogN)$ computational cost.
 
-\footnotetext[2]{For easier reading, we consider images as one-dimensional vectors. A $16 \times 16$ image would give a vector of dimension 256.}
+\footnotetext[2]{Also referred as "vectorized"; we consider 2-D images as one-dimensional vectors. A $16 \times 16$ image would give a vector of dimension 256.}
 
 
 The Fourier transform is widely used as an operator for sparse representations, mainly when dealing with smooth signals that can be approximated by a sum of sinusoids. However, this operator does not generally perform well on images since they contain many discontinuities that are far from being representable using sinusoids.
 
-As an example, most of the coefficients of the code $\x$ in \cref{fig_fourier} are non-zero. The worst performance happens on the edges of the blackboard: the white vertical and horizontal lines that are full of high-value coefficients are trying to code the discontinuity, which is difficult to obtain with a Fourier basis.
+As an example, most of the coefficients of the code $\x$ in \cref{fig_fourier} are non-zero. The worst performance (in terms of sparsity) happens on the edges of the blackboard: the white vertical and horizontal lines that are full of high-value coefficients are trying\footnote{This effect is known as the Gibbs phenomenon.} to code the discontinuity, which is difficult to obtain with a Fourier basis.
 
 Along with Fourier, many other non-adaptative dictionaries exist; we can mention the cosine transform which is at the core of JPEG compression. We can also cite the wavelet transform, used in JPEG2000 compression (for movies in theaters), and the curvelet transform, which is more tolerant to non-smooth images. Note that cosine, wavelet and curvelet transforms are stable and also have fast implementations.
 
@@ -87,7 +87,27 @@ s.t.~& \lVert \x_i \rVert_0 \le \gamma \quad \forall i \text{ in } 1,\dots,S
 \end{align*}
 where $\lVert . \rVert_F$ denotes the Frobenius norm and $\lVert . \rVert_0$ is the pseudo-norm $l_0$ (also known as "counting function").
 
-The \emph{Sparse Coding step} optimizes along $\x$; this step basically uses OMP \cref{alg_omp} or any other pursuit algorithm. The \emph{Dictionary Update step} optimizes along $\D$. This is the step the authors of \cite{chabiron_optimization_2016} worked on. Note that the full K-SVD algorithm is in \cref{sec_ksvd}, \cpageref{sec_ksvd}.
+The \emph{Sparse Coding step} optimizes along $\x$; this step basically uses OMP (see \cref{alg_omp}) or any other pursuit algorithm. The \emph{Dictionary Update step} optimizes along $\D$. This is the step the authors of \cite{chabiron_optimization_2016} worked on. Note that the full K-SVD algorithm is in \cref{sec_ksvd_detail}, \cpageref{sec_ksvd_detail}.
+
+\Cref{fig_ksvd} gives an example of what "learning $\D$" means with the K-SVD algorithm. As the image (a) is too big ($512 \times 512$) to be learned directly, we must chop it into many small patches of size $16 \times 16$. (b) shows some of these patches contained in $\Y$, which actually holds 10240 patches ($\Y$ has dimension $128 \times 10240$). The dictionary $\D$ of size $128 \times 128$ (it has 128 atoms) is shown in (c). $\D$ has been learned with a sparsity of 10 and the process took about five minutes (stopped after 20 iterations).
+
+The dictionary in (c) can now be used for denoising the noisy image (a). If we wanted a dictionary for image recognition or compression, we would probably use many more images.
+
+\begin{figure}[!ht]\centering
+\begin{subfigure}[b]{0.40\textwidth}\centering
+	\includegraphics[width=\textwidth]{figures/ksvd/tableau_512x512.png}
+	\caption{Image used for learning}
+\end{subfigure}
+\begin{subfigure}[b]{0.29\textwidth}\centering
+	\includegraphics[width=0.7\textwidth]{figures/ksvd/patches.pdf}
+	\caption{Image patches $\Y$}
+\end{subfigure}
+\begin{subfigure}[b]{0.29\textwidth}\centering
+	\includegraphics[width=0.7\textwidth]{figures/ksvd/dictionary.pdf}
+	\caption{Learned $\D$}\label{fig_ksvd_dict}
+\end{subfigure}
+\caption{Learning $\D$ on image patches using K-SVD.}\label{fig_ksvd_dict}
+\end{figure}
 
 
 
@@ -310,7 +330,7 @@ We basically chose to use the fast Fourier transform ($\F$) for computing the co
 \end{align*}
 with ${}^*$ denoting the adjoint operator, $\text{.\^{}}$ the point-wise product, $\h^{f}$ the (todo) % TODO H^e?
 
-\subsection{Asserting the "full" gradient}
+\subsection{Validation of the "full" gradient}
 We had some trouble when trying to compute the gradient on the full kernels $(\h^e)_{e \in \E}$ (not only on the supports element locations). To be sure that the computed "full" gradient was correct, we compared it to a finite-diffence gradient:
 
 $$\lim_{\epsilon \rightarrow 0} \frac{\Phi((\h^e)_{e \in \E}+\epsilon e_i) - \Phi ((\h^e)_{e \in \E}) }{\epsilon} ~\overset{?}{=}~ \nabla_i \Phi ((\h^e)_{e \in \E})$$
@@ -353,27 +373,27 @@ $\g^f$ represents for each point $p \in \P$ the minimized objective function if 
 \Cref{fig_gain_n4} compares (c) the gain-per-added-point of $\s^4$ to (d) the absolute value of the partial gradient w.r.t $\h^4$ after a full minimization. It is interesting to see that they share the same direction and shape. After selecting 20 of their best values in (e) and (f), we notice that they almost match, which reinforces our hypothesis that the gradient could give the right information for widening supports.
 
 \begin{figure}[!ht]\centering
-\begin{subfigure}[b]{0.49\textwidth}\centering
+\begin{subfigure}[b]{0.4\textwidth}\centering
 \includegraphics[width=\linewidth]{figures/xp/n4/xp_128x128_sc2_angl1_K3_S3_node4_target.pdf}
 \caption{Target $\y$}
 \end{subfigure}
-\begin{subfigure}[b]{0.49\linewidth}\centering
+\begin{subfigure}[b]{0.4\linewidth}\centering
 \includegraphics[width=\linewidth]{figures/xp/n4/xp_128x128_sc2_angl1_K3_S3_node4_approx.pdf}
 \caption{Approximation $\D\x$} \label{fig_gain_n4_approx}
 \end{subfigure}
-\begin{subfigure}[b]{0.49\linewidth}\centering
+\begin{subfigure}[b]{0.4\linewidth}\centering
 \includegraphics[width=\linewidth]{figures/xp/n4/xp_128x128_sc2_angl1_K3_S3_node4_objmatrix.pdf}
 \caption{Gain-per-added-point for $\s^4$}
 \end{subfigure}
-\begin{subfigure}[b]{0.49\linewidth}\centering
+\begin{subfigure}[b]{0.4\linewidth}\centering
 \includegraphics[width=\linewidth]{figures/xp/n4/xp_128x128_sc2_angl1_K3_S3_node4_partgrad4.pdf}
 \caption{Partial gradient w.r.t $\h^4$}
 \end{subfigure}
-\begin{subfigure}[b]{0.49\linewidth}\centering
+\begin{subfigure}[b]{0.4\linewidth}\centering
 \includegraphics[width=\linewidth]{figures/xp/n4/xp_128x128_sc2_angl1_K3_S3_node4_objmatrix_bestvalues.pdf}
 \caption{Best values of above figure}
 \end{subfigure}
-\begin{subfigure}[b]{0.49\linewidth}\centering
+\begin{subfigure}[b]{0.4\linewidth}\centering
 \includegraphics[width=\linewidth]{figures/xp/n4/xp_128x128_sc2_angl1_K3_S3_node4_partgrad4_bestvalues.pdf}
 \caption{Best values of above figure}
 \end{subfigure}
@@ -552,7 +572,7 @@ with $C^i$ the block-circular matrix for $\h^i$; it represents the final convolu
 \caption{This figure shows how to go from the tree defined by its kernels $(\h^e)_{e \in \E}$ to a matrix $\D$} \label{fig_block_circular}
 \end{figure}
 
-\section{Detail of the K-SVD algorithm} \label{sec_ksvd}
+\section{Detail of the K-SVD algorithm} \label{sec_ksvd_detail}
 \begin{algorithm}
     \caption{K-SVD (K-Singular Value Decomposition) algorithm for \eqref{eq_dl_ksvd}} \label{alg_ksvd}
   \begin{algorithmic}[1]
