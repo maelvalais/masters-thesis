@@ -1,5 +1,5 @@
 \documentclass[11pt, a4paper, onecolumn, twoside,french,cleardoublepage=plain,openany]{report}
-\usepackage[a4paper,margin=3cm,top=3cm,bottom=2cm]{geometry}
+\usepackage[a4paper,top=3cm,bottom=2cm,inner=1cm,outer=3cm,,marginparwidth=2.9cm,marginparsep=0.05cm]{geometry} %showframe
 \usepackage[english]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -36,6 +36,7 @@
     }
   }
 }
+\usepackage[makeroom]{cancel} % for "crossing" an equation
 
 %\usepackage{multirow} % Pour colonnes multiples des tableaux
 %\usepackage{longtable} % Pour longs tableaux
@@ -58,7 +59,7 @@
 \usepackage[acronym,toc,shortcuts]{glossaries}
 \usepackage{nth} % 1st, 3rd, 4th...
 \usepackage{bm} % \bm{} for bold font in text and math modes
-\usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
+\usepackage[colorinlistoftodos,prependcaption,textsize=normalsize]{todonotes} %,textsize=tiny
 \usepackage[pdfusetitle]{hyperref} % for linkable refs and title in pdf meta
 \usepackage[english,capitalise]{cleveref} % capitalise = Fig. instead of fig.
 %\makeglossary

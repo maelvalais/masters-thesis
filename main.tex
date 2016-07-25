@@ -77,7 +77,7 @@ Because optimizing simultaneously along $\D$ and $\X$ causes non-linearity, many
 
 \section{The K-SVD algorithm}
 
-Among the many existing alternating algorithms for dictionary learning like the Online dictionary learning algorithm or the K-means algorithm, the \ac{KSVD} algorithm is well known for its state-of-the-art performances in image denoising. Introduced in \cite{aharon_k-svd:_2006}, K-SVD is responsible for many concepts behind the PALMTREE algorithm (the algorithm we are trying to improve and developed in \cite{chabiron_optimization_2016}). This section summarizes the key elements of the K-SVD algorithm.
+Among the many existing alternating algorithms for dictionary learning like the Online dictionary learning algorithm or the K-means algorithm, the \ac{KSVD} algorithm is well known for its state-of-the-art performances in image denoising. Introduced in \cite{aharon_k-svd:_2006}, K-SVD is responsible for many concepts behind the \acs{PALMTREE} algorithm (the algorithm we are trying to improve and developed in \cite{chabiron_optimization_2016}). This section summarizes the key elements of the K-SVD algorithm.
 
 \ac{KSVD} does not actually solve \eqref{eq_dl}; instead, it gives a solution for a "stronger" problem in the sense that the level of sparsity in K-SVD is enforced by $\gamma$ in
 \begin{align*}
@@ -130,7 +130,7 @@ Many state-of-the-art machine learning techniques are based on trees of convolut
 \chapter{State of the art}
 
 \section{Convolutional dictionaries}
-[Didn't I say everything in \cref{sec_atoms_redund}???]
+\todo[inline]{Didn't I say everything in \cref{sec_atoms_redund}?}
 
 \section{The convolutional tree algorithm}
 
@@ -144,7 +144,7 @@ The work studied in \cite{chabiron_toward_2015} and \cite{chabiron_optimization_
 
 The target image $\y$ as well as the kernels $\h^e$ and supports $\s^e$ are vectors of dimension $N$. The supports $\s^e$ only take the values 0 (corresponding value in $\h^e$ must be 0) or 1 (corresponding value in $\h^e$ can be non-zero). The code $\x$ is a "big" vector of dimension $K$ with $K = N \times Leaves$; $\D$ is a matrix of dimensions $N \times K$ and $\y$ is a vector of dimension $N$.
 
-In the following, we will denote interchangeably the image using the vector notation $y = \{ y_i ~|~ i=1,\dots,N \}$ or the linear map notation $y = \{y(p) ~|~ p \in \P\}$.
+In the following, we will denote the image interchangeably using the vector notation $y = \{ y_i ~|~ i=1,\dots,N \}$ or the linear map notation $y = \{y(p) ~|~ p \in \P\}$.
 
 The \cref{fig_example_kernel} displays examples of a standard kernel (left) and a kernel $\h^e$ (middle) associated with its support $\s^e$ (right). The gray squares represent the "ones" of the support while the kernel is represented by values.
 
@@ -200,11 +200,49 @@ For later references, the objective function of \eqref{eq_ftl} will be denoted a
 
 \subsubsection{Interesting properties of \eqref{eq_ftl}}
 
-The convolution of sparse kernels in \eqref{eq_ftl} leads to theoretically extremely performant dictionaries. The computational cost of $\D\x$ is reduced\footnote{This is the simplified complexity. See \cref{sec_palmtree} for the actual complexity.} to $$O(|\E| N log N)$$ with $|\E|$ the number of edges; this is very close to the performance of the fast Fourier transform.
+The convolution of sparse kernels in \eqref{eq_ftl} leads to theoretically extremely performant dictionaries. The computational cost of $\D\x$ is reduced\footnote{This is the simplified complexity. See \cref{sec_palmtree} for the actual complexity.} to $$O(|\E| N log N)$$ with $|\E|$ the number of edges; and because $|\E|$ is significantly smaller than $N$, this is very close to the performance of the fast Fourier transform.
 
-However, $\D\x$ is possibly extremely non-convex (as mentioned in \cref{sec_tree_model}), suggesting that the optimization of \eqref{eq_ftl} is vain and that we would end up trapped by its many suboptimal critical points. Beyond proving that this problem is actually tractable, the authors of \cite{chabiron_optimization_2016} made the fascinating discovery that optimizing \eqref{eq_ftl} is possible and that the solutions given by PALMTREE were encouraging.
+However, $\D\x$ is possibly extremely non-convex (as mentioned in \cref{sec_tree_model}), suggesting that the optimization of \eqref{eq_ftl} is vain and that we would end up trapped by its many suboptimal critical points. Beyond proving that this problem is actually tractable, the authors of \cite{chabiron_optimization_2016} made the fascinating discovery that optimizing \eqref{eq_ftl} is possible and that the solutions given by \acs{PALMTREE} were encouraging.
+
 
 \subsection{The PALMTREE algorithm}\label{sec_palmtree}
+
+The authors of \cite{chabiron_optimization_2016} have shown that \eqref{eq_ftl2} can be solved using the \ac{PALM} algorithm proposed in \cite{bolte_proximal_2014}. The \ac{PALM} algorithm regularizes the non-convex objective function using a simple linear approximation with respect to one block of variables. One block corresponds to one kernel $\h^e$. \todo{I'll use some help!}
+
+The implementation of the generic \ac{PALM} algorithm for solving the \eqref{eq_ftl2} problem has been named \ac{PALMTREE}. 
+
+An outline of the algorithm is given in \cref{alg_palmtree}, where $t^e$ denotes the step size and $\text{prox}^f_\gamma$ is the proximal operator for prior function $f$ defined by $$\text{prox}^f_\gamma(y) = \underset{x}{\argmin}~ f(x) + \frac{\gamma}{2} \lVert x - y \rVert^2_2$$ which, for $f = \chi_{\Dspace^e}$, is easily computed by a projection onto the $l_2$ unit ball. \todo{Need help}
+
+Details on the step size $t^e$ (which requires the computation of a Lipschitz constant) and the proximal operator $\text{prox}^{\chi_{\Dspace^e}}_{t^e}$ are given in \cite{chabiron_optimization_2016}. We will focus on the way the partial gradient is computed to get more insight 
+
+The partial gradient is cleverly computed using the  redundancy of the convolutions in the tree. We define $\H^e$ as the convolution of every branches that crosses the edge $e$ except for the kernel $\h^e$, i.e. $$\H^e = \h^r * \dots * \h^{\text{above}(e)} * \bcancel{\h^{e}} * \sum_{l \in \text{leaves(e)}} \h^{\text{below}(e)^l} * \dots * \h^{l}$$ where $\text{leaves}(e)$ denotes the leaves that can be reached through $e$, $\text{above}(e)$  the edge right above $e$ and $\text{below}(e)^l$ the edge below $e$ that leads to the leaf $l$.
+
+Using this notation, the authors of \cite{chabiron_optimization_2016} have shown that the partial gradient of $\Phi$ w.r.t. $\h^e$ is 
+$$\nabla_{\h^e} \Phi[(\h^f)_{f \in \E}] = 2 \H^e * \Res$$ with $\Res$ the residual denoted by
+$$\Res = \D\x - \y$$
+
+Because of the projection onto the $l_2$ unit ball, it is sufficient to compute the partial gradient at the support locations. As explained further in \cref{sec_full_grad}, this means that the convolution $2 \H^e * \Res$ can be efficiently computed using a simple convolution. However, computing the gradient on the full kernel cannot be computed efficiently this way.
+
+\begin{algorithm}[!ht]
+    \caption{\ac{PALMTREE} (Proximal Alternating Linearized Minimization for Convolutional Tree model) algorithm for Dictionary Update}\label{alg_palmtree}
+  \begin{algorithmic}[1]
+    \Input
+    \begin{itemize}
+    	\item[--] image $\y$
+    	\item[--] tree $\T(\V,\E)$
+    	\item[--] codes $(\x^l)_{l \in \L}$
+    	\item[--] supports $(\s^e)_{e \in \E}$
+    \end{itemize}
+    \Output kernels $(\h^e)_{e \in \E} \in \R^{|\E| \times N}$
+    \State Initialize $(\h^e)_{e \in \E}$
+    \While{not converged}
+      \For{$e \in \E$ (depth-first way)}
+      	\State $\h^e = \text{prox}^{\chi_{\Dspace^e}}_{t^e} \left(\h^e-\frac{1}{t^e} \nabla_{\h^e} \Phi[(\h^f)_{f \in \E}] \right)$
+      \EndFor
+    \EndWhile
+  \end{algorithmic}
+\end{algorithm}
+
 
 
 \subsection{Drawbacks}
@@ -222,7 +260,7 @@ As described in \cref{sec_tree_model}, the supports $\s^e$ are part of the convo
 So far, the supports have been handcrafted. \Cref{fig_example_kernel} gives an example of typical support layout chosen for the experiments in \cite{chabiron_optimization_2016}. We propose in this work to make the supports "adaptative", i.e. learning them during the optimization process.
 
 \section{Learning the supports}
-[todo: I explain what my contribution will be...]
+\todo{Here, explain what my contribution will be...}
 
 \Cref{fig_fixed_vs_expected} illustrates what could be expected to be found as the solution for an "adaptive" support of same size: the support (b) would shape itself into (c) to better match the target atom.
 
@@ -271,7 +309,7 @@ So far, the supports have been handcrafted. \Cref{fig_example_kernel} gives an e
 
 \chapter{Experiments}
 
-This chapter covers the protocols and results of the various experiments aimed to learning the supports during the PALMTREE algorithm.
+This chapter covers the protocols and results of the various experiments aimed to learning the supports during the \ac{PALMTREE} algorithm.
 
 \section{Experiment protocol}
 The following experiments are using a fixed single-branch tree of depth 4 associated with $\y$, $\h^e$, $\s^e$ and $\x^e$ of size $128 \times 128$. The figures only display the central $64 \times 64$ pixels as shown in \cref{fig_xp_explain}. The gain-per-added-point matrix (introduced in \cref{sec_gain_per_added_point}) is always computed with respect to one of the four supports $\s^e$.
@@ -314,21 +352,21 @@ The Orthogonal Matching Pursuit (\ac{OMP}, detailed in \cref{alg_omp}) chooses w
   \end{algorithmic}
 \end{algorithm}
 
-Our idea is to use the same principle when adding elements to supports $(\s^e)_{e \in \E}$: add a new element to one of the supports between two iterations of the PALMTREE algorithm, using the greatest gradient component information.
+Our idea is to use the same principle when adding elements to supports $(\s^e)_{e \in \E}$: add a new element to one of the supports between two iterations of the \ac{PALMTREE} algorithm, using the greatest gradient component information.
 
 But is it actually correct to choose the element to be added using a strictly local information (the gradient)? Also, how to get the "full" gradient as the current gradient is only computed on the points of the support?
 
 We will first review how the "full" gradient is computed and then describe a way to check that the gradient gives a good direction towards a critical point.
 
 
-\subsection{Computing the "full" gradient}
+\subsection{Computing the "full" gradient} \label{sec_full_grad}
 Up to now, the gradient was computed using a convolution based on translations. It takes advantage of the sparsity of each kernel $\h^e$ as well as the fact that the proximal operator is projecting every kernel onto its support, meaning that only a few elements have to be computed.
 
 We basically chose to use the fast Fourier transform ($\F$) for computing the convolution on the whole kernels:
 \begin{align*}
-	\nabla_{\h^f} \Phi((\h^e)_{e \in \E})&= \F^{-1}(\F(H^{e'})^* \text{.\^{}} \F(R))
+	\nabla_{\h^e} \Phi((\h^f)_{f \in \E})&= \F^{-1}(\F(\H^{e})^* \text{.\^{}} \F(\Res))
 \end{align*}
-with ${}^*$ denoting the adjoint operator, $\text{.\^{}}$ the point-wise product, $\h^{f}$ the (todo) % TODO H^e?
+with ${}^*$ denoting the adjoint operator, $\text{.\^{}}$ the point-wise product; $\H^{e}$ as well as $\Res$ are notations defined in \cref{sec_palmtree}. % TODO H^e?
 
 \subsection{Validation of the "full" gradient}
 We had some trouble when trying to compute the gradient on the full kernels $(\h^e)_{e \in \E}$ (not only on the supports element locations). To be sure that the computed "full" gradient was correct, we compared it to a finite-difference gradient:
@@ -624,9 +662,9 @@ This is because the deviation in the $N$ dimensional space can be written as
 \begin{align*}
 \sigma^2(b) =& \mathbb{E}\left[\lVert b-\mathbb{E}(b) \rVert^2 \right]\\
 =& \mathbb{E}\left(\lVert b \rVert^2 \right)\\
-=& ... \\ % TODO finish useless proof
+=& ... \\ 
 =& \frac{1}{N}\lVert b \rVert^2
-\end{align*}
+\end{align*}\todo{Ask for help}
 which gives 
 $$ \lVert b \rVert = \sigma\sqrt{N} $$
 When projected to the $K$ dimensional space, the noise deviation becomes
@@ -639,6 +677,7 @@ which is much better than the previous distance, provided that $K \gg N$.
 \end{figure}
 
 \section{Why $FT(\widetilde{A}) = FT(A)^*$}
+\todo[inline]{This is a meaningless proof; I'll remove it}
 \begin{align*}
 (\widehat{\widetilde{A}})_{m,n} =& \sum_{k=1}^M \sum_{l=1}^N \widehat{A}_{k,l} e^{-2i\pi (k\frac{m}{M}+l \frac{n}{N})}\\
 =& \sum_{k=1}^M \sum_{l=1}^N A_{-k,-l} e^{-2i\pi (k\frac{m}{M}+l \frac{n}{N})}\\
