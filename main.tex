@@ -171,7 +171,7 @@ Two other teams are also actively working on multi-resolution transforms:
 \end{itemize}
 Their work have been published very recently (early 2016); this thesis does not detail these papers, but studying these advances will be done right after the end of this internship, during the PhD thesis.
 
-\chapter{Theory}
+\chapter{State of the art}
 
 \section{Dictionary structured by the \Gls{treemodel}}
 
@@ -233,7 +233,7 @@ The dictionary update step associated with the \gls{treemodel} is defined as
 
 The unconstrained problem is
 \begin{align}
-\underset{\substack{(\h^e)_{e}}}\min ~ & \lVert \D\x - \y \rVert_2^2 + \sum_{e}\chi_{D_e} (\h^e) \tag{$FTL_2$} \label{eq_ftl2}
+\underset{\substack{(\h^e)_{e}}}\min ~ & \lVert \D\x - \y \rVert_2^2 + \sum_{e}\chi_{D_e} (\h^e) \tag{${FTL}_2$} \label{eq_ftl2}
 \end{align}
 
 For later references, the objective function of \ac{FTL} will be denoted as
@@ -261,21 +261,24 @@ And yet, the authors of \cite{chabiron_optimization_2016} have successfully prov
 
 \subsection{The PALMTREE algorithm}\label{sec_palmtree}
 
-The authors of \cite{chabiron_optimization_2016} have shown that \eqref{eq_ftl2} can be solved using the \ac{PALM} algorithm proposed in \cite{bolte_proximal_2014}. The \ac{PALM} algorithm regularizes the non-convex objective function using a simple linear approximation with respect to one block of variables. One block corresponds to one kernel $\h^e$. \todo{I’ll use some help!}
+The authors of \cite{chabiron_optimization_2016} have shown that \eqref{eq_ftl2} can be solved using the \ac{PALM} algorithm proposed in \cite{bolte_proximal_2014}. The \ac{PALM} algorithm does a proximal gradient iteration successively on the different blocks of variables; \cite{bolte_proximal_2014} provides a proof of convergence towards a critical point for non-convex problems. In our case, one block corresponds to one kernel $\h^e$.
+
+
+regularizes the non-convex objective function using a simple linear approximation with respect to one block of variables. One block corresponds to one kernel $\h^e$.
 
 The implementation of the generic \ac{PALM} algorithm for solving the \eqref{eq_ftl2} problem has been named \ac{PALMTREE}. 
 
-An outline of the algorithm is given in \cref{alg_palmtree}, where $t^e$ denotes the step size and $\text{prox}^f_\gamma$ is the proximal operator for prior function $f$ defined by $$\text{prox}^f_\gamma(y) = \underset{x}{\argmin}~ f(x) + \frac{\gamma}{2} \lVert x - y \rVert^2_2$$ which, for $f = \chi_{\Dspace^e}$, is easily computed by a projection onto the $l_2$ unit ball. \todo{Need help}
+An outline of the algorithm is given in \cref{alg_palmtree}, where $t^e$ denotes the step size and $\text{prox}^f_\gamma$ is the proximal operator for prior function $f$ defined by $$\text{prox}^f_\gamma(y) = \underset{x}{\argmin}~ f(x) + \frac{\gamma}{2} \lVert x - y \rVert^2_2$$ which, for $f = \chi_{\Dspace^e}$, is easily computed by a projection onto the $\Dspace^e$.
 
-Details on the step size $t^e$ (which requires the computation of a Lipschitz constant) and the proximal operator $\text{prox}^{\chi_{\Dspace^e}}_{t^e}$ are given in \cite{chabiron_optimization_2016}. We will focus on the way the partial gradient is computed to get more insight 
+Details on the step size $t^e$ (which requires the computation of a Lipschitz constant) and the proximal operator $\text{prox}^{\chi_{\Dspace^e}}_{t^e}$ are given in \cite{chabiron_optimization_2016}. We will focus on the way the gradient is computed to get more insight from \ac{PALMTREE}.
 
-The partial gradient is cleverly computed using the  redundancy of the convolutions in the tree. We define $\H^e$ as the convolution of every branches that crosses the edge $e$ except for the kernel $\h^e$, i.e. $$\H^e = \h^r * \dots * \h^{\text{above}(e)} * \bcancel{\h^{e}} * \sum_{l \in \text{leaves(e)}} \h^{\text{below}(e)^l} * \dots * \h^{l}$$ where $\text{leaves}(e)$ denotes the leaves that can be reached through $e$, $\text{above}(e)$  the edge right above $e$ and $\text{below}(e)^l$ the edge below $e$ that leads to the leaf $l$.
+We define $\H^e$ as the convolution of every branches that crosses the edge $e$ except for the kernel $\h^e$, i.e. $$\H^e = \h^r * \dots * \h^{\text{above}(e)} * \bcancel{\h^{e}} * \sum_{l \in \text{leaves(e)}} \h^{\text{below}(e)^l} * \dots * \h^{l}$$ where $\text{leaves}(e)$ denotes the leaves that can be reached through $e$, $\text{above}(e)$  the edge right above $e$ and $\text{below}(e)^l$ the edge below $e$ that leads to the leaf $l$.
 
 Using this notation, the authors of \cite{chabiron_optimization_2016} have shown that the partial gradient of $\Phi$ w.r.t. $\h^e$ is 
 $$\nabla_{\h^e} \Phi[(\h^f)_{f \in \E}] = 2 \H^e * \Res$$ with $\Res$ the residual denoted by
 $$\Res = \D\x - \y$$
 
-Because of the projection onto the $l_2$ unit ball, it is sufficient to compute the partial gradient at the support locations. As explained further in \cref{sec_full_grad}, this means that the convolution $2 \H^e * \Res$ can be efficiently computed using a simple convolution. However, computing the gradient on the full kernel cannot be computed efficiently this way.
+Because of the projection onto the $\Dspace^e$ unit ball, it is sufficient to compute the partial gradient at the support locations. As explained further in \cref{sec_full_grad}, this means that the convolution $2 \H^e * \Res$ can be efficiently computed using a simple convolution. However, computing the “full” gradient (meaning on every point of kernel $\h^e$) cannot be computed efficiently this way.
 
 \begin{algorithm}[!ht]
     \caption{\ac{PALMTREE} (Proximal Alternating Linearized Minimization for \Gls{treemodel}) algorithm for Dictionary Update}\label{alg_palmtree}
@@ -754,7 +757,8 @@ This is because the variance in the $N$ dimensional space can be written as
 =& \mathbb{E}\left(\lVert \bm{b} \rVert^2 \right)\\
 =& \mathbb{E}\left(\sum^N_{i=1} b_i^2 \right)\\
 \shortintertext{And as the variance is also $\sigma^2(\bm{b})= \frac{1}{N}\left(\sum_{i=1}^N b_i^2 \right) - \mathbb{E}(\bm{b})^2$, it becomes}
-=& N\sigma^2(\bm{b}) + N\mathbb{E}(\bm{b})^2\\
+=& \mathbb{E} \left(N\sigma^2(\bm{b}) + N\mathbb{E}(\bm{b})^2\right)\\
+=& N \mathbb{E} \left(\sigma^2(\bm{b})\right)\\
 =& ... \\
 =& \frac{1}{N}\lVert \bm{b} \rVert^2
 \end{align*}\todo{Ask for help}
