@@ -14,8 +14,8 @@
 	\fancyhead[LO]{\ifthenelse{\equal{\value{chapter}}{0}}{}{\thesection. \rightmark}} %rightmark = section
 	\fancyhead[RE]{\ifthenelse{\equal{\value{chapter}}{0}}
 		{}
-		{Chapter \thechapter.}
-		\leftmark
+		{\textsc{Chapter} \thechapter.}
+		\textsc{\leftmark}
 	} %leftmark = chapter
 	\fancyhead[RO]{\thepage} %
 	\fancyhead[LE]{\thepage} %

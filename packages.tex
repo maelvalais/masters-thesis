@@ -10,16 +10,18 @@
 \usepackage{siunitx} % SI units
 \usepackage{amssymb} % for convolution sign
 %\usepackage{moreverb} % for c, cpp snippets
-\usepackage{enumitem} % for more indent in itemize
+\usepackage{enumitem} % \begin{enumerate} for more indent in itemize
 
 %\usepackage[english,boxed,lined,onelanguage]{algorithm2e}
 %\SetAlCapSkip{1em} % Margin between algo and caption
 %\SetAlCapNameSty{textit} % text style for  algo captions
 \usepackage{algpseudocode,algorithm,algorithmicx}
 
-%\usepackage[toc,page]{appendix}
+\usepackage[toc,page]{appendix}
+\usepackage[nottoc,numbib]{tocbibind} % Make the bibliography appear in Summary
 \usepackage{fancyhdr} % For titlepage \lhead, \rhead... 
 \usepackage[backend=biber,style= alphabetic,date=long,maxbibnames=5,language=english]{biblatex} % style=ieee for final thesis
+\DeclareFieldFormat*{citetitle}{{\it #1}}
 \bibliography{master-thesis.bib}
 
 % To suppress fields in my .bib, try 
@@ -54,16 +56,17 @@
 
 \usepackage{mathtools} % for \shortintertext{} in align block
 
-\usepackage[]{minitoc} % Intermediate 
+%\usepackage[]{minitoc} % Intermediate 
 \usepackage{etoolbox} % For toggle function (to hide titlepage)
-\usepackage[acronym,toc,shortcuts]{glossaries}
 \usepackage{nth} % 1st, 3rd, 4th...
 \usepackage{bm} % \bm{} for bold font in text and math modes
 \usepackage[colorinlistoftodos,prependcaption,textsize=normalsize]{todonotes} %,textsize=tiny
 \usepackage[pdfusetitle]{hyperref} % for linkable refs and title in pdf meta
+\usepackage[acronym,toc,shortcuts]{glossaries}
 \usepackage[english,capitalise]{cleveref} % capitalise = Fig. instead of fig.
-%\makeglossary
-%\makeindex
+
+\makeglossary
+\makeindex
 
 
 

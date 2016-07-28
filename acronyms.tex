@@ -1,5 +1,7 @@
 \usepackage{relsize}
-% \newacronymwithdescr{Label}{Court}{Long}{Description}
+\setacronymstyle{short-long}
+
+% Use: \newacronymwithdescr{Label}{Court}{Long}{Description}
 \newcommand*{\newacronymwithdescr}[5][]{%
   \newglossaryentry{main-#2}{name={#3},%
   text={(\acs{#2}) #3\glsadd{#2}},%
@@ -8,19 +10,34 @@
   }%
   \newacronym{#2}{#3\glsadd{main-#2}}{#4}%
 }
+% Use: \newglossary{Label}{Name}{Description}
+\newcommand*{\newgls}[4][]{%
+  \newglossaryentry{#2}{name={#3},%
+  description={#4},%
+  #1 %
+  }%
+}
 
-% Pas de point final pour les entrées glossaire ou acronymes
-\setacronymstyle{sm-short-long}
-%\newacronym{IMT}{IMT}{Institut de Mathématiques de Toulouse}
+
+
+
 \newacronymwithdescr{IMT}{IMT}{Institut de Mathématiques de Toulouse}{is the main laboratory in mathematics in Toulouse}
 
-\newglossaryentry{KSVD}{name=K-SVD,description={(K-Singular Vector Decomposition algorithm) is an adaptative method for learning a dictionary using a set of images; each image is decomposed in many small patches that form the atoms of the dictionary. Those atoms are then optimized using OMP (sparse coding of $x$) and a SVD (for the dictionary update of $D$). See \cite{aharon_k-svd:_2006}}}
-
-\newacronymwithdescr{OMP}{OMP}{Orthogonal Matching Pursuit}{is a greedy algorithm for coding an image into a sparse (with many zeros) code.}
+\newacronymwithdescr{OMP}{OMP}{Orthogonal Matching Pursuit}{is a greedy algorithm for coding an image into a sparse (with many zeros) code}
 
 \newacronym{PALM}{PALM}{Proximal Alternating Linearized Minimization}
 
-\newacronym{PALMTREE}{PALMTREE}{\acl{PALM} adapted to the convolutional tree model}
+\newacronym[see={PALM}]{PALMTREE}{PALMTREE}{\acl{PALM} for Convolutional Tree Model}
+
+\newacronym{DFT}{DFT}{Discrete Cosine Transform}
+
+\newacronymwithdescr{KSVD}{K-SVD}{K Singular Value Decomposition}{is a generalization of the K-Means algorithm for learning a dictionary on a set of images; each image is decomposed in many small patches that are then learned to form the atoms of the dictionary. See \cite{aharon_k-svd:_2006}}
+
+\newacronymwithdescr[sort={FTL}]{FTL}{\eqref{eq_ftl}}{Fast Transform Learning}{is an optimization problem for dictionary learning. Instead of using the matrix-vector product as in the standard Dictionary Learning \eqref{eq_dl} problem, \eqref{eq_ftl} is based on the \gls{treemodel}}
+
+\newgls{KMeans}{K-Means}{is an unsupervised machine learning algorithm widely used thanks to its easy implementation. It is not specific to image processing and can be applied to any kind of data}
+
+\newgls[text={convolutional tree model}]{treemodel}{Convolutional Tree Model}{is a model of structured dictionary based on convolutions of sparse kernels, proposed in \cite{chabiron_optimization_2016}}
 
 
 % dictionary update step
