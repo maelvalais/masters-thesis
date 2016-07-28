@@ -476,7 +476,7 @@ Figure \ref{fig_verif_gradient} compares the FFT-computed gradient to the finite
 
 \section{Gain-per-added-point to the support}\label{sec_gain_per_added_point}
 
-This section details the method used for making sure that the “full” gradient is appropriate for adding points to supports.
+This section details the method used for making sure that the “full” gradient is appropriate for adding points to supports at \cref{alg_omppalmtree_find} in \cref{alg_omppalmtree}.
 
 We designed \cref{alg_gain_per_added_point} for computing what we call the \emph{gain-per-added-point} matrix, denoted $\g^f$ ($f$ is the edge of the studied support). \Cref{alg_gain_per_added_point} tries every possible point that could be added to one given support $s^f$ and see how much the objective function decreases when adding the point and continuing the minimization.
 
@@ -524,11 +524,11 @@ We designed \cref{alg_gain_per_added_point} for computing what we call the \emph
 \caption{Best values of above figure}
 \end{subfigure}
 \end{subfigure}
-\caption{Minimization of a single branch tree with fixed supports. Note the zeros of the gradient on each support location (small squares): in the direction of those nine points, the gradient is null, meaning that we are at a critical point.}\label{fig_gain_n4}
+\caption{Gain-per-added-point compared to “full” gradient. The “full” gradient is computed on the converged “common starting point” $\k$ (see \cref{alg_gain_per_added_point}). The gradient and gain-per-added-point maxima almost are at the same place. Note the null gradient values on the points of the support (small squares); with respect to those nine points, the necessary condition for optimality is met. However, the rest of the gradient is not null, meaning we are on a suboptimal solution.}\label{fig_gain_n4}
 \end{figure}
 
 
-\Cref{fig_gain_n1_n2} makes the same comparison for two other kernels of the same tree (it is the same experiment). Whatever the kernel, the best values of the gradient seem to follow the same shape as the gain-per-added-point matrix. 
+\Cref{fig_gain_n1_n2} does the same comparison for two other kernels of the same tree (it is the same experiment). Whatever the kernel, the best values of the gradient seem to follow the same shape as the gain-per-added-point matrix. 
 
 \begin{figure}[!ht]\centering
 	\begin{subfigure}[b]{0.24\linewidth}\centering
@@ -619,13 +619,15 @@ The experiment shown in \cref{fig_before_after_adding} is based on the results o
 
 We also observe that when adding a point to the support (materialized by the \nth{10} small square), the highest gradient values “shift” to the south-west. Adding a point to the support has an effect on every surrounding points.
 
-\subsection{Local versus distant information}
+\subsection{Adding elements before the convergence of \ac{PALMTREE}}
 
-The gain-per-added-point can been seen as a distant direction (each point is the objective function of a converged solution) whereas the gradient is a local direction. The  \cref{fig_gain_n4} also presents the gradient of a converged solution, and we noticed that it had the same shape as gain-per-added-point. We might wonder if this only happens on converged solutions or if the gradient also give a valid information whatever the iteration.
+At \cref{alg_omppalmtree_ftl} of \cref{alg_omppalmtree}, we do a full minimization, i.e. it stops as soon as \ac{PALMTREE} has converged. Because the minimization takes a lot of time, it was tempting to try adding elements every few iterations of \ac{PALMTREE} instead of waiting until it converges.
 
-% meaning that the gain-per-added-point would be “close” to what the gradient would indicate. We wondered if the gradient would stay the same throughout all iterations; compared to the converged gain-per-added-point which is a “distant” information, the gradient might not always indicate the direction to that gain.
+The \cref{fig_gain_n4} has shown that the “full” gradient could be satisfactorily used for adding elements to the support $s$, provided that \cref{alg_palmtree} at \cref{alg_omppalmtree_ftl} has converged. Would the gradient still give a valid information on a not-yet converged solution $\k$ of \ac{PALMTREE}, for example after 5 iterations?
 
-With this problem in mind, \cref{fig_iter_gain_vs_grad} compares the best values of gain-per-added-point to gradients snapshots taken during the minimization. This is reassuring: whatever the iteration, the gradient best values keep close to the gain-per-added-point best values.
+\Cref{fig_iter_gain_vs_grad} compares the best values of gain-per-added-point to gradients snapshots taken during the minimization. This is reassuring: whatever the iteration, the gradient best values stay close to the gain-per-added-point best values.
+
+
 
 \begin{figure}[!ht]\centering
 \begin{subfigure}[b]{0.49\linewidth}\centering
@@ -650,7 +652,7 @@ With this problem in mind, \cref{fig_iter_gain_vs_grad} compares the best values
 	\caption{Grad. iter. 200}
 	\end{subfigure}
 \end{subfigure}
-\caption{Is the gradient giving the same information depending on the iteration? The conditions are the same as \cref{fig_gain_n4}. Only the best values are displayed.}\label{fig_iter_gain_vs_grad}
+\caption{Is the gradient giving the same information depending on the iteration of \ac{PALMTREE}? This is the same experiment as \cref{fig_gain_n4}. Only the best values are displayed.}\label{fig_iter_gain_vs_grad}
 \end{figure}
 
 \section{Learning the supports}
@@ -674,10 +676,11 @@ The resulting approximation is encouraging with a relative RMSE decrease of -76\
 	\caption{Approximation $\D\x$}
 	\end{subfigure}
 \end{subfigure}
-\begin{subfigure}[b]{0.4\textwidth}\centering
-\includegraphics[width=0.37\textwidth]{figures/variable_support/support.pdf}
+\begin{subfigure}[b]{0.3\textwidth}\centering
+\includegraphics[width=0.50\textwidth]{figures/variable_support/support.pdf}
+\caption{Supports $\s_e$}
 \end{subfigure}
-\caption{Learning the support (add only). Starting from simple Diracs, the best element (using greatest gradient) is added to one of the supports every 5 iterations, up to 36 elements (same number as the fixed support in \cref{fig_gain_n4}).} \label{fig_variable_support}
+\caption{Learning the support (adding elements only). Starting from simple Diracs, the best element (using greatest gradient) is added to one of the supports every 5 iterations, up to 36 elements (same number as the fixed support in \cref{fig_gain_n4}).} \label{fig_variable_support}
 \end{figure}
 
 \section{Conclusions and perspectives}
