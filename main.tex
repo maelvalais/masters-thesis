@@ -72,7 +72,7 @@ Previously mentioned dictionaries are said to be “non-adaptative”, meaning t
 
 Dictionary learning allows to create “adaptative” dictionaries. Instead of being fixed, the atoms of an “adaptative” dictionary are based on a learning set of example images, denoted by
 $$\Y = \begin{bmatrix} \y_1 & \dots & \y_S \end{bmatrix}$$
-where the columns of $\Y$ are the vectorized\footnote{A vectorized matrix of dimension $R \times C$ of an image is the concatenation of all columns to form a vector of size $R \cdot C$} images $\y_i \in \R^N$. The dictionary $\D$ is made of $K$ columns $\d_i$ (the \gls{atoms}) such that the number of atoms is much larger than the dimension of a single image $\y_i$ ($K \gg N$):
+where the columns of $\Y$ are the vectorized\footnote{A vectorized matrix of dimension $R \times C$ of an image is the concatenation of all columns to form a vector of size $R \cdot C$} images $\y_i \in \R^N$. The dictionary $\D$ is made of $K$ columns $\d_i$ (the atoms) such that the number of atoms is much larger than the dimension of a single image $\y_i$ ($K \gg N$):
 $$\D = \begin{bmatrix} \d_1 & \dots & \d_K \end{bmatrix}.$$
 
 The codes $\X$ are defined by
@@ -176,7 +176,7 @@ Their work have been published very recently (early 2016); this thesis does not 
 \section{Dictionary structured by the \Gls{treemodel}}
 
 \subsection{\Gls{treemodel}}\label{sec_tree_model}
-The work studied in \cite{chabiron_toward_2015} and \cite{chabiron_optimization_2016} offers a different way of structuring the matrix $\D$, namely the \emph{\Gls{treemodel}}. Instead of using “plain” atoms as columns and dealing with the matrix-vector product in $O(N \cdot K)$, $\D$ is defined by a convolutional tree structure $$\T(\V,\E)$$ where each edge $e$ of $\E$ is characterized by a kernel $\h^e$ and a support $\s^e$. The root $r$ and leaves $l$ of $\V$ allow us to define a branch as the successive edges growing from the root to one of the leaves.
+The work studied in \cite{chabiron_toward_2015} and \cite{chabiron_optimization_2016} offers a different way of structuring the matrix $\D$, namely the \emph{\Gls{treemodel}}. Instead of using “plain” atoms as columns and dealing with the matrix-vector product in $O(N \cdot K)$, $\D$ is defined by a convolutional tree structure $$\T(\V,\E)$$ where each edge $e$ of $\E$ is characterized by a kernel $\h^e$ and a support $\s^e$. The leaves $l \in \L \subset \V$ associated with the root $r \in \V$ allow us to define a branch as the successive edges growing from the root (top) to one of the leaves (bottom).
 
 \begin{figure}[!ht]\centering
 \includegraphics[width=\textwidth]{figures/tree.pdf}
@@ -185,13 +185,13 @@ The work studied in \cite{chabiron_toward_2015} and \cite{chabiron_optimization_
 
 The target image $\y$ as well as the kernels $\h^e$ and supports $\s^e$ are vectors of dimension $N$. The supports $\s^e$ only take the values 0 (corresponding value in $\h^e$ must be 0) or 1 (corresponding value in $\h^e$ can be non-zero). For easier reading, we will denote the families $(\h^e)_{e \in \E}$ and $(\s^e)_{e \in \E}$ by $$\h = (\h^e)_{e \in \E}$$ and $$\s = (\s^e)_{e \in \E}.$$
 
-The code $\x$ is a “big” vector of dimension $K$ with $K = N \cdot |\L|$ such that $$\x = \begin{bmatrix}\x^1_1 \\ \vdots \\ \x^{|\L|}_N\end{bmatrix}$$
+The code $\x$ is a “big” vector of dimension $K$ with $K = N \cdot |\L|$ such that $$\x = \begin{bmatrix}\x^1_1 \\ \vdots \\ \x^{|\L|}_N\end{bmatrix}.$$ 
+Finally, the dictionary matrix associated\footnote{The Convolutional tree dictionary can be re-written into a matrix; see \cref{sec_matrix_vs_tree}} to the \gls{treemodel} is denoted $\D$ and is of dimension $N \times K$, and the image $\y$ is a vector of dimension $N$.
 
- $\D$ is a matrix of dimension $N \times K$ and $\y$ is a vector of dimension $N$.
+In the following, we will denote the images interchangeably using the vector notation  or the linear map notation: $$\y = \{ y_i ~|~ i=1,\dots,N \} \quad \text{is equivalent to}\quad \y = \{y(p) ~|~ p \in \P\}.$$
 
-In the following, we will denote the images interchangeably using the vector notation $\y = \{ y_i ~|~ i=1,\dots,N \}$ or the linear map notation $\y = \{y(p) ~|~ p \in \P\}$.
-
-The \cref{fig_example_kernel} displays examples of a standard kernel (left) and a kernel $\h^e$ (middle) associated with its support $\s^e$ (right). The gray squares represent the “ones” of the support while the kernel is represented by values.
+For more convenience, the images $\h^e$, $\x^l$ and $\y$ are defined as “circular” or “periodic” signals, meaning that they are defined for every $p \in \mathcal{Z}$. With that in mind, we can define the circular convolution for two circular signals $\h$ and $\h’$ of $\R^N$ as
+$$(\h * \h’)_p = \sum_{p’ \in \P} \h_{p-p’} \h’_{p’}$$
 
 \begin{figure}[!ht]\centering
 \begin{subfigure}[b]{0.20\textwidth}\centering
@@ -203,18 +203,19 @@ The \cref{fig_example_kernel} displays examples of a standard kernel (left) and 
 \caption{Kernel $\h^e$ (left) and its associated support $\s^e$ (right).}\label{fig_example_kernel}
 \end{subfigure}
 \end{figure}
+The \cref{fig_example_kernel} displays examples of a standard kernel (left) and a kernel $\h^e$ (middle) associated with its support $\s^e$ (right). The gray squares represent the “ones” of the support while the kernel is represented by values inside the squares.
 
-One atom of the dictionary $\D$ corresponds to the convolution of successive kernels on a given branch identified by the leaf $l$. We will denote that successive convolution by
-$$\h^{*l} = \h^r * \dots * \h^l$$
+We denote the convolution of successive kernels on a given branch identified by the leaf $l$ by
+$$\h^{*l} = \h^r * \dots * \h^l.$$
 
-Using the matrix notation\footnote{See \cref{sec_matrix_vs_tree}}, the convolutional tree dictionary $\D$ applied to a code $\x$ approximates $\y$ as follows
-$$\D\x \approx \y$$
-
-The dictionary $\D$ can be written as a matrix (showed in \cref{sec_matrix_vs_tree}). This allows us to compare the computational complexity\todo{REPHRASE} of this dictionary against a simple matrix-vector product. The convolutional tree dictionary computes $\D\x$ using the following formula
+Instead of using the standard matrix-vector product, the convolutional tree dictionary computes $\D\x$ with the following
 
 \begin{align}
 	\D\x = \sum_{l \in \L} \x^l * \h^{*l} \label{eq_Dx_as_convolution}
 \end{align}
+
+The convolutional tree dictionary $\D$ applied to a code $\x$ approximates $\y$ as follows
+$$\D\x \approx \y$$
 
 \subsection{The \acs{FTL} problem}
 
@@ -243,18 +244,18 @@ For later references, the objective function of \ac{FTL} will be denoted as
 
 \subsubsection{Interesting properties of \ac{FTL}}
 
-The convolution of sparse kernels in \ac{FTL} leads to theoretically highly performant dictionaries. The computational cost of $\D\x$ using \cref{eq_Dx_as_convolution} is reduced to $O(Q \cdot N)$ ($Q$ is the number of elements in all supports, i.e. $Q=|\{s^e_p | s^e_p = 1, \forall (e,p) \in \E \times \P}|$). And because $Q$ only depends on the number of edges and is designed to be significantly smaller than  $N$, using the \gls{treemodel} decreases greatly the cost of using the dictionary and is comparable to the Fourier transform performance (in $O(N \log N)$).
+The convolution of sparse kernels in \ac{FTL} leads to theoretically highly performant dictionaries. The computational cost of $\D\x$ using \cref{eq_Dx_as_convolution} is reduced to $O(Q \cdot N)$ ($Q$ is the number of elements in all supports, i.e. $Q=|\{s^e_p ~|~ s^e_p = 1, \forall (e,p) \in \E \times \P\}|$). And because $Q$ only depends on the number of edges and is designed to be significantly smaller than  $N$, using the \gls{treemodel} decreases greatly the cost of using the dictionary and is comparable to the Fourier transform performance (in $O(N \log N)$).
 
 \begin{table}[!ht] \centering 
 \caption{Computational cost of $\D\x$} \label{table_comparison_Dx_costs}
 \begin{tabular}{c|c}
 Using matrix-vector product & Using \gls{treemodel} \\\\ \hline \\
-$O(KN)$ & $O(Q \cdot N)$
+$O(K \cdot N)$ & $O(Q \cdot N)$
 \end{tabular}
 \end{table}
 
 
-However, the product $\D\x$ can be seen as a multivariable polynomial of degree the depth of $\T$ (variables are $(\h^e)_{e \in \E}$ and $\x$). This non-linearity makes the objective function possibly strongly non-convex, suggesting that we would end up trapped by its many suboptimal critical points of \ac{FTL}.
+However, the product $\D\x$ can be seen as a multivariable polynomial of degree the depth of $\T$ (variables are $(\h^e)_{e \in \E}$ and $\x$). This non-linearity makes the objective function possibly strongly non-convex, suggesting that we would end up trapped by its many suboptimal critical points of $\Phi$.
 
 And yet, the authors of \cite{chabiron_optimization_2016} have successfully proved that this problem is actually tractable. More surprisingly, they discovered that optimizing \ac{FTL} is possible and that the solutions given by \acs{PALMTREE} are encouraging.
 
@@ -698,9 +699,21 @@ The resulting approximation is encouraging with a relative RMSE decrease of -76\
 
 \section{Link between \gls{treemodel} and dictionary matrix}\label{sec_matrix_vs_tree} % $\bm{D} in \section{} bugs
 
-Figure \ref{fig_block_circular} outlines the relation between the tree and the matrix forms of $\D\x$ in the \gls{treemodel}. The dictionary $\D$ can be written using the notation
+Figure \ref{fig_block_circular} outlines the relation between a convolutional tree   dictionary and its matrix $\D\x$ in the \gls{treemodel}. The dictionary $\D$ can be written using the notation
 $$\D = \begin{bmatrix}C^5 & C^6\end{bmatrix} \begin{bmatrix}C^1 & C^2 & 0 & 0 \\0 & 0 & C^3 & C^4\end{bmatrix}$$
 with $C^i$ the block-circular matrix for $\h^i$; it represents the final convolution $\h^{*l}*\x^l$ when using matrices.
+
+It is useful to introduce the block-circulant matrix when trying to translate the convolutional product into a matrix-vector product. The block-circulant matrix is defined as
+
+\begin{figure}[!ht] \centering
+\includegraphics[width=\textwidth]{figures/block-circulant_matrix.pdf}
+\caption{} \label{fig_block_circular}
+\end{figure}
+
+One atom $d_i$ with $i = 1,\dots,K$ of the dictionary matrix $\D$ corresponds to one column of the block-circulant matrix\footnote{The principles behind the block-circulant matrix is explained in \cref{sec_matrix_vs_tree}} $C(h^{*l})$; $\D$ can thus be written as
+$$\D = \begin{bmatrix} C(h^{*l_1}) & \dots & C(h^{*l_{|\L|}}) \end{bmatrix}.$$
+
+
 
 \begin{figure}[!ht] \centering
 \begin{subfigure}[b]{0.30\textwidth}\centering
@@ -711,8 +724,11 @@ with $C^i$ the block-circular matrix for $\h^i$; it represents the final convolu
 \includegraphics[width=\textwidth]{figures/pov-matrix.pdf}
 \caption{Best values of above figure}
 \end{subfigure}
-\caption{This figure shows how to go from the tree defined by its kernels $(\h^e)_{e \in \E}$ to a matrix $\D$} \label{fig_block_circular}
+\caption{This figure shows how to go from the tree defined by its kernels $(\h^e)_{e \in \E}$ to a matrix $\D$} \label{fig_tree_as_matrix}
 \end{figure}
+
+
+
 
 \clearpage
 
@@ -775,10 +791,14 @@ which is much better than the previous distance, provided that $k \ll N$.
 
 \clearpage
 
-\section{Why $\F(\widetilde{A}) = \F(A)^*$}
-\todo[inline]{This is a meaningless proof; I’ll remove it}
+\section{Prooving $\F(\widetilde{A}) = \F(A)^*$} \label{sec_proof_fourier_flip_adjoint}
+When dealing with periodic images (images are periodically repeated such that every point $p \in \mathcal{Z}$ is defined), computing the Fourier transform of a “flipped” image $\F(\widetilde{A})$, with $\widetilde{A}_p = A_{-p}$, can be simplified using the property
+
+$$\F(\widetilde{A}) = \F(A)^*$$
+
+with $\F$ the \ac{DFT}, $^*$ the adjoint operator. Here is the proof:
 \begin{align*}
-(\widehat{\widetilde{A}})_{m,n} =& \sum_{k=1}^M \sum_{l=1}^N \widetilde{A}_{k,l} e^{-2i\pi (k\frac{m}{M}+l \frac{n}{N})}\\
+\F({\widetilde{A}})_{m,n} =& \sum_{k=1}^M \sum_{l=1}^N \widetilde{A}_{k,l} e^{-2i\pi (k\frac{m}{M}+l \frac{n}{N})}\\
 =& \sum_{k=1}^M \sum_{l=1}^N A_{-k,-l} e^{-2i\pi (k\frac{m}{M}+l \frac{n}{N})}\\
 \shortintertext{By changing variables $k’=-k$ and $l’=-l$, we get:}
 =& \sum_{k’=-M}^{-1} \sum_{l’=-N}^{-1} A_{k’,l’} e^{2i\pi (k’\frac{m}{M}+l’ \frac{n}{N})}
