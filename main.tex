@@ -21,11 +21,11 @@
 
 \chapter{Introduction} %\markboth{Introduction}{}}
 
+This chapter will first introduce and review the main existing dictionaries that have been used for sparse representation, from non-adaptative transforms to learned dictionaries and through the intermediate over-complete dictionaries. The second part of this chapter gives the general motivations and objectives of this work as well as the related works.
+
 \section{The need for sparse representations}
 
 A sparse signal over some representation means that it can be expressed using only a few elements of the representation – in other words, sparse means with many zeros. Many applications ranging from machine learning to image denoising and image recognition heavily rely on the property that we can summarize (or more exactly approximate) any signal using a proper sparse representation. The job of obtaining the raw\footnote{A “raw” signal is represented in the canonical basis} signal from its sparse counterpart can be written in terms of an operator, often called \emph{dictionary} or \emph{transform}.
-
-This chapter will review the main existing dictionaries that have been used for sparse representation, from non-adaptative transforms to learned dictionaries and through the intermediate over-complete dictionaries.
 
 \section{Basis and redundant dictionaries}
 
@@ -172,6 +172,7 @@ Two other teams are also actively working on multi-resolution transforms:
 Their work have been published very recently (early 2016); this thesis does not detail these papers, but studying these advances will be done right after the end of this internship, during the PhD thesis.
 
 \chapter{State of the art}
+This chapter aims to introduce the \Gls{treemodel} as well as its associated dictionary learning problem, \acs{FTL}, and the algorithm \ac{PALMTREE} that solves this problem. The end of this chapter is dedicated to detailing the specific objectives of this internship.
 
 \section{Dictionary structured by the \Gls{treemodel}}
 
@@ -186,7 +187,7 @@ The work studied in \cite{chabiron_toward_2015} and \cite{chabiron_optimization_
 The target image $\y$ as well as the kernels $\h^e$ and supports $\s^e$ are vectors of dimension $N$. The supports $\s^e$ only take the values 0 (corresponding value in $\h^e$ must be 0) or 1 (corresponding value in $\h^e$ can be non-zero). For easier reading, we will denote the families $(\h^e)_{e \in \E}$ and $(\s^e)_{e \in \E}$ by $$\h = (\h^e)_{e \in \E}$$ and $$\s = (\s^e)_{e \in \E}.$$
 
 The code $\x$ is a “big” vector of dimension $K$ with $K = N \cdot |\L|$ such that $$\x = \begin{bmatrix}\x^1_1 \\ \vdots \\ \x^{|\L|}_N\end{bmatrix}.$$ 
-Finally, the dictionary matrix associated\footnote{The Convolutional tree dictionary can be re-written into a matrix; see \cref{sec_matrix_vs_tree}} to the \gls{treemodel} is denoted $\D$ and is of dimension $N \times K$, and the image $\y$ is a vector of dimension $N$.
+Finally, the dictionary matrix associated\footnote{The Convolutional tree dictionary can be rewritten into a matrix; see \cref{sec_matrix_vs_tree}} to the \gls{treemodel} is denoted $\D$ and is of dimension $N \times K$, and the image $\y$ is a vector of dimension $N$.
 
 In the following, we will denote the images interchangeably using the vector notation  or the linear map notation: $$\y = \{ y_i ~|~ i=1,\dots,N \} \quad \text{is equivalent to}\quad \y = \{y(p) ~|~ p \in \P\}.$$
 
@@ -321,6 +322,8 @@ So far, the supports have been handcrafted. \Cref{fig_example_kernel} gives an e
 Any actual image processing application would require to learn the dictionary on a large set of images (namely the $\Y$ matrix). However, \ac{PALMTREE} is still unable to handle more than one image.
 
 Moreover, most experiments on \ac{PALMTREE} have been focused on the dictionary update step; real applications would need to alternate between the dictionary update step and the sparse coding step.
+\todo{Add an example (image) of what PALMTREE is capable of (or more exactly, what it is limited to}
+
 
 \section{Learning the supports}
 \todo{Here, explain what my contribution will be...}
@@ -345,7 +348,7 @@ Moreover, most experiments on \ac{PALMTREE} have been focused on the dictionary 
 
 \Cref{fig_xp_fixed_vs_expected} experimentally confirms the assumption made in \Cref{fig_fixed_vs_expected}. We switched $\s^4$ from a generic (\textit{a priori}) support to a hand-made support that follows the general direction of $\y$ (\cref{fig_fixed_vs_expected_y}). The RMSE\footnotemark[1] is decreased by -16\% (lower is better). The approximation in \cref{fig_xp_fixed_vs_expected_approx2} looks visually better than the one in \cref{fig_xp_fixed_vs_expected_approx1}.
 
-\footnotetext[1]{Root mean square error. Let $\y^1$ and $\y^2$ two images of concatenated into a vector of dimension $N$, then $RMSE(\y^1,\y^2) = \frac{1}{N} \sqrt{\sum_{i=1}^N (y^1_i - y^2_i)^2}$}
+\footnotetext[1]{Let $\y^1$ and $\y^2 \in \R^N$; the Root Mean Square Error is defined by  $$\text{RMSE}(\y^1,\y^2) = \frac{1}{N} \sqrt{\sum_{i=1}^N (y^1_i - y^2_i)^2}$$}
 
 \begin{figure}[!ht]\centering
 \begin{subfigure}[b]{0.085\textwidth}\centering
@@ -697,35 +700,49 @@ The resulting approximation is encouraging with a relative RMSE decrease of -76\
 \chapter{Miscellaneous}
 
 
-\section{Link between \gls{treemodel} and dictionary matrix}\label{sec_matrix_vs_tree} % $\bm{D} in \section{} bugs
+\section{Link between \gls{treemodel} and dictionary matrix}\label{sec_matrix_vs_tree} 
 
-Figure \ref{fig_block_circular} outlines the relation between a convolutional tree   dictionary and its matrix $\D\x$ in the \gls{treemodel}. The dictionary $\D$ can be written using the notation
-$$\D = \begin{bmatrix}C^5 & C^6\end{bmatrix} \begin{bmatrix}C^1 & C^2 & 0 & 0 \\0 & 0 & C^3 & C^4\end{bmatrix}$$
-with $C^i$ the block-circular matrix for $\h^i$; it represents the final convolution $\h^{*l}*\x^l$ when using matrices.
-
-It is useful to introduce the block-circulant matrix when trying to translate the convolutional product into a matrix-vector product. The block-circulant matrix is defined as
+It is useful to introduce the circulant matrix when trying to translate the convolutional product into a matrix-vector product. The circulant matrix of a vector $\h$ of dimension $N$ is defined as the $N \times N$ matrix $C(\h)$ such that
+$$C(\h) = 
+	\begin{bmatrix}
+		h_1     & h_{N}   & h_{N-1} & \dots & h_{2} \\
+		h_2     & h_{1}   & h_{N}   & \dots & h_{3} \\
+		h_3     & h_{2}   & h_{1}   & \dots & h_{4} \\
+		\vdots  &         &         &       & \vdots \\
+		h_{N-1} & h_{N-2} & h_{N-3} & \dots & h_{N} \\
+		h_N     & h_{N-1} & h_{N-2} & \dots & h_{1} \\
+	\end{bmatrix}
+.$$
 
 \begin{figure}[!ht] \centering
 \includegraphics[width=\textwidth]{figures/block-circulant_matrix.pdf}
-\caption{} \label{fig_block_circular}
+\caption{Rewriting the convolution into a metrix-vector product.} \label{fig_block_circular}
 \end{figure}
 
-One atom $d_i$ with $i = 1,\dots,K$ of the dictionary matrix $\D$ corresponds to one column of the block-circulant matrix\footnote{The principles behind the block-circulant matrix is explained in \cref{sec_matrix_vs_tree}} $C(h^{*l})$; $\D$ can thus be written as
-$$\D = \begin{bmatrix} C(h^{*l_1}) & \dots & C(h^{*l_{|\L|}}) \end{bmatrix}.$$
-
-
+We can then rewrite the convolutions used in
+$$\D\x = \sum_{l \in \L} \x^l * \h^{*l}$$
+using circular matrices. We denote $C^i = C(\h^i)$ the circular matrix for edge $i$. \Cref{fig_tree_as_matrix} compares the convolutional tree (a) to the product $\D\x$ ($\D$ being the dictionary $\D$ written as a matrix). For the convolutional tree given in (a), $\D$ can be summarized as
+\begin{align}
+\D = \begin{bmatrix}C^5 & C^6\end{bmatrix} \begin{bmatrix}C^1 & C^2 & 0 & 0 \\0 & 0 & C^3 & C^4\end{bmatrix} \label{eq_matrix_developed}
+\end{align}
+with $C^i$ the block-circular matrix for $\h^i$; it represents the final convolution $\h^{*l}*\x^l$ when using matrices.
 
 \begin{figure}[!ht] \centering
 \begin{subfigure}[b]{0.30\textwidth}\centering
-\includegraphics[width=\textwidth]{figures/pov-tree.pdf}
+\includegraphics[width=0.7\textwidth]{figures/pov-tree.pdf}
 \caption{Convolutional tree}
 \end{subfigure}
 \begin{subfigure}[b]{0.69\textwidth}\centering
 \includegraphics[width=\textwidth]{figures/pov-matrix.pdf}
-\caption{Best values of above figure}
+\caption{Convolutional tree dictionary using a circular matrix}
 \end{subfigure}
-\caption{This figure shows how to go from the tree defined by its kernels $(\h^e)_{e \in \E}$ to a matrix $\D$} \label{fig_tree_as_matrix}
+\caption{From $\D$ as a convolutional tree to $\D$ as a matrix}\label{fig_tree_as_matrix}
 \end{figure}
+
+One atom $d_i$ with $i = 1,\dots,K$ ($K=N \cdot |\L|$) of the dictionary matrix $\D$ corresponds to one column of the block-circulant matrix $C(h^{*l})$; $\D$ can thus be rewritten as
+\begin{align}\D = \begin{bmatrix} C(h^{*1}) & \dots & C(h^{*{|\L|}}) \end{bmatrix}.\label{eq_matrix_factorized} \end{align}
+
+To sum up, the matrix associated to the convolutional tree dictionary $\D$ can be understood as a factorization of sparse matrices $C^i$. Under the “developed” form \eqref{eq_matrix_developed}, the matrix $\D$ is of dimension $N \times K$.
 
 
 
@@ -798,15 +815,11 @@ $$\F(\widetilde{A}) = \F(A)^*$$
 
 with $\F$ the \ac{DFT}, $^*$ the adjoint operator. Here is the proof:
 \begin{align*}
-\F({\widetilde{A}})_{m,n} =& \sum_{k=1}^M \sum_{l=1}^N \widetilde{A}_{k,l} e^{-2i\pi (k\frac{m}{M}+l \frac{n}{N})}\\
-=& \sum_{k=1}^M \sum_{l=1}^N A_{-k,-l} e^{-2i\pi (k\frac{m}{M}+l \frac{n}{N})}\\
-\shortintertext{By changing variables $k’=-k$ and $l’=-l$, we get:}
-=& \sum_{k’=-M}^{-1} \sum_{l’=-N}^{-1} A_{k’,l’} e^{2i\pi (k’\frac{m}{M}+l’ \frac{n}{N})}
-\shortintertext{And thanks to the $(M,N)$ periodicity of $A$, which means that $A_{i,j}=A_{i+kM,j+lN}$, $\forall (k,l) \in \mathbb{N}^2$, letting us with:}
-=& \sum_{k'=-M}^{-1} \sum_{l'=-N}^{-1} A_{k'+M,l'+N} e^{2i\pi (k'\frac{m}{M}+l' \frac{n}{N})}\\
-\shortintertext{With a second change of variables $k''=k'+M$ and $l''=l'+N$:}
-=& \sum_{k''=-M+M}^{-1+M} \sum_{l''=-N+N}^{-1+N} A_{k'',l''} e^{2i\pi (k'\frac{m}{M}+l' \frac{n}{N})}\\
-=& \sum_{k'=1}^{M} \sum_{l'=1}^{N} A_{k',l'} e^{2i\pi (k'\frac{m}{M}+l' \frac{n}{N})}
+\F({\widetilde{A}})_{m,n} =& \F(A)_{-m,-n} \\
+=& \sum_{k=1}^M \sum_{l=1}^N A_{k,l} e^{-2i\pi (-k\frac{m}{M}-l \frac{n}{N})}\\
+=& \sum_{k=1}^M \sum_{l=1}^N A_{k,l} \left( e^{-2i\pi (k\frac{m}{M}+l \frac{n}{N})} \right)^*\\
+=& \left( \sum_{k=1}^M \sum_{l=1}^N A_{k,l} e^{-2i\pi (k\frac{m}{M}+l \frac{n}{N})} \right)^*\\
+=& \left( \F(A)_{m,n} \right)^*
 \end{align*}\todo{To be continued}
 
 \printglossary
