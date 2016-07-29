@@ -10,8 +10,8 @@
 \pagestyle{empty} \restoregeometry
 %\cleardoublepage % White until the next even page
 \pagestyle{body}
-%\abstract{} \todo[inline]{Write an abstract}
-%{\centering \subsection*{Foreword}} \addcontentsline{toc}{subsection}{Foreword}\todo[inline]{Write a foreword}
+{\let\clearpage\relax \abstract{}} \todo[inline]{Write an abstract}
+{\let\clearpage\relax \centering \subsection*{Foreword}} \addcontentsline{toc}{subsection}{Foreword}\todo[inline]{Write a foreword}
 \tableofcontents
 %{\let\clearpage\relax\listoffigures}
 %{\let\clearpage\relax\listoftables}
