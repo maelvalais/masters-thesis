@@ -70,19 +70,19 @@ Although offering excellent performances for sparse representation thanks to the
 \section{Learned dictionaries}
 Previously mentioned dictionaries are said to be “non-adaptative”, meaning that they won’t be able to sparsely code every possible type of signal.
 
-Dictionary learning allows to create “adaptative” dictionaries. Instead of being fixed, atoms are based on a learning set of example images, denoted by
+Dictionary learning allows to create “adaptative” dictionaries. Instead of being fixed, the atoms of an “adaptative” dictionary are based on a learning set of example images, denoted by
 $$\Y = \begin{bmatrix} \y_1 & \dots & \y_S \end{bmatrix}$$
-where the columns of $\Y$ are the vectorized\footnote{A vectorized matrix of dimension $I \times J$ of an image is the concatenation of all columns to form a vector of size $IJ$} images $\y_i$ of dimension $N$. The dictionary $\D$ is made of $K$ columns $\d_i$ (the atoms) such that the number of atoms is much larger than the dimension of a single image $\y_i$ ($K \gg N$):
+where the columns of $\Y$ are the vectorized\footnote{A vectorized matrix of dimension $R \times C$ of an image is the concatenation of all columns to form a vector of size $R \cdot C$} images $\y_i \in \R^N$. The dictionary $\D$ is made of $K$ columns $\d_i$ (the \gls{atoms}) such that the number of atoms is much larger than the dimension of a single image $\y_i$ ($K \gg N$):
 $$\D = \begin{bmatrix} \d_1 & \dots & \d_K \end{bmatrix}.$$
 
 The codes $\X$ are defined by
-$$\X = \begin{bmatrix} \x_1 & \dots & \x_S \end{bmatrix}$$
-where $\X$ is the concatenation of $S$ column vectors $\x_i$ (the codes) of dimension $K$. The dictionary learning problem is defined as
+$$\X = \begin{bmatrix} \x_1 & \dots & \x_{|\L|} \end{bmatrix}$$
+where $\X$ is the concatenation of $|\L|$ column vectors $\x^l$ (the codes) of dimension $K$. The dictionary learning problem is defined as
 \begin{align}
 \underset{\D,\X}{\min}~ & \lVert \X \rVert_1 + \lambda\lVert \D\X-\Y \rVert^2_F \tag{$DL$} \label{eq_dl} \\
 \text{s.t.}~ & \lVert \d_k \rVert \le \gamma & \forall k = 1,\dots,K\label{eq_dl_finite_norm}
 \end{align}
-where $\lVert . \rVert_F$ denotes the Frobenius norm and $\lVert . \rVert_1$ is the $l_1$ norm defined by $\lVert \X \rVert_1 = \sum_{i=1}^S |\x_i|$. The constraint \ref{eq_dl_finite_norm} prevents the atoms from having an arbitrarily big norm.
+where $\lVert . \rVert_F$ denotes the Frobenius norm and $\lVert . \rVert_1$ is the $l_1$ norm defined by $\lVert \X \rVert_1 = \sum_{i=1}^S |\x_i|$. The constraint \ref{eq_dl_finite_norm} prevents the atoms from having an arbitrarily large norm.
 
 The problem \eqref{eq_dl} can be understood as finding the atoms of $\D$ that give the sparsest (with as many zeros as possible) representation $\x_i$ approximating $\y_i$ for all $i = 1,\dots,S$. This approximation is denoted
 $$\D\X \approx \Y$$
@@ -101,7 +101,7 @@ The non-linearity caused by the product $\D\X$ induces a non-convex objective fu
 Among the many available algorithms (and their multiple versions) for dictionary learning, the \ac{KSVD} algorithm is a typical example. Introduced in \cite{aharon_k-svd:_2006} and inspired by the widely known \gls{KMeans} algorithm, it is used in many image processing applications. This algorithm is detailed in the next section.
 
 Another approach, more scalable, is denoted as “online” dictionary learning. The Online Dictionary Learning algorithm, proposed in \cite{mairal_online_2010}, learns one image after the other instead of learning the whole set at once. It makes it very suitable for huge sets of learning images.
-
+\todo{Should I invite the reader to read \cite{rubinstein_dictionaries_2010} which makes a full review of all available transforms (until 2010)?}
 
 \subsection{Example with the \acs{KSVD} algorithm}
 
@@ -138,7 +138,7 @@ The dictionary in (c) can now be used for denoising the noisy image (a). If we w
 
 
 \subsection{Problem of atom scalability: multi-scale dictionaries}
-As the learned \ac{KSVD} dictionary relies on the $O(NK)$ matrix-vector product and has to be over-complete ($K \gg N$) in order to achieve sparsity, we easily understand that $N$ cannot take an arbitrarily large value. In practice, the example images (also called patches) and atoms of the dictionary are generally at most $16 \times 16$.
+As the learned \ac{KSVD} dictionary relies on the $O(N \cdot K)$ matrix-vector product and has to be over-complete ($K \gg N$) in order to achieve sparsity, we easily understand that $N$ cannot take an arbitrarily large value. In practice, the example images (also called patches) and atoms of the dictionary are generally at most $16 \times 16$.
 
 Dictionaries with bigger atoms are known as multi-resolution (also called multi-scale), meaning that the atoms can contain either details or large features in images.
 
@@ -176,7 +176,7 @@ Their work have been published very recently (early 2016); this thesis does not 
 \section{Dictionary structured by the \Gls{treemodel}}
 
 \subsection{\Gls{treemodel}}\label{sec_tree_model}
-The work studied in \cite{chabiron_toward_2015} and \cite{chabiron_optimization_2016} offers a different way of structuring the matrix $\D$, namely the \emph{\Gls{treemodel}}. Instead of using “plain” atoms as columns and dealing with the matrix-vector product in $O(NK)$, $\D$ is defined by a convolutional tree structure $$\T(\V,\E)$$ where each edge $e$ of $\E$ is characterized by a kernel $\h^e$ and a support $\s^e$. The root $r$ and leaves $l$ of $\V$ allow us to define a branch as the successive edges growing from the root to one of the leaves.
+The work studied in \cite{chabiron_toward_2015} and \cite{chabiron_optimization_2016} offers a different way of structuring the matrix $\D$, namely the \emph{\Gls{treemodel}}. Instead of using “plain” atoms as columns and dealing with the matrix-vector product in $O(N \cdot K)$, $\D$ is defined by a convolutional tree structure $$\T(\V,\E)$$ where each edge $e$ of $\E$ is characterized by a kernel $\h^e$ and a support $\s^e$. The root $r$ and leaves $l$ of $\V$ allow us to define a branch as the successive edges growing from the root to one of the leaves.
 
 \begin{figure}[!ht]\centering
 \includegraphics[width=\textwidth]{figures/tree.pdf}
@@ -185,11 +185,11 @@ The work studied in \cite{chabiron_toward_2015} and \cite{chabiron_optimization_
 
 The target image $\y$ as well as the kernels $\h^e$ and supports $\s^e$ are vectors of dimension $N$. The supports $\s^e$ only take the values 0 (corresponding value in $\h^e$ must be 0) or 1 (corresponding value in $\h^e$ can be non-zero). For easier reading, we will denote the families $(\h^e)_{e \in \E}$ and $(\s^e)_{e \in \E}$ by $$\h = (\h^e)_{e \in \E}$$ and $$\s = (\s^e)_{e \in \E}.$$
 
-The code $\x$ is a “big” vector of dimension $K$ with $K = N \times |\L|$ such that $$\x = \begin{bmatrix}\x^1_1 \\ \vdots \\ \x^{|\L|}_N\end{bmatrix}$$
+The code $\x$ is a “big” vector of dimension $K$ with $K = N \cdot |\L|$ such that $$\x = \begin{bmatrix}\x^1_1 \\ \vdots \\ \x^{|\L|}_N\end{bmatrix}$$
 
- $\D$ is a matrix of dimensions $N \times K$ and $\y$ is a vector of dimension $N$.
+ $\D$ is a matrix of dimension $N \times K$ and $\y$ is a vector of dimension $N$.
 
-In the following, we will denote the images interchangeably using the vector notation $y = \{ y_i ~|~ i=1,\dots,N \}$ or the linear map notation $y = \{y(p) ~|~ p \in \P\}$.
+In the following, we will denote the images interchangeably using the vector notation $\y = \{ y_i ~|~ i=1,\dots,N \}$ or the linear map notation $\y = \{y(p) ~|~ p \in \P\}$.
 
 The \cref{fig_example_kernel} displays examples of a standard kernel (left) and a kernel $\h^e$ (middle) associated with its support $\s^e$ (right). The gray squares represent the “ones” of the support while the kernel is represented by values.
 
@@ -223,7 +223,7 @@ The dictionary update step associated with the \gls{treemodel} is defined as
 \underset{\substack{(\h^e)_{e}}}\min ~ & \lVert \D\x - \y \rVert_2^2 \tag{$FTL$} \label{eq_ftl}\\
 \text{s.t.~} & \s^e_p=0 \Rightarrow \h^e_p = 0 \quad & \forall p=1,\dots,N ,~\forall e \in \E \label{eq_ftl_in_support} \\
  & \lVert \h^e \rVert \le \gamma & \forall e \in \E\label{eq_ftl_kernel_finite_nrj}
-\end{align} The constraint in (\ref{eq_ftl_in_support}) guarantees that each kernel $\h^e$ has its non-zero values on the points of its support $\s^e$. Constraint (\ref{eq_ftl_kernel_finite_nrj}) ensures that the overall energy of every support is finite and prevents a specific kernel to “explode”.
+\end{align} The constraint in (\ref{eq_ftl_in_support}) guarantees that each kernel $\h^e$ has its non-zero values on the points of its support $\s^e$. Constraint (\ref{eq_ftl_kernel_finite_nrj}) ensures that the overall energy of every support is finite and prevents a specific kernel to “explode” (similar to constraint \eqref{eq_dl_finite_norm} of the \eqref{eq_dl} problem).
 
 \ac{FTL} can be rewritten as an unconstrained problem by introducing a characteristic function $\chi_{\Dspace^e}$ defined for each edge $e$ as follows
 
@@ -243,13 +243,13 @@ For later references, the objective function of \ac{FTL} will be denoted as
 
 \subsubsection{Interesting properties of \ac{FTL}}
 
-The convolution of sparse kernels in \ac{FTL} leads to theoretically highly performant dictionaries. The computational cost of $\D\x$ using \cref{eq_Dx_as_convolution} is reduced to $O(|\E| S N)$ ($|\E|$ is the number of edges and $S$ the number of elements in all supports). And because $|\E|$ and $S$ are designed to be significantly smaller than $K$ and $N$, using the \gls{treemodel} decreases greatly the cost of using the dictionary and is comparable to the Fourier transform performance (in $O(N \log N)$).
+The convolution of sparse kernels in \ac{FTL} leads to theoretically highly performant dictionaries. The computational cost of $\D\x$ using \cref{eq_Dx_as_convolution} is reduced to $O(Q \cdot N)$ ($Q$ is the number of elements in all supports, i.e. $Q=|\{s^e_p | s^e_p = 1, \forall (e,p) \in \E \times \P}|$). And because $Q$ only depends on the number of edges and is designed to be significantly smaller than  $N$, using the \gls{treemodel} decreases greatly the cost of using the dictionary and is comparable to the Fourier transform performance (in $O(N \log N)$).
 
 \begin{table}[!ht] \centering 
 \caption{Computational cost of $\D\x$} \label{table_comparison_Dx_costs}
 \begin{tabular}{c|c}
 Using matrix-vector product & Using \gls{treemodel} \\\\ \hline \\
-$O(KN)$ & $O(|\E|N)$
+$O(KN)$ & $O(Q \cdot N)$
 \end{tabular}
 \end{table}
 
@@ -278,7 +278,7 @@ Using this notation, the authors of \cite{chabiron_optimization_2016} have shown
 $$\nabla_{\h^e} \Phi[(\h^f)_{f \in \E}] = 2 \H^e * \Res$$ with $\Res$ the residual denoted by
 $$\Res = \D\x - \y$$
 
-Because of the projection onto the $\Dspace^e$ unit ball, it is sufficient to compute the partial gradient at the support locations. As explained further in \cref{sec_full_grad}, this means that the convolution $2 \H^e * \Res$ can be efficiently computed using a simple convolution. However, computing the “full” gradient (meaning on every point of kernel $\h^e$) cannot be computed efficiently this way.
+Because of the projection onto the $\Dspace^e$ set, it is sufficient to compute the partial gradient at the support locations. As explained further in \cref{sec_full_grad}, this means that the convolution $2 \H^e * \Res$ can be efficiently computed using a simple convolution. However, computing the “full” gradient (meaning on every point of kernel $\h^e$) cannot be computed efficiently this way.
 
 \begin{algorithm}[!ht]
     \caption{\ac{PALMTREE} (Proximal Alternating Linearized Minimization for \Gls{treemodel}) algorithm for Dictionary Update}\label{alg_palmtree}
@@ -290,7 +290,7 @@ Because of the projection onto the $\Dspace^e$ unit ball, it is sufficient to co
     	\item[--] codes $(\x^l)_{l \in \L}$
     	\item[--] supports $(\s^e)_{e \in \E}$
     \end{itemize}
-    \Output kernels $(\h^e)_{e \in \E} \in \R^{|\E| \times N}$
+    \Output kernels $(\h^e)_{e \in \E} \in \R^{|\E| \cdot N}$
     \State Initialize $(\h^e)_{e \in \E}$
     \While{not converged}
       \For{$e \in \E$ (depth-first way)}
@@ -402,7 +402,7 @@ The Orthogonal Matching Pursuit (\ac{OMP}, detailed in \cref{alg_omp}) chooses w
 \begin{algorithm}[!ht]
     \caption{Orthogonal Matching Pursuit (OMP) algorithm for sparse approximation}\label{alg_omp}
   \begin{algorithmic}[1]
-    \Input signal $\y$ of dimension $N$, dictionary of dim $N \times K$ with $K \gg N$
+    \Input signal $\y$ of dimension $N$, dictionary of dim. $N \times K$ with $K \gg N$
     \Output A $k$-sparse code $\x$ of dimension $K$
     \State \textbf{Initialization} $S=\{\}$
     \For{$i = 1,\dots,k$}
@@ -420,7 +420,7 @@ Our idea is to use the same principle when adding elements to supports $(\s^e)_{
 \begin{algorithm}[!ht]
     \caption{\ac{OMP} algorithm using \ac{PALMTREE}}\label{alg_omppalmtree}
   \begin{algorithmic}[1]
-    \Input signal $\y$ of dimension $N$, dictionary of dim $N \times K$ with $K = |\E| \times N$ and $K \gg N$
+    \Input signal $\y$ of dimension $N$, dictionary of dim $N \times K$ with $K = |\E| \cdot N$ and $K \gg N$
     \Output A $k$-sparse code $\x$ of dimension $K$
     \State \textbf{Initialization} Initialize the supports $\s^e$ such that $k=1$
     \For{$i = 1,\dots,k$}
