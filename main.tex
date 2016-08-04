@@ -395,13 +395,14 @@ Every experiment in this chapter is using a fixed single-branch tree of depth 4 
 \end{subfigure}
 \caption{Experiment setup. The experiments are using one image $\y$, one dictionary $\D$ (formed by $\T$, $(\s^e)_{e \in \E}$, $(\h^e)_{e \in \E}$) and one $\x$. The parameters $\y$, $\x$, $\T$, $(\s^e)_{e \in \E}$ are given and $(\h^e)_{e \in \E}$ is learned (the only variable).}\label{fig_xp_explain}
 \end{figure}
-The experiment’s dictionary associated to this convolutional tree can be simply written as
-$$\D\x = \h^1 * \h^2 * \h^3 * \h^4 * x$$
+In the following experiments, the dictionary associated to this convolutional tree can be simply written as 
+$$\D\x = \h^1 * \h^2 * \h^3 * \h^4 * x.$$
 
 \section{Using the gradient for choosing the element to add}
 
-The Orthogonal Matching Pursuit (\ac{OMP}, detailed in \cref{alg_omp}) chooses which component $\x_i$ should be “turned on” at each iteration, finding the atom $d_i$ that has the greatest correlation with the residual $\Res$. This step (cf. \cref{alg_omp_pick_correlation}) uses the gradient $\nabla \Phi(\x)$, with $$\Phi(\x) = \lVert \D\x - \y \rVert^2$$
-
+The Orthogonal Matching Pursuit (\ac{OMP}, detailed in \cref{alg_omp}) chooses at \cref{alg_omp_pick_correlation} which component $\x_i$ should be “turned on” at each iteration, finding the atom $\d_i$ that has the greatest correlation with the residual $\Res = \D\x - \y$, i.e.
+$$ i = \underset{j}{\argmax} ~ | \D^T \Res |_j $$
+which is litteraly the same as computing the gradient $\nabla \Phi(\x)$, with $$\Phi(\x) = \lVert \D\x - \y \rVert^2.$$
 
 \begin{algorithm}[!ht]
     \caption{Orthogonal Matching Pursuit (OMP) algorithm for sparse approximation}\label{alg_omp}
@@ -410,7 +411,7 @@ The Orthogonal Matching Pursuit (\ac{OMP}, detailed in \cref{alg_omp}) chooses w
     \Output A $k$-sparse code $\x$ of dimension $K$
     \State \textbf{Initialization} $S=\{\}$
     \For{$i = 1,\dots,k$}
-      \State $j =  \underset{j = 1,\dots,K}{\argmax} | \nabla \Phi(\x)_j |$ \label{alg_omp_pick_correlation}\Comment{find atom with max. correlation with residual $\Res$}
+      \State $j =  \underset{j = 1,\dots,K}{\argmax}~| \nabla \Phi(\x)_j |$ \label{alg_omp_pick_correlation}\Comment{find atom with max. correlation with residual $\Res$}
       \State $S = S \cup \{j\}$
       \State $\x = \underset{\text{supp}(\x) \subset S}{\argmin} \Phi(\x)$
     \EndFor
@@ -660,12 +661,11 @@ The \cref{fig_gain_n4} has shown that the “full” gradient could be satisfact
 
 
 \section{Learning the supports}
-%This section presents some results regarding 
 
 \subsection{Learning supports by only adding}
-After having shown that the gradient would give a good indication on which support elements should be added, we tried learning the support $\s$ using the \cref{alg_omppalmtree}. According to the conclusions of \cref{sec_add_before_converged} that indicates that the convergence of \ac{PALMTREE} is not mandatory before adding an element, we modified the \ac{PALMTREE} algorithm so that it stops every $t$ iterations.
+After having shown that the gradient gives a good indication on which support elements should be added, we tried learning the support $\s$ using the \cref{alg_omppalmtree}. According to the conclusions of \cref{sec_add_before_converged} that indicates that the convergence of \ac{PALMTREE} is not mandatory before adding an element, we simply set a smaller maximum of iterations for \ac{PALMTREE}; we denote this number of iterations $T$.
 
-In \cref{fig_variable_support}, the initial supports are simply centered Diracs; every $t=5$ iterations, one element is added where the gradient is the greatest, up to 36 elements. The experiment converges after about 200 iterations.
+In \cref{fig_variable_support}, the initial supports are simply centered Diracs; every $T=5$ iterations of \ac{PALMTREE}, one element is added where the gradient is the greatest, up to 36 elements. The experiment converges after about 200 iterations of \ac{PALMTREE}.
 
 The resulting approximation is encouraging with a relative RMSE decrease of -76\% compared to the approximation in \cref{fig_gain_n4}.
 
@@ -821,6 +821,10 @@ with $\F$ the \ac{DFT}, $^*$ the adjoint operator. Here is the proof:
 =& \left( \sum_{k=1}^M \sum_{l=1}^N A_{k,l} e^{-2i\pi (k\frac{m}{M}+l \frac{n}{N})} \right)^*\\
 =& \left( \F(A)_{m,n} \right)^*
 \end{align*}
+
+%\section{Performance of learning the transform and the transform itself}
+%\todo{Is the transform parallelizable? Is learning the transform parallelizable?}
+
 
 \printglossary
 {\let\clearpage\relax \printacronyms}
