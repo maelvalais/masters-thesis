@@ -41,6 +41,13 @@ else
     fi
 fi
 
+# TRICK: when I have a $variable with a space-separated string of 
+# directories (for example) and I want to do something for each 
+# element of that string, I can use $IFS.
+#    * IFS stores the characters that serve as delimiters
+# Example:
+#    while IFS= read -r var; do ...; done
+
 while read f; do
     file=`echo $f | cut -d ":" -f1 | sed "s/^\.\///g"`
     found=false
