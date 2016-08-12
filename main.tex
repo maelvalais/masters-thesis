@@ -21,7 +21,7 @@
 
 \chapter{Introduction} %\markboth{Introduction}{}}
 
-This chapter will first introduce and review the main existing dictionaries that have been used for sparse representation, from non-adaptative transforms to learned dictionaries and through the intermediate over-complete dictionaries. The second part of this chapter gives the general motivations and objectives of this work as well as the related works.
+In this chapter, we introduce and review the main existing dictionaries that have been used for sparse representation, from non-adaptative transforms to learned dictionaries and through the intermediate over-complete dictionaries. The second part of this chapter gives the general motivations and objectives of this work as well as the related works.
 
 \section{The need for sparse representations}
 
@@ -29,7 +29,7 @@ A sparse signal over some representation means that it can be expressed using on
 
 \section{Basis and redundant dictionaries}
 
-The \ac{DFT} is a classical example of operators used for sparsity. The \ac{DFT} can be written as a matrix $\D$, where $\D$ denotes the dictionary. Finding the Fourier representation – which we will refer as the \emph{code} $\x$ – of an image $\y$ amounts to compute 
+The \ac{DFT} is a classical example of an operator used for sparsity. The \ac{DFT} can be written as a matrix $\D$, where $\D$ denotes the dictionary. Finding the Fourier representation – which we will refer as the \emph{code} $\x$ – of an image $\y$ amounts to compute 
 $$\x = \D^T\y.$$
 
 \begin{figure}[!ht]
@@ -155,7 +155,7 @@ Many state-of-the-art machine learning techniques are based on trees of convolut
 \begin{itemize}
 \item[--] fast (fast computation of $\D\x$),
 \item[--] adaptative (must be learned on a set of images)
-\item[--] and stable.
+\item[--] and stable (does not amplify errors).
 \end{itemize}
 
 As mentioned, many algorithms are available, but are often fast at the expense of adaptiveness (such as the Fourier transform) or adaptative at the expense of speed (such as \ac{KSVD}).
@@ -662,7 +662,7 @@ The \cref{fig_gain_n4} has shown that the “full” gradient could be satisfact
 
 \section{Learning the supports}
 
-\subsection{Learning supports by only adding}
+\subsection{Learning supports for a single branch}
 After having shown that the gradient gives a good indication on which support elements should be added, we tried learning the support $\s$ using the \cref{alg_omppalmtree}. According to the conclusions of \cref{sec_add_before_converged} that indicates that the convergence of \ac{PALMTREE} is not mandatory before adding an element, we simply set a smaller maximum of iterations for \ac{PALMTREE}; we denote this number of iterations $T$.
 
 In \cref{fig_variable_support}, the initial supports are simply centered Diracs; every $T=5$ iterations of \ac{PALMTREE}, one element is added where the gradient is the greatest, up to 36 elements. The experiment converges after about 200 iterations of \ac{PALMTREE}.
@@ -686,6 +686,102 @@ The resulting approximation is encouraging with a relative RMSE decrease of -76\
 \end{subfigure}
 \caption{Learning the support (adding elements only). Starting from simple Diracs, the best element (using greatest gradient) is added to one of the supports every 5 iterations, up to 36 elements (same number as the fixed support in \cref{fig_gain_n4}).} \label{fig_variable_support}
 \end{figure}
+
+\subsection{Learning supports for a tree}
+
+\Cref{alg_omppalmtree} gives encouraging results; however, two issues rose when trying the same algorithm on a tree:
+\begin{itemize}
+	\item[-] the gradient indicates elements that are far from each other, hence making the kernels extremely spread;
+	\item[-] even though all points are gathered, the gradient might sometimes lead to very large kernels.
+\end{itemize}
+
+To address these issues, we added a new constraint when choosing the new element to be added. \Cref{alg_omppalmtree2} reflects that change. At \cref{alg_omppalmtree2_find}, the term 
+$$\alpha \underbrace{\lVert p \rVert_C}_{\text{Distance to origin}} \cdot \underbrace{\frac{\underset{p'}{\max} |\nabla \Phi_{\h^e}(\h)_{p'}|}{\underset{p'}{\max}\lVert p' \rVert_C}}_{\text{Normalization}}$$
+aims to concentrate the supports around the origin. $\lVert p\rVert_C$ is the circular euclidian norm, defined by
+$$\lVert p \rVert_C = \lVert \min\left(p ~\text{mod}~ N, (N-p) ~\text{mod}~ N\right) \rVert_2$$
+
+\begin{itemize}
+	\item max gradient seems to always lead to adding on the root more than on others
+	\item adding multiple elmts every ~5 iterations of PALMTREE gives good results
+	\item  
+\end{itemize}
+
+
+\begin{algorithm}[!ht]
+    \caption{\ac{OMP} algorithm using \ac{PALMTREE} (version 2)}\label{alg_omppalmtree2}
+  \begin{algorithmic}[1]
+    \Input signal $\y$ of dimension $N$, dictionary of dim $N \times K$ with $K = |\E| \cdot N$ and $K \gg N$
+    \Output A $k$-sparse code $\x$ of dimension $K$
+    \State \textbf{Initialization} Initialize the supports $\s^e$ such that $k=1$
+    \For{$i = 1,\dots,k$}
+      \State $(e,p) = \underset{(e,p) \in \E \times \P}{\argmax}~ |\nabla \Phi_{\h^e}(\h)_p| - \alpha \underbrace{\lVert p \rVert_C \cdot \frac{\underset{p'}{\max} |\nabla \Phi_{\h^e}(\h)_{p'}|}{\underset{p'}{\max}\lVert p' \rVert_C}}_{\text{Concentrate the support}} $\Comment{Choose support $s^e$ and location $p$} \label{alg_omppalmtree2_find}
+      \State $\s^e_p = 1$
+      \State $\h = \underset{\h^e \in \Dspace^e}{\argmin}~ \Phi(\h)$ \Comment{Do $T$ iter. of \ac{PALMTREE}} \label{alg_omppalmtree2_ftl}
+    \EndFor
+  \end{algorithmic}
+\end{algorithm}
+
+
+\begin{figure} \centering
+\includegraphics[width=0.5\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad1_every5_add5_totinit0_totadd279_alpha30_target.pdf}
+\caption{The target $\y$ made of curvelets at different scales and angles}
+\end{figure}
+
+\begin{figure}
+\begin{subfigure}[b]{0.49\textwidth}\centering
+\includegraphics[width=\textwidth]{figures/tree-learn/xp_learnsupp256_curvelet_decomp3[tree-binary_dpth4]_supp-generic3x3_[fixed-supports]_approx.pdf}
+	\caption{}
+\end{subfigure}
+\begin{subfigure}[b]{0.49\textwidth}\centering
+\includegraphics[width=\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad1_every5_add5_totinit0_totadd279_alpha30_approx.pdf} 
+	\caption{}
+\end{subfigure}
+\begin{subfigure}[b]{0.49\textwidth}\centering
+\includegraphics[width=\textwidth]{figures/tree-learn/xp_learnsupp256_curvelet_decomp3[tree-binary_dpth4]_supp-generic3x3_[fixed-supports]_tree.pdf}
+	\caption{}
+\end{subfigure}
+\begin{subfigure}[b]{0.49\textwidth}\centering
+\includegraphics[width=\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad1_every5_add5_totinit0_totadd279_alpha30_tree.pdf} 
+	\caption{}
+\end{subfigure}
+\caption{}
+\end{figure}
+
+
+\begin{figure}
+\begin{subfigure}[b]{0.49\textwidth}\centering
+\includegraphics[width=\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad1_every5_add5_totinit0_totadd279_alpha30_approx.pdf}
+	\caption{}
+\end{subfigure}
+\begin{subfigure}[b]{0.49\textwidth}\centering
+\includegraphics[width=\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad0_every5_add5_totinit0_totadd279_alpha30_approx.pdf} 
+	\caption{}
+\end{subfigure}
+\begin{subfigure}[b]{0.49\textwidth}\centering
+\includegraphics[width=\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad1_every5_add5_totinit0_totadd279_alpha30_tree.pdf}
+	\caption{}
+\end{subfigure}
+\begin{subfigure}[b]{0.49\textwidth}\centering
+\includegraphics[width=\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad0_every5_add5_totinit0_totadd279_alpha30_tree.pdf} 
+	\caption{}
+\end{subfigure}
+\caption{}
+\end{figure}
+
+\begin{figure}
+\begin{subfigure}[b]{0.49\textwidth}\centering
+\includegraphics[width=\textwidth]{figures/tree-learn/gradient-vs-sequential/gradient_used.pdf}
+	\caption{}
+\end{subfigure}
+\begin{subfigure}[b]{0.49\textwidth}\centering
+\includegraphics[width=\textwidth]{figures/tree-learn/gradient-vs-sequential/gradient_not_used.pdf} 
+	\caption{}
+\end{subfigure}	
+\caption{}
+\end{figure}
+
+
+
 
 \section{Conclusions and perspectives}
 
