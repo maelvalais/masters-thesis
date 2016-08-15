@@ -174,9 +174,7 @@ Their work have been published very recently (early 2016); this thesis does not 
 \chapter{State of the art}
 This chapter aims to introduce the \Gls{treemodel} as well as its associated dictionary learning problem, \acs{FTL}, and the algorithm \ac{PALMTREE} that solves this problem. The end of this chapter is dedicated to detailing the specific objectives of this internship.
 
-\section{Dictionary structured by the \Gls{treemodel}}
-
-\subsection{\Gls{treemodel}}\label{sec_tree_model}
+\section{Dictionary structured by the \Gls{treemodel}} \label{sec_tree_model}
 The work studied in \cite{chabiron_toward_2015} and \cite{chabiron_optimization_2016} offers a different way of structuring the matrix $\D$, namely the \emph{\Gls{treemodel}}. Instead of using “plain” atoms as columns and dealing with the matrix-vector product in $O(N \cdot K)$, $\D$ is defined by a convolutional tree structure \begin{equation*}\T(\V,\E)\end{equation*} where each edge $e$ of $\E$ is characterized by a kernel $\h^e$ and a support $\s^e$. The leaves $l \in \L \subset \V$ associated with the root $r \in \V$ allow us to define a branch as the successive edges growing from the root (top) to one of the leaves (bottom).
 
 \begin{figure}[!ht]\centering
@@ -218,7 +216,7 @@ Instead of using the standard matrix-vector product, the convolutional tree dict
 The convolutional tree dictionary $\D$ applied to a code $\x$ approximates $\y$ as follows
 \begin{equation*}\D\x \approx \y\end{equation*}
 
-\subsection{The \acs{FTL} problem}
+\section{The \acs{FTL} problem}
 
 The dictionary update step associated with the \gls{treemodel} is defined as
 \begin{align}
@@ -261,7 +259,7 @@ However, the product $\D\x$ can be seen as a multivariable polynomial of degree 
 And yet, the authors of \cite{chabiron_optimization_2016} have successfully proved that this problem is actually tractable. More surprisingly, they discovered that optimizing \ac{FTL} is possible and that the solutions given by \acs{PALMTREE} are encouraging.
 
 
-\subsection{The PALMTREE algorithm}\label{sec_palmtree}
+\section{The PALMTREE algorithm}\label{sec_palmtree}
 
 The authors of \cite{chabiron_optimization_2016} have shown that \eqref{eq_ftl2} can be solved using the \ac{PALM} algorithm proposed in \cite{bolte_proximal_2014}. The \ac{PALM} algorithm does a proximal gradient iteration successively on the different blocks of variables; \cite{bolte_proximal_2014} provides a proof of convergence towards a critical point for non-convex problems. In our case, one block corresponds to one kernel $\h^e$.
 
@@ -303,7 +301,7 @@ Because of the projection onto the $\Dspace^e$ set, it is sufficient to compute 
 \end{algorithm}
 
 
-\subsection{Drawbacks}
+\section{PALMTREE Drawbacks}
 As explained in \cite[p. 23]{chabiron_optimization_2016}, the main drawbacks to use this \gls{treemodel} for practical dictionary learning (i.e. denoising or image recognition) is that it requires the user to pre-define and fix certain central elements of the model, which is likely to lead to suboptimal results. Among them are the design of the tree (number of children per node, depth) and the choice of the supports.
 % NOTE: dictionary learning is an application of machine learning specifically designed for image processing 
 \subsubsection{Choice of the tree}
@@ -313,21 +311,20 @@ But getting an actual adaptative dictionary update step implies that the design 
 
 \subsubsection{Choice of the supports}
 
-As described in \cref{sec_tree_model}, the supports $\s^e$ are part of the \gls{treemodel}. In \cite{chabiron_toward_2015}, the authors experimentally showed that using fixed supports for approximating many kinds of atoms (curvelets, cosines) is possible. For the specific purpose of approximating existing atoms, the results turned out to be very promising. However, the proposed model was supposed to be able to approximate any kind of image.
-
-So far, the supports have been handcrafted. \Cref{fig_example_kernel} gives an example of typical support layout chosen for the experiments in \cite{chabiron_optimization_2016}. We propose in this work to make the supports “adaptative”, i.e. learning them during the optimization process.
+As described in \cref{sec_tree_model}, the supports $\s^e$ are part of the \gls{treemodel}. In \cite{chabiron_toward_2015}, the authors experimentally showed that using fixed supports for approximating many kinds of atoms (curvelets, wavelet packets) is possible. For the specific purpose of approximating existing atoms, the results turned out to be very promising. However, the proposed model was supposed to be able to approximate any kind of image, which is pratically not possible with fixed supports.
 
 \subsubsection{Still a prototype}
 Any actual image processing application would require to learn the dictionary on a large set of images (namely the $\Y$ matrix). However, \ac{PALMTREE} is still unable to handle more than one image.
 
 Moreover, most experiments on \ac{PALMTREE} have been focused on the dictionary update step; real applications would need to alternate between the dictionary update step and the sparse coding step.
-\todo{Add an example (image) of what PALMTREE is capable of (or more exactly, what it is limited to}
+\todo{Add an example (image) of what \ac{PALMTREE} is capable of (or more exactly, what it is limited to}
 
 
-\section{Learning the supports}
-\todo{Here, explain what my contribution will be...}
+\section{Internship goal}
 
-\Cref{fig_fixed_vs_expected} illustrates what could be expected to be found as the solution for an “adaptive” support of same size: the support (b) would shape itself into (c) to better match the target atom.
+So far, the supports of the convolutional tree dictionaries have been handcrafted. \Cref{fig_example_kernel} gives an example of typical support layout chosen for the experiments in \cite{chabiron_optimization_2016}. 
+
+To fix ideas, \cref{fig_fixed_vs_expected} illustrates what could be expected to be found as the solution for an “adaptive” support of same size: the support (b) would shape itself into (c) to better match the target atom.
 
 \begin{figure}[!ht]\centering
 \begin{subfigure}[b]{0.32\textwidth}\centering
@@ -344,8 +341,11 @@ Moreover, most experiments on \ac{PALMTREE} have been focused on the dictionary 
 \end{subfigure}
 \caption{Generic versus expected supports. (a) is the target image made of one curvelet. (b) gives the locations of the support elements for one edge of the tree. (c) shows a handcrafted support that we expect to be giving better results as it follows the general direction of the curvelet}\label{fig_fixed_vs_expected}
 \end{figure}
+\FloatBarrier
 
-\Cref{fig_xp_fixed_vs_expected} experimentally confirms the assumption made in \Cref{fig_fixed_vs_expected}. We switched $\s^4$ from a generic (\textit{a priori}) support to a hand-made support that follows the general direction of $\y$ (\cref{fig_fixed_vs_expected_y}). The RMSE\footnotemark[1] is decreased by -16\% (lower is better). The approximation in \cref{fig_xp_fixed_vs_expected_approx2} looks visually better than the one in \cref{fig_xp_fixed_vs_expected_approx1}.
+Finally, \cref{fig_xp_fixed_vs_expected} experimentally confirms the assumption made in \Cref{fig_fixed_vs_expected}. We switched $\s^4$ from a generic (\textit{a priori}) support to a hand-made support that follows the general direction of $\y$ (\cref{fig_fixed_vs_expected_y}). The RMSE\footnotemark[1] is decreased by -16\% (lower is better). The approximation in \cref{fig_xp_fixed_vs_expected_approx2} looks visually better than the one in \cref{fig_xp_fixed_vs_expected_approx1}.
+
+Based on these observations, we propose in this work to make the supports “adaptative”, i.e. learning them during the optimization process.
 
 \footnotetext[1]{Let $\y^1$ and $\y^2 \in \R^N$; the Root Mean Square Error is defined by  \begin{equation*}\text{RMSE}(\y^1,\y^2) = \frac{1}{N} \sqrt{\sum_{i=1}^N (y^1_i - y^2_i)^2}\end{equation*}}
 
@@ -454,7 +454,7 @@ We basically chose to use the fast Fourier transform ($\F$) for computing the co
 \begin{align*}
 	\nabla_{\h^e} \Phi((\h^f)_{f \in \E})&= \F^{-1}(\F(\H^{e})^* \circ \F(\Res))
 \end{align*}
-with ${}^*$ denoting the adjoint operator, $\circ$ the Hadamard product (point-wise product); $\H^{e}$ as well as $\Res$ are notations defined in \cref{sec_palmtree}. \todo[]{should I talk about the complexity of such using Fourier instead of the “sparse” convolution we use for the “restrained” gradient?}
+with ${}^*$ denoting the adjoint operator, $\circ$ the Hadamard product (point-wise product); $\H^{e}$ as well as $\Res$ are notations defined in \cref{sec_palmtree}.
 
 \subsection{Validation of the “full” gradient}
 We had some trouble when trying to compute the gradient on the full kernels $(\h^e)_{e \in \E}$ (not only on the supports element locations). To be sure that the computed “full” gradient was correct, we compared it to a finite-difference gradient:
