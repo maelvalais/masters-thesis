@@ -90,7 +90,7 @@ The problem \eqref{eq_dl} can be understood as finding the atoms of $\D$ that gi
 \Cref{fig_overcomplete_matrix} gives an idea of what we mean by approximating an image $\y$ using the matrix-vector product of a sparse code $\x$ and a learned dictionary $\D$. For this example, $\y$ is represented by a linear combination of three atoms of $\D$: $\x$ is 3-sparse.
 
 \begin{figure}[!ht] \centering
-\includegraphics[width=0.80\textwidth]{figures/sparsity-matrix.pdf}
+\includegraphics[width=0.90\textwidth]{figures/sparsity-matrix.pdf}
 \caption{Matrix view of $\D\x$ when $\D$ is over-complete (much more columns than lines).}\label{fig_overcomplete_matrix}
 \end{figure}
 
@@ -194,11 +194,11 @@ For more convenience, the images $\h^e$, $\x^l$ and $\y$ are defined as “circu
 
 \begin{figure}[!ht]\centering
 \begin{subfigure}[b]{0.20\textwidth}\centering
-\includegraphics[width=0.80\textwidth]{figures/kernel-exple.pdf}
+\includegraphics[width=0.90\textwidth]{figures/kernel-exple.pdf}
 \caption{Averaging kernel: fixed support and values}
 \end{subfigure}
 \begin{subfigure}[b]{0.79\textwidth}\centering
-\includegraphics[width=0.80\textwidth]{figures/kernel-h_e.pdf}
+\includegraphics[width=0.90\textwidth]{figures/kernel-h_e.pdf}
 \caption{Kernel $\h^e$ (left) and its associated support $\s^e$ (right).}\label{fig_example_kernel}
 \end{subfigure}
 \end{figure}
@@ -778,19 +778,21 @@ We found out that simply adjusting the "concentrating term" \eqref{eq_dist_origi
 
 \begin{figure}[!h] \centering
 \begin{subfigure}[b]{0.49\textwidth}\centering
-\includegraphics[width=0.8\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad1_every5_add5_totinit0_totadd279_alpha30_tree.pdf}
+\includegraphics[width=0.9\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad1_every5_add5_totinit0_totadd279_alpha30_tree.pdf}
 	\caption{Supports chosen using gradient}
 \end{subfigure}
 \begin{subfigure}[b]{0.49\textwidth}\centering
-\includegraphics[width=0.8\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad0_every5_add5_totinit0_totadd279_alpha30_tree.pdf} 
+\includegraphics[width=0.9\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad0_every5_add5_totinit0_totadd279_alpha30_tree.pdf} 
 	\caption{Supports chosen sequentially}
 \end{subfigure}
+%\end{figure}
+%\begin{figure}[!h] \ContinuedFloat
 \begin{subfigure}[b]{0.49\textwidth}\centering
-\includegraphics[width=0.8\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad1_every5_add5_totinit0_totadd279_alpha30_approx.pdf}
+\includegraphics[width=0.9\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad1_every5_add5_totinit0_totadd279_alpha30_approx.pdf}
 	\caption{Approximation $\D\x$ of above tree}
 \end{subfigure}
 \begin{subfigure}[b]{0.49\textwidth}\centering
-\includegraphics[width=0.8\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad0_every5_add5_totinit0_totadd279_alpha30_approx.pdf} 
+\includegraphics[width=0.9\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad0_every5_add5_totinit0_totadd279_alpha30_approx.pdf} 
 	\caption{Approximation $\D\x$ of above tree}
 \end{subfigure}
 \caption{Comparison of sequential versus using gradient when choosing a support for adding an element.}\label{fig_cmp_sequential_vs_grad}
@@ -819,7 +821,7 @@ We can note that both ways lead to balanced supports. Curiously, choosing the su
 \caption{Objective function versus compute time for many $\alpha$. Each graph sums up 35 runs (at $\alpha=0,2,4\dots$) of the \cref{alg_omppalmtree3}.} \label{fig_cmp_obj_vs_time}
 \end{figure}
 
-\Cref{alg_omppalmtree3} suffers from having one more parameter to be chosen: $\alpha$. \Cref{fig_before_after_adding} compares the objective function to the time spent for many $\alpha$ from 0 to 70. We did this experiment with both (a) gradient chosen supports and (b) sequentially chosen supports (as described in \cref{sec_pbm_unbalanced_supports}).
+\Cref{alg_omppalmtree3} suffers from having one more parameter to be chosen: $\alpha$. \Cref{fig_cmp_obj_vs_time} compares the objective function to the time spent for many $\alpha$ from 0 to 70. We did this experiment with both (a) gradient chosen supports and (b) sequentially chosen supports (as described in \cref{sec_pbm_unbalanced_supports}).
 
 For both (a) and (b), the best $\alpha$ is located in the range from 20 to 30. It is interesting to note that choosing the supports sequentially  significantly reduces the compute time. The objective functions are although similar.
 
@@ -840,22 +842,24 @@ As expected, learning the supports strongly decreases the RMSE. As for the singl
 
 \begin{figure}[!h] \centering
 \begin{subfigure}[b]{0.49\textwidth}\centering
-\includegraphics[width=0.8\textwidth]{figures/tree-learn/xp_learnsupp256_curvelet_decomp3[tree-binary_dpth4]_supp-generic3x3_[fixed-supports]_tree.pdf}
+\includegraphics[width=0.9\textwidth]{figures/tree-learn/xp_learnsupp256_curvelet_decomp3[tree-binary_dpth4]_supp-generic3x3_[fixed-supports]_tree.pdf}
 	\caption{Tree with generic supports}
 \end{subfigure}
 \begin{subfigure}[b]{0.49\textwidth}\centering
-\includegraphics[width=0.8\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad1_every5_add5_totinit0_totadd279_alpha30_tree.pdf} 
+\includegraphics[width=0.9\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad1_every5_add5_totinit0_totadd279_alpha30_tree.pdf} 
 	\caption{Tree with learned supports}
 \end{subfigure}
+\end{figure}
+\begin{figure} \ContinuedFloat
 \begin{subfigure}[b]{0.49\textwidth}\centering
-\includegraphics[width=0.8\textwidth]{figures/tree-learn/xp_learnsupp256_curvelet_decomp3[tree-binary_dpth4]_supp-generic3x3_[fixed-supports]_approx.pdf}
+\includegraphics[width=0.9\textwidth]{figures/tree-learn/xp_learnsupp256_curvelet_decomp3[tree-binary_dpth4]_supp-generic3x3_[fixed-supports]_approx.pdf}
 	\caption{Approximation $\D\x$ (generic supports)}
 \end{subfigure}
 \begin{subfigure}[b]{0.49\textwidth}\centering
-\includegraphics[width=0.8\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad1_every5_add5_totinit0_totadd279_alpha30_approx.pdf} 
+\includegraphics[width=0.9\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad1_every5_add5_totinit0_totadd279_alpha30_approx.pdf} 
 	\caption{Approximation $\D\x$ (learned supports)}
 \end{subfigure}
-\caption{Comparison of generic versus learned supports. Learning the supports allows us to decreases the RMSE by -58\%.}\label{fig_learnsupp_vs_generic}
+\caption{Comparison of generic versus learned supports. The RMSE decreases by -58\%.}\label{fig_learnsupp_vs_generic}
 \end{figure}
 
 
