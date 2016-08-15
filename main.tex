@@ -70,7 +70,7 @@ Although offering excellent performances for sparse representation thanks to the
 \section{Learned dictionaries}
 Previously mentioned dictionaries are said to be “non-adaptative”, meaning that they won’t be able to sparsely code every possible type of signal.
 
-Dictionary learning allows to create “adaptative” dictionaries. Instead of being fixed, the atoms of an “adaptative” dictionary are based on a learning set of example images, denoted by
+Dictionary learning allows us to create “adaptative” dictionaries. Instead of being fixed, the atoms of an “adaptative” dictionary are based on a learning set of example images, denoted by
 \begin{equation*}\Y = \begin{bmatrix} \y_1 & \dots & \y_S \end{bmatrix}\end{equation*}
 where the columns of $\Y$ are the vectorized\footnote{A vectorized matrix of dimension $R \times C$ of an image is the concatenation of all columns to form a vector of size $R \cdot C$} images $\y_i \in \R^N$. The dictionary $\D$ is made of $K$ columns $\d_i$ (the atoms) such that the number of atoms is much larger than the dimension of a single image $\y_i$ ($K \gg N$):
 \begin{equation*}\D = \begin{bmatrix} \d_1 & \dots & \d_K \end{bmatrix}.\end{equation*}
@@ -301,7 +301,6 @@ Because of the projection onto the $\Dspace^e$ set, it is sufficient to compute 
     \EndWhile
   \end{algorithmic}
 \end{algorithm}
-
 
 
 \subsection{Drawbacks}
@@ -623,6 +622,7 @@ The experiment shown in \cref{fig_before_after_adding} is based on the results o
 
 We also observe that when adding a point to the support (materialized by the \nth{10} small square), the highest gradient values “shift” to the south-west. Adding a point to the support has an effect on every surrounding points.
 
+\FloatBarrier
 \subsection{Adding elements before the convergence of \ac{PALMTREE}} \label{sec_add_before_converged}
 
 At \cref{alg_omppalmtree_ftl} of \cref{alg_omppalmtree}, we do a full minimization, i.e. it stops as soon as \ac{PALMTREE} has converged. Because the minimization takes a lot of time, it was tempting to try adding elements every few iterations of \ac{PALMTREE} instead of waiting until it converges.
@@ -657,27 +657,35 @@ The \cref{fig_gain_n4} has shown that the “full” gradient could be satisfact
 
 \Cref{fig_iter_gain_vs_grad} compares the best values of gain-per-added-point to gradient snapshots taken during the minimization. This is reassuring: whatever the iteration, the gradient best values stay close to the gain-per-added-point best values. We may conclude that adding elements every few iterations of \ac{PALMTREE} works.
 
+\FloatBarrier
 \section{Learning the supports for a single branch}
 After having shown that the gradient gives a good indication on which support elements should be added, we tried learning the support $\s$ using the \cref{alg_omppalmtree}. According to the conclusions of \cref{sec_add_before_converged} that indicates that the convergence of \ac{PALMTREE} is not mandatory before adding an element, we simply set a smaller maximum of iterations for \ac{PALMTREE}; we denote this number of iterations $T$.
 
-In \cref{fig_variable_support}, the initial supports are simply centered Diracs; every $T=5$ iterations of \ac{PALMTREE}, one element is added where the gradient is the greatest, up to 36 elements. The experiment converges after about 200 iterations of \ac{PALMTREE}.
+In \cref{fig_variable_support_c}, the initial supports are simply centered Diracs; every $T=5$ iterations of \ac{PALMTREE}, one element is added where the gradient is the greatest, up to 36 elements. The experiment converges after about 200 iterations of \ac{PALMTREE}.
 
-The resulting approximation is encouraging with a relative RMSE decrease of -76\% compared to the approximation in \cref{fig_gain_n4}.
+The resulting approximation (d) is encouraging with a relative RMSE decrease of -76\% compared to the approximation (b) using the generic supports in (a).
+
+%\begin{subfigure}[b]{1\textwidth}\centering
+%\includegraphics[width=\textwidth]{figures/variable_support/xp_128x128_sc2_angl1_K3_S3_node4_variable_target.pdf}
+%\caption{Image $\y$}
+%\end{subfigure}
 
 \begin{figure}[!ht]\centering
-\begin{subfigure}[b]{0.3\textwidth}\centering
-	\begin{subfigure}[b]{1\textwidth}\centering
-	\includegraphics[width=\textwidth]{figures/variable_support/xp_128x128_sc2_angl1_K3_S3_node4_variable_target.pdf}
-	\caption{Image $\y$}
-	\end{subfigure}
-	\begin{subfigure}[b]{1\textwidth}\centering
-	\includegraphics[width=\textwidth]{figures/variable_support/xp_128x128_sc2_angl1_K3_S3_node4_variable_approx.pdf}
-	\caption{Approximation $\D\x$}
-	\end{subfigure}
+\begin{subfigure}[b]{0.085\textwidth}\centering
+	\includegraphics[width=\textwidth]{figures/exple-better-support/tree_classic.pdf}
+	\caption{}
 \end{subfigure}
-\begin{subfigure}[b]{0.3\textwidth}\centering
-\includegraphics[width=0.47\textwidth]{figures/variable_support/support.pdf}
-\caption{Supports $\s_e$}
+\begin{subfigure}[b]{0.39\textwidth}\centering
+\includegraphics[width=\textwidth]{figures/exple-better-support/xp_128x128_sc2_angl1_K3_S3_node4classic_approx.pdf}
+\caption{Approx. $\D\x$ with generic supports}\label{fig_xp_fixed_vs_expected_approx1}
+\end{subfigure}
+\begin{subfigure}[b]{0.085\textwidth}\centering
+\includegraphics[width=\textwidth]{figures/variable_support/support.pdf}
+\caption{}\label{fig_variable_support_c}
+\end{subfigure}
+\begin{subfigure}[b]{0.39\textwidth}\centering
+\includegraphics[width=\textwidth]{figures/variable_support/xp_128x128_sc2_angl1_K3_S3_node4_variable_approx.pdf}
+\caption{Approx. $\D\x$ with learned supports} 
 \end{subfigure}
 \caption{Learning the support (adding elements only). Starting from simple Diracs, the best element (using greatest gradient) is added to one of the supports every 5 iterations, up to 36 elements (same number as the fixed support in \cref{fig_gain_n4}).} \label{fig_variable_support}
 \end{figure}
@@ -685,7 +693,6 @@ The resulting approximation is encouraging with a relative RMSE decrease of -76\
 \section{Learning supports for a tree}
 
 \subsection{Experiment setup}
-For testing our support learning algorithm \cref{alg_omppalmtree}, we use the convolutional tree defined in \cref{fig_learntree_setup}. The target $\y$ made of curvelets at different scales and angles. From left to right and top to bottom, the 16 curvelets (numbered 1 through 16) have corresponding codes $\x^i$ with $i=1,\dots16$. The codes are located at the center of their corresponding curvelet.
 
 \begin{figure}[!h] \centering
 \begin{subfigure}[b]{0.325\textwidth}\centering
@@ -703,12 +710,14 @@ For testing our support learning algorithm \cref{alg_omppalmtree}, we use the co
 \caption{Setup of the support learning experiments.}\label{fig_learntree_setup}
 \end{figure}
 
+For testing our support learning algorithm \cref{alg_omppalmtree}, we use the convolutional tree defined in \cref{fig_learntree_setup}. The target $\y$ made of curvelets at different scales and angles. From left to right and top to bottom, the 16 curvelets (numbered 1 through 16) have corresponding codes $\x^i$ with $i=1,\dots16$. The codes are located at the center of their corresponding curvelet.
+
 \subsection{Problem of scattered elements using \cref{alg_omppalmtree}}
  
 An unforeseen issue rose when trying the \cref{alg_omppalmtree} on a tree instead of a single branch: the gradient indicates elements that are far from each other. The selection of the best support element to be added can be unexpectedly far from previously added elements, hence producing scattered kernels.
 
 \begin{figure}[!h] \centering
-\includegraphics[width=1\textwidth]{figures/tree-scattered-supports/supports_with_zoom.pdf}
+\includegraphics[width=0.9\textwidth]{figures/tree-scattered-supports/supports_with_zoom.pdf}
 \caption{Scattered supports when using plain \cref{alg_omppalmtree}. The right image is a magnified version of $\s^1$.} \label{fig_scattered_support}
 \end{figure}
 
@@ -767,19 +776,19 @@ We found out that simply adjusting the "concentrating term" \eqref{eq_dist_origi
 
 \begin{figure}[!h] \centering
 \begin{subfigure}[b]{0.49\textwidth}\centering
-\includegraphics[width=0.7\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad1_every5_add5_totinit0_totadd279_alpha30_tree.pdf}
+\includegraphics[width=0.8\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad1_every5_add5_totinit0_totadd279_alpha30_tree.pdf}
 	\caption{Supports chosen using gradient}
 \end{subfigure}
 \begin{subfigure}[b]{0.49\textwidth}\centering
-\includegraphics[width=0.7\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad0_every5_add5_totinit0_totadd279_alpha30_tree.pdf} 
+\includegraphics[width=0.8\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad0_every5_add5_totinit0_totadd279_alpha30_tree.pdf} 
 	\caption{Supports chosen sequentially}
 \end{subfigure}
 \begin{subfigure}[b]{0.49\textwidth}\centering
-\includegraphics[width=0.7\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad1_every5_add5_totinit0_totadd279_alpha30_approx.pdf}
+\includegraphics[width=0.8\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad1_every5_add5_totinit0_totadd279_alpha30_approx.pdf}
 	\caption{Approximation $\D\x$ of above tree}
 \end{subfigure}
 \begin{subfigure}[b]{0.49\textwidth}\centering
-\includegraphics[width=0.7\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad0_every5_add5_totinit0_totadd279_alpha30_approx.pdf} 
+\includegraphics[width=0.8\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad0_every5_add5_totinit0_totadd279_alpha30_approx.pdf} 
 	\caption{Approximation $\D\x$ of above tree}
 \end{subfigure}
 \caption{Comparison of sequential versus using gradient when choosing a support for adding an element.}\label{fig_cmp_sequential_vs_grad}
@@ -805,12 +814,14 @@ We can note that both ways lead to balanced supports. Curiously, choosing the su
 \includegraphics[width=\textwidth]{figures/tree-learn/gradient-vs-sequential/gradient_not_used.pdf} 
 	\caption{}
 \end{subfigure}	
+\caption{Objective function versus compute time for many $\alpha$. Each graph sums up 35 runs (at $\alpha=0,2,4\dots$) of the \cref{alg_omppalmtree3}.} \label{fig_cmp_obj_vs_time}
 \end{figure}
 
 \Cref{alg_omppalmtree3} suffers from having one more parameter to be chosen: $\alpha$. \Cref{fig_before_after_adding} compares the objective function to the time spent for many $\alpha$ from 0 to 70. We did this experiment with both (a) gradient chosen supports and (b) sequentially chosen supports (as described in \cref{sec_pbm_unbalanced_supports}).
 
-For both (a) and (b), the best $\alpha$ is located in the range from 20 to 30. We also notice that choosing the supports sequentially  significantly reduces the compute time, but the objective functions are similar.
+For both (a) and (b), the best $\alpha$ is located in the range from 20 to 30. It is interesting to note that choosing the supports sequentially  significantly reduces the compute time. The objective functions are although similar.
 
+\FloatBarrier
 \subsection{Final results using \cref{alg_omppalmtree3}}
 \Cref{fig_learnsupp_vs_generic} shows the difference between a tree with generic supports (left) and a learned supports tree (right). Both have the same number of support elements $Q = 279$. Here is some numbers for comparison:
 \begin{table}[!h] \centering
@@ -827,30 +838,40 @@ As expected, learning the supports strongly decreases the RMSE. As for the singl
 
 \begin{figure}[!h] \centering
 \begin{subfigure}[b]{0.49\textwidth}\centering
-\includegraphics[width=\textwidth]{figures/tree-learn/xp_learnsupp256_curvelet_decomp3[tree-binary_dpth4]_supp-generic3x3_[fixed-supports]_tree.pdf}
+\includegraphics[width=0.8\textwidth]{figures/tree-learn/xp_learnsupp256_curvelet_decomp3[tree-binary_dpth4]_supp-generic3x3_[fixed-supports]_tree.pdf}
 	\caption{Tree with generic supports}
 \end{subfigure}
 \begin{subfigure}[b]{0.49\textwidth}\centering
-\includegraphics[width=\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad1_every5_add5_totinit0_totadd279_alpha30_tree.pdf} 
+\includegraphics[width=0.8\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad1_every5_add5_totinit0_totadd279_alpha30_tree.pdf} 
 	\caption{Tree with learned supports}
 \end{subfigure}
 \begin{subfigure}[b]{0.49\textwidth}\centering
-\includegraphics[width=\textwidth]{figures/tree-learn/xp_learnsupp256_curvelet_decomp3[tree-binary_dpth4]_supp-generic3x3_[fixed-supports]_approx.pdf}
+\includegraphics[width=0.8\textwidth]{figures/tree-learn/xp_learnsupp256_curvelet_decomp3[tree-binary_dpth4]_supp-generic3x3_[fixed-supports]_approx.pdf}
 	\caption{Approximation $\D\x$ (generic supports)}
 \end{subfigure}
 \begin{subfigure}[b]{0.49\textwidth}\centering
-\includegraphics[width=\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad1_every5_add5_totinit0_totadd279_alpha30_approx.pdf} 
+\includegraphics[width=0.8\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad1_every5_add5_totinit0_totadd279_alpha30_approx.pdf} 
 	\caption{Approximation $\D\x$ (learned supports)}
 \end{subfigure}
-\caption{Comparison of generic versus learned supports.}\label{fig_learnsupp_vs_generic}
+\caption{Comparison of generic versus learned supports. Learning the supports allows us to decreases the RMSE by -58\%.}\label{fig_learnsupp_vs_generic}
 \end{figure}
 
 
-
+\FloatBarrier
 \section{Conclusions and perspectives}
 
-\todo[inline]{PALMTREE should be able to handle multiple images}
-\todo[inline]{test PALMTREE on a real dictionary learning example (with sparse coding step)}
+ 
+During this study, we found out that the gradient can be used for learning the support in an \ac{OMP} manner. We also noticed that learning supports on a branch gives excellent results, although being less conclusive on a tree. After some adaptations, the algorithm OMP-PALMTREE gave promising results for curvelets – with the downside of having a new parameter to tune.
+
+These comforting results on simple curvelet targets should be deepened using other kinds of atoms. In \cite{chabiron_optimization_2016}, wavelet packets have been used as target atoms. Testing our algorithms on different atoms would give us more feedback on how to tune the support learning.
+
+Before beginning this study, we had in mind an algorithm for support learning that would add elements – as we actually did – but also remove useless elements. This part has not been studied, even though some of the implementation has been done (for removing elements).
+
+Beyond this internship, the idea was to learn most parameters for the \gls{treemodel}; including the supports and the tree structure. In our experiments, we have let aside the tree structure, using a simple binary tree that would fit our needs. But a tiling-like tree, as shown in \cite{chabiron_optimization_2016}, would perform much better. 
+
+Also, this work only focuses on the dictionary update step – this is why we use simplified codes and targets with well separated atoms. For this model to be useful in real applications, we should integrate it to a full dictionary learning algorithm that includes a sparse coding step. This has been investigated in \cite{chabiron_optimization_2016}.
+
+Finally, the whole \gls{treemodel} has only been designed for learning on a single image $\y$; a future goal would be to modify the algorithm to use multiple images when learning, as well as make it scalable (like the Online Dictionary Learning algorithm).
 
 
 \clearpage
@@ -907,7 +928,7 @@ To sum up, the matrix associated to the convolutional tree dictionary $\D$ can b
 
 
 
-\clearpage
+\FloatBarrier
 
 \section{Detail of the \ac{KSVD} algorithm} \label{sec_ksvd_detail}
 \begin{algorithm}
@@ -936,7 +957,7 @@ To sum up, the matrix associated to the convolutional tree dictionary $\D$ can b
   \end{algorithmic}
 \end{algorithm}
 
-\clearpage
+\FloatBarrier
 
 \section{Why is sparse coding used for denoising?}
 
@@ -966,7 +987,7 @@ which is much better than the previous distance, provided that $k \ll N$.
 \caption{When projected onto a lower dimensional space, the standard deviation of the additive Gaussian noise $\bm{b} \sim \mathcal{N}(0,\sigma^2I)$ will be greatly reduced if $k \ll N$. The sparser the representation the better the denoising. \label{sparse_reduce_noise}}
 \end{figure}
 
-\clearpage
+\FloatBarrier
 
 \section{Prooving $\F(\widetilde{A}) = \F(A)^*$} \label{sec_proof_fourier_flip_adjoint}
 When dealing with periodic images (images are periodically repeated such that every point $p \in \mathcal{Z}$ is defined), computing the Fourier transform of a “flipped” image $\F(\widetilde{A})$, with $\widetilde{A}_p = A_{-p}$, can be simplified using the property
