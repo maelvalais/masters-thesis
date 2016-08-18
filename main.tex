@@ -735,7 +735,7 @@ For testing our support learning algorithm \cref{alg_omppalmtree}, we use the co
 
 \subsection{Problem of scattered elements using \cref{alg_omppalmtree}}
  
-An unforeseen issue rose when trying the \cref{alg_omppalmtree} on a tree instead of a single branch: the gradient indicates elements that are far from each other. The selection of the best support element to be added can be unexpectedly far from previously added elements, hence producing scattered kernels.
+An unforeseen issue rose when trying the \cref{alg_omppalmtree} on a tree instead of a single branch: the gradient indicates elements that are far from each other. The selection of the best support element to be added can be unexpectedly far from previously added elements, hence producing scattered kernels. Having “gathered” supports is essential for the convolutional tree model. \todo[inline]{HELP: I can’t find explanations on why it is essential to have “gathered” kernels, contrary to “scattered” kernels} 
 
 \begin{figure}[!h] \centering
 \begin{subfigure}[b]{0.65\textwidth}\centering
@@ -746,10 +746,10 @@ An unforeseen issue rose when trying the \cref{alg_omppalmtree} on a tree instea
 \includegraphics[width=1\textwidth]{figures/tree-scattered-supports/_partgrad1.pdf}
 \caption{Gradient for $\h^1$} \label{fig_scattered_support_grad}
 \end{subfigure}
-\caption{Scattered supports when using plain \cref{alg_omppalmtree}. The gradient in (b) has its maximum values in multiple places, therefore producing scattered supports.} \label{fig_scattered_support}
+\caption{Scattered supports when using plain \cref{alg_omppalmtree}. The gradient in (b) has its maximum values in distant locations, therefore producing scattered supports.} \label{fig_scattered_support}
 \end{figure}
 
-\Cref{fig_scattered_support} illustrates this issue; every support has its elements scattered instead of being gathered in one place. Ideally, we would like all elements to be centered around the origin (in the figures, the origin is at the center of the image).
+\Cref{fig_scattered_support_tree} illustrates this problem; every support has its elements scattered instead of being gathered in one place. The corresponding gradient, shown in \cref{fig_scattered_support_grad}, has multiple “local” maxima that are far from the origin. Ideally, we would like all elements to be centered around the origin (in the figures, the origin is at the center of the image).
 
 \begin{algorithm}[!h]
     \caption{\ac{OMP} algorithm using \ac{PALMTREE} (version 2)}\label{alg_omppalmtree2}
@@ -758,19 +758,48 @@ An unforeseen issue rose when trying the \cref{alg_omppalmtree} on a tree instea
     \Output A $k$-sparse code $\x$ of dimension $K$
     \State \textbf{Initialization} Initialize the supports $\s^e$ such that $k=1$
     \For{$i = 1,\dots,k$}
-      \State $(e,p) = \underset{(e,p) \in \E \times \P}{\argmax}~ |\nabla \Phi_{\h^e}(\h)_p| - \underbrace{\alpha~f(\h,e,p)}_{\text{Regularization for concentrating the support}} $\Comment{Choose support $s^e$ and location $p$} \label{alg_omppalmtree2_find}
+      \State $(e,p) = \underset{(e,p) \in \E \times \P}{\argmax}~ \left[ |\nabla \Phi_{\h^e}(\h)_p| \underbrace{ - \alpha~f(p)}_{\text{Concentrate the support}} \right]$ \label{alg_omppalmtree2_find}
       \State $\s^e_p = 1$
-      \State $\h = \underset{\h^e \in \Dspace^e}{\argmin}~ \Phi(\h)$ \Comment{Do $T$ iter. of \ac{PALMTREE}} \label{alg_omppalmtree2_ftl}
+      \State $\h = \underset{\h^e \in \Dspace^e}{\argmin}~ \Phi(\h)$ \label{alg_omppalmtree2_ftl}
     \EndFor
   \end{algorithmic}
 \end{algorithm}
 
-To address this issue, we added a new constraint when choosing the new element to be added. \Cref{alg_omppalmtree2} reflects that change. At \cref{alg_omppalmtree2_find}, the term 
-\begin{equation}\alpha \underbrace{\lVert p \rVert_c}_{\text{Distance to origin}} \cdot \underbrace{\frac{1}{\underset{p'}{\max}\lVert p' \rVert_c}}_{\text{Distance normalization}}\label{eq_dist_origin}\end{equation}
-aims to concentrate each support around its origin. $\lVert p\rVert_c$ is the circular euclidian norm defined on $p=\begin{pmatrix}x \\ y\end{pmatrix}1,\dots,M \times 1,\dots,N$ by
+\begin{figure}[!h] \centering
+\begin{subfigure}[b]{0.325\textwidth}\centering
+\includegraphics[width=1\textwidth]{figures/tree-scattered-supports/grad_node1.pdf}
+\caption{Gradient } \label{}
+\end{subfigure}
+\begin{subfigure}[b]{0.325\textwidth}\centering
+\includegraphics[width=1\textwidth]{figures/tree-scattered-supports/dist_to_orig.pdf}
+\caption{Function $f(p)$} \label{}
+\end{subfigure}
+\begin{subfigure}[b]{0.325\textwidth}\centering
+\includegraphics[width=1\textwidth]{figures/tree-scattered-supports/regularized.pdf}
+\caption{gradient - $f(p)$} \label{}
+\end{subfigure}
+\caption{Example of linear regularization using distance to origin (center of the figure).} \label{fig_grad_minus_dist}
+\end{figure}
 
-\begin{equation*}\lVert p \rVert_c = \left\| \begin{matrix} \min\left(x \bmod M, (M-x) \bmod M\right) \\ \min\left(y \bmod N, (N-y) \bmod N\right) \end{matrix} \right\|_2\end{equation*}
-with $\bmod$ the modulo operator; note that this definition doesn't use the "one dimensional" notation $p \in \P$ previously used because of the circular specificity.
+To address this issue, we added in \cref{alg_omppalmtree2} a regularization term $f(p) \subset \R$ that prevents $p$ from being too far from the origin (center\footnote{The actual implementation relies on kernels centered on the origin $(1,1)$; for easier understanding, we translate the kernels so that the origin is centered.} of the support).
+\begin{equation}
+f(p) = \frac{\text{dist}(o-p)}{\underset{p' \in 1,\dots,N}{\max}\text{dist}(o-p')} \quad \in [0,1] \label{eq_regularized1}
+\end{equation}
+with $o$ the origin, which is the center of the support. Note that $f$ simply normalizes \text{dist()} in $[0,1]$. \Cref{fig_grad_minus_dist} illustrates the effect on the regularization $f(p)$ on the objective function (at \cref{alg_omppalmtree2_find} of \cref{alg_omppalmtree2}).
+
+
+
+  $\text{dist}(p)$ is the circular euclidian norm defined on $p=1,\dots,N$ by\footnotemark[1]
+\begin{equation*} \text{dist}(p) = \min\left[p \bmod N, (N-p) \bmod N\right]\end{equation*}
+with $\bmod$ the modulo operator.
+
+\footnotetext[1]{Note that the actual implementation uses non-vectorized images (matrices). This implies that this definition must be extended to two dimensional $\bm{p} = \begin{bmatrix}
+	p_1 \\ p_2\end{bmatrix}$. It is easily done with 
+	$\text{dist}(\bm{p}) = \left\| \begin{bmatrix} \text{dist}(p_1) \\ \text{dist}(p_2)\end{bmatrix} \right\|_2$.}
+
+
+\subsection{Tuning of regularization parameter $\alpha$}
+
 
 
 \subsection{Problem of unbalanced supports using \cref{alg_omppalmtree2}} \label{sec_pbm_unbalanced_supports}
@@ -785,8 +814,8 @@ Beyond the issue of "scattered" supports, another problem appeared when using th
 
 \Cref{fig_unbalanced_supports} illustrates this issue: with $\alpha=10$, most elements are added on the support $\s^1$, while $\s^{27}$ has only 3 elements.
 
-We found out that simply adjusting the "concentrating term" \eqref{eq_dist_origin}, with respect to each support, gives much better results. The adjusted "concentrating term" for the modified \cref{alg_omppalmtree3} is
-\begin{equation}\alpha \underbrace{\lVert p \rVert_c}_{\text{Distance to origin}} \cdot \underbrace{\frac{\underset{p'}{\max} |\nabla \Phi_{\h^e}(\h)_{p'}|}{\underset{p'}{\max}\lVert p' \rVert_c}}_{\text{Normalized distance (adjusted to each support)}.}\label{eq_dist_origin_adjusted}\end{equation}
+We found out that simply adjusting the "concentrating term" \eqref{eq_regularized1}, with respect to each support, gives much better results. The adjusted "concentrating term" for the modified \cref{alg_omppalmtree3} is
+\begin{equation}\alpha \underbrace{\lVert p \rVert_c}_{\text{Distance to origin}} \cdot \underbrace{\frac{\underset{p'}{\max} |\nabla \Phi_{\h^e}(\h)_{p'}|}{\underset{p'}{\max}\lVert p' \rVert_c}}_{\text{Normalized distance (adjusted to each support)}.}\label{eq_regularized2}\end{equation}
 
 \begin{algorithm}[!h]
     \caption{\ac{OMP} algorithm using \ac{PALMTREE} (version 3)}\label{alg_omppalmtree3}
@@ -824,7 +853,7 @@ We found out that simply adjusting the "concentrating term" \eqref{eq_dist_origi
 \caption{Comparison of sequential versus using gradient when choosing a support for adding an element.}\label{fig_cmp_sequential_vs_grad}
 \end{figure}
 
-To make sure that the support that is chosen using the gradient with this adjusted "concentrating term" \eqref{eq_dist_origin_adjusted} actually gives appropriate results, we compare in \cref{fig_cmp_sequential_vs_grad} the learned supports when 
+To make sure that the support that is chosen using the gradient with this adjusted "concentrating term" \eqref{eq_regularized2} actually gives appropriate results, we compare in \cref{fig_cmp_sequential_vs_grad} the learned supports when 
 \begin{enumerate}[label=(\alph*)]
 	\item $e$ and $p$ are both chosen using the gradient;
 	\item $p$ is chosen using the gradient, $e$ is sequentially selected: we add an element to $\s^1$, then to $\s^2$\dots so that every support has the exact same amount of elements.
