@@ -733,6 +733,23 @@ The resulting approximation (d) is encouraging with a relative RMSE decrease of 
 
 For testing our support learning algorithm \cref{alg_omppalmtree}, we use the convolutional tree defined in \cref{fig_learntree_setup}. The target $\y$ made of curvelets at different scales and angles. From left to right and top to bottom, the 16 curvelets of $\y$ (numbered 1 through 16) have the corresponding codes $\x^i$ with $i=1,\dots16$. The codes are located at the center of their corresponding curvelet.
 
+
+\begin{figure}[!h] \centering
+\begin{subfigure}[b]{0.49\textwidth}\centering
+\includegraphics[width=0.8\textwidth]{figures/tree-scattered-supports/xp_learnsupp256_curvelet_decomp3+tree-binary_dpth4+supp-diracs+usegrad0_every5_add5_totinit0_totadd279_a0_b1_approx.pdf}
+\caption{Approximation $\D\x$}
+\end{subfigure}
+\begin{subfigure}[b]{0.49\textwidth}\centering
+\includegraphics[width=0.8\textwidth]{figures/tree-scattered-supports/xp_learnsupp256_curvelet_decomp3+tree-binary_dpth4+supp-diracs+usegrad0_every5_add5_totinit0_totadd279_a0_b1_tree.pdf}
+	\caption{Learned support tree} \label{fig_test_omppalmtree_tree}
+\end{subfigure}
+\caption{Results after using \cref{alg_omppalmtree}. The support elements in (b) are extremely scattered, thus making them indistinguishable.}\label{fig_test_omppalmtree}
+\end{figure}
+
+A first result using \cref{alg_omppalmtree} as-is is displayed in  \Cref{fig_test_omppalmtree}. The support elements are so distant from each other that we cannot distinguish them. A zoom on one of the supports is made in the next section.
+
+
+
 \subsection{Problem of scattered elements using \cref{alg_omppalmtree}}
  
 An unforeseen issue rose when trying the \cref{alg_omppalmtree} on a tree instead of a single branch: the gradient indicates elements that are far from each other. The selection of the best support element to be added can be unexpectedly far from previously added elements, hence producing scattered kernels. Having “gathered” supports is essential for the convolutional tree model. \todo[inline]{HELP: I can’t find explanations on why it is essential to have “gathered” kernels, contrary to “scattered” kernels} 
@@ -788,7 +805,6 @@ f(p) = \frac{\text{dist}(o-p)}{\underset{p' \in 1,\dots,N}{\max}\text{dist}(o-p'
 with $o$ the origin, which is the center of the support. Note that $f$ simply normalizes \text{dist()} in $[0,1]$. \Cref{fig_grad_minus_dist} illustrates the effect on the regularization $f(p)$ on the objective function (at \cref{alg_omppalmtree2_find} of \cref{alg_omppalmtree2}).
 
 
-
   $\text{dist}(p)$ is the circular euclidian norm defined on $p=1,\dots,N$ by\footnotemark[1]
 \begin{equation*} \text{dist}(p) = \min\left[p \bmod N, (N-p) \bmod N\right]\end{equation*}
 with $\bmod$ the modulo operator.
@@ -798,16 +814,38 @@ with $\bmod$ the modulo operator.
 	$\text{dist}(\bm{p}) = \left\| \begin{bmatrix} \text{dist}(p_1) \\ \text{dist}(p_2)\end{bmatrix} \right\|_2$.}
 
 
+
 \subsection{Tuning of regularization parameter $\alpha$}
+In the previous section, we proposed the regularization function $f$, which means that we must deal with an additional parameter $\alpha$.
+
+\begin{figure}[!h] \centering
+\includegraphics[width=0.6\textwidth]{figures/tree-learn/gradient-vs-sequential/gradient_used.pdf}
+	\caption{Tuning of $\alpha$}
+\end{figure}
+
+We launched the algorithm for every $\alpha$ ranging from 0 to 70. \Cref{fig_unbalanced_supports} compares the RMSE and compute time with respect to $\alpha$. The optimal range of $\alpha$ seems to be between 20 and 30.
+
+\begin{figure}[!h] \centering
+\begin{subfigure}[b]{0.49\textwidth}\centering
+\includegraphics[width=0.8\textwidth]{figures/tree-unbalanced-supp/xp_learnsupp256_curvelet_decomp3[tree-binary_dpth4]_supp-diracs_[usegrad1_every5_add5_totinit0_totadd279_alpha30]_approx.pdf}
+\caption{Approximation $\D\x$}
+\end{subfigure}
+\begin{subfigure}[b]{0.49\textwidth}\centering
+\includegraphics[width=0.8\textwidth]{figures/tree-unbalanced-supp/xp_learnsupp256_curvelet_decomp3[tree-binary_dpth4]_supp-diracs_[usegrad1_every5_add5_totinit0_totadd279_alpha30]_tree.pdf}
+\caption{Learned support tree}
+\end{subfigure}
+\caption{Learned dictionary using \cref{alg_omppalmtree2} with $\alpha=30$.} \label{fig_test_omppalmtree2}
+\end{figure}
+
+\Cref{fig_test_omppalmtree2} is the result of \cref{alg_omppalmtree2} for $\alpha=30$. 
 
 
-
-\subsection{Problem of unbalanced supports using \cref{alg_omppalmtree2}} \label{sec_pbm_unbalanced_supports}
+\subsection{Regularization problem: unbalanced supports} \label{sec_pbm_unbalanced_supports}
 Beyond the issue of "scattered" supports, another problem appeared when using the gradient for both choosing $e$. Although The $p$ indicated by the gradient seems appropriate (discussed in \cref{sec_gain_per_added_point}), the maximum value of the gradient for choosing $e$ leads to unbalanced supports: some supports contain most elements, while others have only one or two elements.
 
 \begin{figure}[!h] \centering
 \begin{subfigure}[b]{1\textwidth}\centering
-\includegraphics[width=0.6\textwidth]{figures/pbm-unbalanced-supp/tree-unbalanced.pdf}
+\includegraphics[width=0.6\textwidth]{figures/tree-unbalanced-supp/tree-unbalanced.pdf}
 \end{subfigure}
 \caption{Problem of unbalanced support choosing ($\alpha=10$).} \label{fig_unbalanced_supports}
 \end{figure}
@@ -840,8 +878,8 @@ We found out that simply adjusting the "concentrating term" \eqref{eq_regularize
 \includegraphics[width=0.9\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad0_every5_add5_totinit0_totadd279_alpha30_tree.pdf} 
 	\caption{Supports chosen sequentially}
 \end{subfigure}
-%\end{figure}
-%\begin{figure}[!h] \ContinuedFloat
+\end{figure}
+\begin{figure}[!h] \ContinuedFloat
 \begin{subfigure}[b]{0.49\textwidth}\centering
 \includegraphics[width=0.9\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad1_every5_add5_totinit0_totadd279_alpha30_approx.pdf}
 	\caption{Approximation $\D\x$ of above tree}
