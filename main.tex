@@ -186,10 +186,14 @@ The work studied in \cite{chabiron_toward_2015} and \cite{chabiron_optimization_
 
 The target image $\y$ as well as the kernels $\h^e$ and supports $\s^e$ are vectors of dimension $N$. The supports $\s^e$ only take the values 0 (corresponding value in $\h^e$ must be 0) or 1 (corresponding value in $\h^e$ can be non-zero). For easier reading, we will denote the families $(\h^e)_{e \in \E}$ and $(\s^e)_{e \in \E}$ by \begin{equation*}\h = (\h^e)_{e \in \E}\end{equation*} and \begin{equation*}\s = (\s^e)_{e \in \E}.\end{equation*}
 
-The code $\x$ is a “big” vector of dimension $K$ with $K = N \cdot |\L|$ such that \begin{equation*}\x = \begin{bmatrix}\x^1_1 \\ \vdots \\ \x^{|\L|}_N\end{bmatrix}.\end{equation*} 
+The code $\x$ is a “big” vector of dimension $K$ with $K = N \cdot |\L|$ such that \begin{equation*}\x = \begin{bmatrix}x_{11} \\ \vdots \\ x_{|\L|N}\end{bmatrix} \quad \text{with $x_{lp}$ the coefficient of $\x$ at leaf $l$, point $p$.}\end{equation*} 
 Finally, the dictionary matrix associated\footnote{The Convolutional tree dictionary can be rewritten into a matrix; see \cref{sec_matrix_vs_tree}} with the \gls{treemodel} is denoted $\D$ and is of dimension $N \times K$, and the image $\y$ is a vector of dimension $N$.
 
-In the following, we will denote the images interchangeably using the vector notation  or the linear map notation: \begin{equation*}\y = \{ y_i ~|~ i=1,\dots,N \} \quad \text{is equivalent to}\quad \y = \{y(p) ~|~ p \in \P\}.\end{equation*}
+In the following, we will denote the image space using the notation 
+\begin{equation*}\P = \{p ~|~ p=1,\dots,N\}\end{equation*}
+and the image $\y$ will be defined as
+\begin{equation*}\y = \begin{bmatrix}y_1 \\ \vdots \\ y_N\end{bmatrix} \quad \text{with $y_p$ the $p$-th coefficient of $\y$.}
+\end{equation*}
 
 For more convenience, the images $\h^e$, $\x^l$ and $\y$ are defined as “circular” or “periodic” signals, meaning that they are defined for every $p \in \mathcal{Z}$. With that in mind, we can define the circular convolution for two circular signals $\h$ and $\h’$ of $\R^N$ as
 \begin{equation*}(\h * \h’)_p = \sum_{p’ \in \P} \h_{p-p’} \h’_{p’}\end{equation*}
@@ -854,7 +858,9 @@ Beyond the issue of “scattered” supports, another problem appeared when usin
 \Cref{fig_unbalanced_supports} illustrates this issue: with $\alpha=10$, most elements are added on the support $\s^1$, while $\s^{27}$ has only 3 elements.
 
 We found out that simply adjusting the “concentrating term” \eqref{eq_regularized1}, with respect to each support, gives much better results. The adjusted “concentrating term” for the modified \cref{alg_omppalmtree3} is
-\begin{equation}\alpha \underbrace{\lVert p \rVert_c}_{\text{Distance to origin}} \cdot \underbrace{\frac{\underset{p'}{\max} |\nabla \Phi_{\h^e}(\h)_{p'}|}{\underset{p'}{\max}\lVert p' \rVert_c}}_{\text{Normalized distance (adjusted to each support)}.}\label{eq_regularized2}\end{equation}
+\begin{equation}
+f’(p) = \frac{\text{dist}(o-p)}{\underset{p' \in 1,\dots,N}{\max}\text{dist}(o-p')} \cdot \underset{p'=1,\dots,N}{\max} |\nabla \Phi_{\h^e}(\h)_{p'}| \quad \in [0,1] \label{eq_regularized1}
+\end{equation}
 
 \begin{algorithm}[!h]
     \caption{\ac{OMP} algorithm using \ac{PALMTREE} (version 3)}\label{alg_omppalmtree3}
