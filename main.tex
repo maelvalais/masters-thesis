@@ -798,7 +798,7 @@ An unforeseen issue rose when trying the \cref{alg_omppalmtree} on a tree instea
 \caption{Example of linear regularization using distance to origin (center of the figure).} \label{fig_grad_minus_dist}
 \end{figure}
 
-To address this issue, we added in \cref{alg_omppalmtree2} a regularization term $f(p) \subset \R$ that prevents $p$ from being too far from the origin (center\footnote{The actual implementation relies on kernels centered on the origin $(1,1)$; for easier understanding, we translate the kernels so that the origin is centered.} of the support).
+To address this issue, we added in \cref{alg_omppalmtree2} a regularization (or prior) term $f(p) \subset \R$ that prevents $p$ from being too far from the origin (center\footnote{The actual implementation relies on kernels centered on the origin $(1,1)$; for easier understanding, we translate the kernels so that the origin is centered.} of the support).
 \begin{equation}
 f(p) = \frac{\text{dist}(o-p)}{\underset{p' \in 1,\dots,N}{\max}\text{dist}(o-p')} \quad \in [0,1] \label{eq_regularized1}
 \end{equation}
@@ -837,11 +837,12 @@ We launched the algorithm for every $\alpha$ ranging from 0 to 70. \Cref{fig_unb
 \caption{Learned dictionary using \cref{alg_omppalmtree2} with $\alpha=30$.} \label{fig_test_omppalmtree2}
 \end{figure}
 
-\Cref{fig_test_omppalmtree2} is the result of \cref{alg_omppalmtree2} for $\alpha=30$. 
+\Cref{fig_test_omppalmtree2} is the result of \cref{alg_omppalmtree2} for $\alpha=30$. Compared to \cref{fig_test_omppalmtree}, the regularization improves the RMSE by -29\%. It confirms our intuition that “gathered” supports lead to better approximations.
+
 
 
 \subsection{Regularization problem: unbalanced supports} \label{sec_pbm_unbalanced_supports}
-Beyond the issue of "scattered" supports, another problem appeared when using the gradient for both choosing $e$. Although The $p$ indicated by the gradient seems appropriate (discussed in \cref{sec_gain_per_added_point}), the maximum value of the gradient for choosing $e$ leads to unbalanced supports: some supports contain most elements, while others have only one or two elements.
+Beyond the issue of “scattered” supports, another problem appeared when using the gradient for both choosing $e$. Although The $p$ indicated by the gradient seems appropriate (discussed in \cref{sec_gain_per_added_point}), the maximum value of the gradient for choosing $e$ leads to unbalanced supports: some supports contain most elements, while others have only one or two elements.
 
 \begin{figure}[!h] \centering
 \begin{subfigure}[b]{1\textwidth}\centering
@@ -852,7 +853,7 @@ Beyond the issue of "scattered" supports, another problem appeared when using th
 
 \Cref{fig_unbalanced_supports} illustrates this issue: with $\alpha=10$, most elements are added on the support $\s^1$, while $\s^{27}$ has only 3 elements.
 
-We found out that simply adjusting the "concentrating term" \eqref{eq_regularized1}, with respect to each support, gives much better results. The adjusted "concentrating term" for the modified \cref{alg_omppalmtree3} is
+We found out that simply adjusting the “concentrating term” \eqref{eq_regularized1}, with respect to each support, gives much better results. The adjusted “concentrating term” for the modified \cref{alg_omppalmtree3} is
 \begin{equation}\alpha \underbrace{\lVert p \rVert_c}_{\text{Distance to origin}} \cdot \underbrace{\frac{\underset{p'}{\max} |\nabla \Phi_{\h^e}(\h)_{p'}|}{\underset{p'}{\max}\lVert p' \rVert_c}}_{\text{Normalized distance (adjusted to each support)}.}\label{eq_regularized2}\end{equation}
 
 \begin{algorithm}[!h]
@@ -891,7 +892,7 @@ We found out that simply adjusting the "concentrating term" \eqref{eq_regularize
 \caption{Comparison of sequential versus using gradient when choosing a support for adding an element.}\label{fig_cmp_sequential_vs_grad}
 \end{figure}
 
-To make sure that the support that is chosen using the gradient with this adjusted "concentrating term" \eqref{eq_regularized2} actually gives appropriate results, we compare in \cref{fig_cmp_sequential_vs_grad} the learned supports when 
+To make sure that the support that is chosen using the gradient with this adjusted “concentrating term” \eqref{eq_regularized2} actually gives appropriate results, we compare in \cref{fig_cmp_sequential_vs_grad} the learned supports when 
 \begin{enumerate}[label=(\alph*)]
 	\item $e$ and $p$ are both chosen using the gradient;
 	\item $p$ is chosen using the gradient, $e$ is sequentially selected: we add an element to $\s^1$, then to $\s^2$\dots so that every support has the exact same amount of elements.
@@ -930,7 +931,7 @@ Compute time & 87.8 seconds & 89.1 seconds \\ \bottomrule
 \end{tabular}
 \end{table}
 
-As expected, learning the supports strongly decreases the RMSE. As for the single-branch experiment, the supports are "shaped" into their target atom.
+As expected, learning the supports strongly decreases the RMSE. As for the single-branch experiment, the supports are “shaped” into their target atom.
 
 \begin{figure}[!h] \centering
 \begin{subfigure}[b]{0.49\textwidth}\centering
