@@ -31,7 +31,7 @@ if [ $mode == "latex" ]; then
     # sed 's/[\\}]//g' -> remove any left "\" and "}" that could be left
     # sed 's/ *\(.*\) *$/\1/g' -> remove before/after whitespace
 elif [ $mode == "git" ]; then
-    git ls-tree --name-only --full-tree -r HEAD | grep "\.\(pdf\|jpg\|jpeg\|png\|gif\)$"
+    git ls-files | grep "\.\(pdf\|jpg\|jpeg\|png\|gif\)$"
 elif [ $mode == "git-only" ]; then
     comm <($0) <($0 --git) -1 -3
 elif [ $mode == "latex-only" ]; then
