@@ -11,7 +11,7 @@
 %\cleardoublepage % White until the next even page
 \pagestyle{body}
 {\let\clearpage\relax \abstract{
-This master’s thesis presents the algorithm OMP-PALMTREE for optimizing convolutional tree dictionaries from a unique image; inspired from the construction of supports in OMP, this algorithm enhances  PALMTREE by learning the supports (instead of fixed ones). The  support adding step, as for OMP, is based on the maximum value of the gradient – which is shown to be giving convincing indications on the best element that should be added. OMP-PALMTREE constitutes the “dictionary update” step in a standard dictionary learning algorithm, and must be associated with a “sparse coding” step (yet to be developed) for it to be used in applications like denoising or image recognition. Thanks to the Convolutional tree model, dictionaries learned using OMP-PALMTREE are faster than any dictionary learned using a standard matrix-vector product  (quadratic computational cost), with a linear computational cost with respect to the size of the image.
+This master’s thesis presents the algorithm OMP-PALMTREE for optimizing convolutional tree dictionaries from a unique image; inspired from the construction of supports in OMP, this algorithm enhances  PALMTREE by learning the supports (instead of fixing them). The  support adding step, as for OMP, is based on the maximum value of the gradient – which is shown to be giving convincing indications on the best element that should be added. OMP-PALMTREE constitutes the “dictionary update” step in a standard dictionary learning algorithm, and must be associated with a “sparse coding” step (yet to be developed) for it to be used in applications like denoising or image recognition. Thanks to the Convolutional tree model, dictionaries learned using OMP-PALMTREE are faster than any dictionary learned using a standard matrix-vector product  (quadratic computational cost), with a linear computational cost with respect to the size of the image.
 
 
 \keywords{Deep learning, dictionary learning, sparse image representation, non-convex optimization, machine learning, image processing}
@@ -46,16 +46,16 @@ The \ac{DFT} is a classical example of an operator used for sparsity. The \ac{DF
   \caption{Decomposition $\D^T\y=\x$ of a signal $\y$ using the dictionary $\D$ made of Fourier series. In $\x$, the middle coefficients are coding “large” features while the corner values are coding the details. The multiple white lines, ranging from the middle to the borders, outline the discontinuities caused by the blackboard edges; these coefficients are scattered (hence not sparse), which shows that the Fourier basis has representation problems in presence of discontinuities.} \label{fig_fourier}
 \end{figure}
 
-However, the Fourier transform is quite different from the representations we have in mind, namely the convolutional tree structures. First, Fourier coefficients form a basis, implying that it is a one-to-one representation in the sense that every code $\x$ is associated with a unique image $\y$. This basis is also orthogonal, meaning that the operator is stable (it does not amplify errors), as well as normed (each element has a norm equal to 1).
+\noindent However, the Fourier transform is quite different from the representations we have in mind, namely the convolutional tree structures. First, Fourier coefficients form a basis, implying that it is a one-to-one representation in the sense that every code $\x$ is associated with a unique image $\y$. This basis is also orthogonal, meaning that the operator is stable (it does not amplify errors), as well as normed (each element has a norm equal to 1).
 
-More importantly, the \ac{DFT} has interesting properties that allow fast implementations. For example, applying the Matlab function \texttt{fft2} to the \cref{fig_fourier} takes less than a millisecond. If we assume $N$ to be the dimension of the concatenated\footnotemark[2] image, instead of computing a time-expensive $O(N^2)$ matrix-vector product, the fast Fourier transform only requires a computational cost of the order $O(N \log N)$.
+\noindent More importantly, the \ac{DFT} has interesting properties that allow fast implementations. For example, applying the Matlab function \texttt{fft2} to the \cref{fig_fourier} takes less than a millisecond. If we assume $N$ to be the dimension of the concatenated\footnotemark[2] image, instead of computing a time-expensive $O(N^2)$ matrix-vector product, the fast Fourier transform only requires a computational cost of the order $O(N \log N)$.
 
 \footnotetext[2]{Also referred as “vectorized”; we consider 2-D images as one-dimensional vectors. A $16 \times 16$ image would give a vector of dimension 256.}
 
 
 The Fourier transform is widely used as an operator for sparse representations, mainly when dealing with smooth signals that can be approximated by a sum of sinusoids. However, this operator does not generally perform well on images since they contain many discontinuities that are far from being representable using sinusoids.
 
-The problem with discontinuities is illustrated in \cref{fig_fourier}. As an example, the bottom edge of the blackboard (which is a strong discontinuity) induces a long vertical trail of high coefficients in $\x$. Because of discontinuities, $\x$ is forced to have many non-zero coefficients. 
+\noindent The problem with discontinuities is illustrated in \cref{fig_fourier}. As an example, the bottom edge of the blackboard (which is a strong discontinuity) induces a long vertical trail of high coefficients in $\x$. Because of discontinuities, $\x$ is forced to have many non-zero coefficients. 
 
 Along with Fourier, many other basis dictionaries exist; we can mention the cosine transform which is at the core of JPEG compression. We can also cite the wavelet transform, used in JPEG2000 compression. Note that both wavelets and cosine are stable and have fast implementations.
 
@@ -63,14 +63,14 @@ Along with Fourier, many other basis dictionaries exist; we can mention the cosi
 
 Basis dictionaries were generalized by using multiple bases to form a stable and redundant (also called over-complete) dictionary in \cite{shaobing_chen_atomic_2001}. For example, combining a canonical basis with a cosine basis allows both peaks and sinusoids to be represented.
 
-Other redundant dictionaries, like the curvelet transform, do not have the useful properties of bases, yet being stable and having a fast implementation. It is interesting to note that contrary to Fourier or cosine transforms, the curvelets can code (to an extent) non-smooth signals.
+\noindent Other redundant dictionaries, like the curvelet transform, do not have the useful properties of bases, yet being stable and having a fast implementation. It is interesting to note that contrary to Fourier or cosine transforms, the curvelets can code (to an extent) non-smooth signals.
 
 % Notes for myself
 % 1. tight frame = preserves the norm
 % 2. orthogonality preserves the norm (norm doesn’t make the errors explode)
 % 3. orthogonal means that it is stable
 
-Although offering excellent performances for sparse representations thanks to their fast implementations, redundant dictionaries have the drawback to lack adaptativity.
+\noindent Although offering excellent performances for sparse representations thanks to their fast implementations, redundant dictionaries have the drawback to lack adaptativity.
 
 
 \section{Learned dictionaries}
@@ -86,14 +86,12 @@ where $\X$ is the concatenation of $S$ column vectors $\x_i$ (the codes) of dime
 \text{s.t.}~ & \lVert \d_k \rVert \le \gamma & \forall k = 1,\dots,K\label{eq_dl_finite_norm}
 \end{align}
 where $\lVert . \rVert_F$ denotes the Frobenius norm and $\lVert . \rVert_1$ is the $l_1$ norm defined by $\|\X_i\|_1  = \sum_{i=1}^S  sum_{j=1}^K \|\x_i^j \|$.
+Note that the constraint \ref{eq_dl_finite_norm} prevents the atoms from having an arbitrarily large norm.
 
-
-$\lVert \X \rVert_1 = \sum_{i=1}^S |\x_i|$. Note that the constraint \ref{eq_dl_finite_norm} prevents the atoms from having an arbitrarily large norm.
-
-The problem \eqref{eq_dl} can be understood as finding the atoms of $\D$ that give the sparsest (with as many zeros as possible) representation $\x_i$ approximating $\y_i$ for all $i = 1,\dots,S$. This approximation is denoted as
+\noindent The problem \eqref{eq_dl} can be understood as finding the atoms of $\D$ that give the sparsest (with as many zeros as possible) representation $\x_i$ approximating $\y_i$ for all $i = 1,\dots,S$. This approximation is denoted as
 \begin{equation*}\D\X \approx \Y.\end{equation*}
 
-\Cref{fig_overcomplete_matrix} gives an idea of what we mean by approximating an image $\y$ using the matrix-vector product of a sparse code $\x$ and a learned dictionary $\D$. For this example, $\y$ is represented by a linear combination of three atoms of $\D$: $\x$ is 3-sparse.
+\noindent \Cref{fig_overcomplete_matrix} gives an idea of what we mean by approximating an image $\y$ using the matrix-vector product of a sparse code $\x$ and a learned dictionary $\D$. For this example, $\y$ is represented by a linear combination of three atoms of $\D$: $\x$ is 3-sparse.
 
 \begin{figure}[!ht] \centering
 \includegraphics[width=0.90\textwidth]{figures/sparsity-matrix.pdf}
@@ -101,14 +99,14 @@ The problem \eqref{eq_dl} can be understood as finding the atoms of $\D$ that gi
 \end{figure}
 
 
-The non-linearity caused by the product $\D\X$ induces a non-convex objective function, making it difficult to optimize simultaneously with respect to $\D$ and $\X$. To work around this problem, many algorithms solve \eqref{eq_dl} by optimizing alternatively with respect to the dictionary $\D$ and the codes $\X$.
+Note that the non-linearity caused by the product $\D\X$ induces a non-convex objective function, making it difficult to optimize simultaneously with respect to $\D$ and $\X$. To work around this problem, many algorithms solve \eqref{eq_dl} by optimizing alternatively with respect to the dictionary $\D$ and the codes $\X$.
 
 \subsection{Existing dictionary learning algorithms}
 Among the many available algorithms (and their multiple versions) for dictionary learning, the \ac{KSVD} algorithm is a typical example. Introduced in \cite{aharon_k-svd:_2006} and inspired by the widely known \gls{KMeans} algorithm, it is used in many image processing applications. This algorithm is detailed in the next section.
 
-Another approach, more scalable, is denoted as “online” dictionary learning. The Online Dictionary Learning algorithm, proposed in \cite{mairal_online_2010}, learns one image after the other instead of learning the whole set of images simultaneously. Thus it is very suitable for huge sets of learning images.
+\noindent Another approach, more scalable, is denoted as “online” dictionary learning. The Online Dictionary Learning algorithm, proposed in \cite{mairal_online_2010}, learns one image after the other instead of learning the whole set of images simultaneously. Thus it is very suitable for huge sets of learning images.
 
-For a thorough review of every transform available (developed before 2010), the reader is invited to take a look at  \cite{rubinstein_dictionaries_2010}.
+\noindent For a thorough review of every transform available (developed before 2010), the reader is invited to take a look at  \cite{rubinstein_dictionaries_2010}.
 
 
 \subsection{Example with the \acs{KSVD} algorithm}
@@ -122,9 +120,9 @@ s.t.~& \lVert \x_i \rVert_0 \le \gamma & \forall i \in 1,\dots,S
 \end{align*}
 where $\lVert . \rVert_F$ denotes the Frobenius norm and $\lVert . \rVert_0$ is the pseudo-norm $l_0$ (also known as “counting function”).
 
-The \emph{Sparse Coding step} optimizes the cost function with respect to $\x$; this step basically uses \ac{OMP} (detailed in \cref{alg_omp}) or any other pursuit algorithm. The \emph{Dictionary Update step} optimizes the cost function w.r.t. $\D$. This is the step that was studied in \cite{chabiron_optimization_2016}. Note that the full \ac{KSVD} algorithm is presented in \cref{sec_ksvd_detail}, \cpageref{sec_ksvd_detail}.
+\noindent The \emph{Sparse Coding step} optimizes the cost function with respect to $\x$; this step basically uses \ac{OMP} (detailed in \cref{alg_omp}) or any other pursuit algorithm. The \emph{Dictionary Update step} optimizes the cost function w.r.t. $\D$. This is the step that was studied in \cite{chabiron_optimization_2016}. Note that the full \ac{KSVD} algorithm is presented in \cref{sec_ksvd_detail}, \cpageref{sec_ksvd_detail}.
 
-\Cref{fig_ksvd} gives an example of what “learning $\D$” with the \ac{KSVD} algorithm means. As the image (a) is too big ($512 \times 512$) to be learned directly, we must chop it into many small patches, e.g. of size $16 \times 16$. \Cref{fig_ksvd_patches} shows some of these patches contained in $\Y$, which actually holds 10240 patches ($\Y$ has dimension $128 \times 10240$). The dictionary $\D$ of size $128 \times 128$ (it has 128 atoms) is shown in (c). Note that $\D$ has been learned with a sparsity of 10 and that the process took about five minutes (stopped after 20 iterations).
+\noindent \Cref{fig_ksvd} gives an example of what “learning $\D$” with the \ac{KSVD} algorithm means. As the image (a) is too big ($512 \times 512$) to be learned directly, we must chop it into many small patches, e.g., of size $16 \times 16$. \Cref{fig_ksvd_patches} shows some of these patches contained in $\Y$, which actually holds 10240 patches ($\Y$ has dimension $128 \times 10240$). The dictionary $\D$ of size $128 \times 128$ (it has 128 atoms) is shown in (c). Note that $\D$ has been learned with a sparsity of 10 and that the process took about five minutes (stopped after 20 iterations).
 \noindent The dictionary in \cref{fig_ksvd_dict} can now be used for denoising the noisy image of \cref{fig_ksvd_image}. If we would like a dictionary for image recognition or compression, we would probably need many additional images in order to obtain a good classification or compression performance.
 
 \begin{figure}[!ht]\centering
@@ -147,15 +145,15 @@ The \emph{Sparse Coding step} optimizes the cost function with respect to $\x$; 
 \subsection{Problem of atom scalability: multi-scale dictionaries}
 As the learned \ac{KSVD} dictionary relies on the $O(N \cdot K)$ matrix-vector product and has to be over-complete ($K \gg N$) in order to achieve sparsity, we easily understand that $N$ cannot take an arbitrarily large value. In practice, the example images (also called patches) and atoms of the dictionary are generally of size at most $16 \times 16$.
 
-Dictionaries with bigger atoms are known as multi-resolution (also called multi-scale), meaning that the atoms can contain either details or large features computed from the images.
+\noindent Dictionaries with bigger atoms are known as multi-resolution (also called multi-scale), meaning that the atoms can contain either details or large features computed from the images.
 
 
 \subsection{Problem of atom redundancy: convolutional dictionaries} \label{sec_atoms_redund}
 The \ac{KSVD} algorithm is not translation-invariant in the sense that multiple atoms of the dictionary can have the same detail but slightly translated. The authors of \cite{mailhe_shift-invariant_2008} worked on making the update step invariant by translation, but it still needs a lot of tuning and finding the right parameters.
 
-Translation-invariant transforms are known as convolutional dictionaries. Instead of many atoms containing translated versions of the same feature, convolutional dictionaries contain all possible translations for every atom; contrary to traditional learned dictionaries, it is unlikely to find two atoms containing the same detail with different locations.
+\noindent Translation-invariant transforms are known as convolutional dictionaries. Instead of many atoms containing translated versions of the same feature, convolutional dictionaries contain all possible translations for every atom; contrary to traditional learned dictionaries, it is unlikely to find two atoms containing the same detail with different locations.
 
-Many state-of-the-art machine learning techniques are based on trees of convolutions, such as the Convolutional Neural Networks used in Deep learning \cite{lecun_deep_2015}.
+\noindent Many state-of-the-art machine learning techniques are based on trees of convolutions, such as the Convolutional Neural Networks used in Deep learning \cite{lecun_deep_2015}.
 
 \section{Research motivations and objectives}
 Sparse representations have been used successfully in many applications. The use of these representations is only limited by the performance of their transforms. By performance, we mean that the transform must be
@@ -165,9 +163,9 @@ Sparse representations have been used successfully in many applications. The use
 \item[--] and stable (does not amplify errors).
 \end{itemize}
 
-As mentioned, many algorithms are available in the literature. However, they are often fast but not adaptative (such as the Fourier transform) or adaptative and not fast (such as \ac{KSVD}).
+\noindent As mentioned, many algorithms are available in the literature. However, they are often fast but not adaptative (such as the Fourier transform) or adaptative and not fast (such as \ac{KSVD}).
 
-The main objectives of this work is to develop a multi-resolution  dictionary model (allowing large atoms to be considered) that is fast and adaptive, based on the principle of convolutional trees. During his PhD thesis, Olivier Chabiron has been working on a \Gls{treemodel}, presented in the paper \citetitle{chabiron_optimization_2016} (\cite{chabiron_optimization_2016}). Our work will focus on this model for \eqref{eq_dl}.
+\noindent The main objectives of this work is to develop a multi-resolution  dictionary model (allowing large atoms to be considered) that is fast and adaptive, based on the principle of convolutional trees. During his PhD thesis, Olivier Chabiron has been working on a \Gls{treemodel}, presented in the paper \citetitle{chabiron_optimization_2016} (\cite{chabiron_optimization_2016}). Our work will focus on this model for \eqref{eq_dl}.
 
 
 \section{Related work}
@@ -190,18 +188,18 @@ The work studied in \cite{chabiron_toward_2015} and \cite{chabiron_optimization_
 \caption{View of a convolutional tree; the $\h^e$ and $\s^e$ are what define $\D$}\label{fig_tree}
 \end{figure}
 
-The target image $\y$ as well as the kernels $\h^e$ and supports $\s^e$ are vectors of dimension $N$. The supports $\s^e$ only take the values 0 (corresponding value in $\h^e$ must be 0) or 1 (corresponding value in $\h^e$ can be non-zero). For easier reading, we will denote the families $(\h^e)_{e \in \E}$ and $(\s^e)_{e \in \E}$ by \begin{equation*}\h = (\h^e)_{e \in \E}\end{equation*} and \begin{equation*}\s = (\s^e)_{e \in \E}.\end{equation*}
+\noindent The target image $\y$ as well as the kernels $\h^e$ and supports $\s^e$ are vectors of dimension $N$. The supports $\s^e$ only take the values 0 (corresponding value in $\h^e$ must be 0) or 1 (corresponding value in $\h^e$ can be non-zero). For easier reading, we will denote the families $(\h^e)_{e \in \E}$ and $(\s^e)_{e \in \E}$ by \begin{equation*}\h = (\h^e)_{e \in \E}\end{equation*} and \begin{equation*}\s = (\s^e)_{e \in \E}.\end{equation*}
 
 The code $\x$ is a “big” vector of dimension $K$ with $K = N \cdot |\L|$ such that \begin{equation*}\x = \begin{bmatrix}x_{11} \\ \vdots \\ x_{|\L|N}\end{bmatrix} \quad \text{with $x_{lp}$ the coefficient of $\x$ at leaf $l$, point $p$.}\end{equation*} 
 Finally, the dictionary matrix associated\footnote{The Convolutional tree dictionary can be rewritten into a matrix; see \cref{sec_matrix_vs_tree}} with the \gls{treemodel} is denoted $\D$ and is of dimension $N \times K$, and the image $\y$ is a vector of dimension $N$.
 
-In the following, we will denote the image space using the notation 
+\noindent In the following, we will denote the image space using the notation 
 \begin{equation*}\P = \{p ~|~ p=1,\dots,N\}\end{equation*}
 and the image $\y$ will be defined as
 \begin{equation*}\y = \begin{bmatrix}y_1 \\ \vdots \\ y_N\end{bmatrix} \quad \text{with $y_p$ the $p$-th coefficient of $\y$.}
 \end{equation*}
 
-For more convenience, the images $\h^e$, $\x^l$ and $\y$ are defined as “circular” or “periodic” signals, meaning that they are defined for every $p \in \mathcal{Z}$. With that in mind, we can define the circular convolution for two circular signals $\h$ and $\h’$ of $\R^N$ as
+\noindent For more convenience, the images $\h^e$, $\x^l$ and $\y$ are defined as “circular” or “periodic” signals, meaning that they are defined for every $p \in \mathcal{Z}$. With that in mind, we can define the circular convolution for two circular signals $\h$ and $\h’$ of $\R^N$ as
 \begin{equation*}(\h * \h’)_p = \sum_{p’ \in \P} \h_{p-p’} \h’_{p’}\end{equation*}
 
 \begin{figure}[!ht]\centering
@@ -216,12 +214,12 @@ For more convenience, the images $\h^e$, $\x^l$ and $\y$ are defined as “circu
 \caption{Two examples of convolutional kernels.}\label{fig_example_kernel}
 \end{figure}
 
-\Cref{fig_example_kernel-h_e} displays examples of a standard kernel (left) and a kernel $\h^e$ (middle) associated with its support $\s^e$ (right). The gray squares represent the “ones” of the support while the kernel is represented by values inside the squares.
+\noindent \Cref{fig_example_kernel-h_e} displays examples of a standard kernel (left) and a kernel $\h^e$ (middle) associated with its support $\s^e$ (right). The gray squares represent the “ones” of the support while the kernel is represented by values inside the squares.
 
-We denote the convolution of successive kernels on a given branch identified by the leaf $l$ by
+\noindent We denote the convolution of successive kernels on a given branch identified by the leaf $l$ by
 \begin{equation*}\h^{*l} = \h^r * \dots * \h^l.\end{equation*}
 
-Instead of using the standard matrix-vector product, the convolutional tree dictionary computes $\D\x$ as follows
+\noindent Instead of using the standard matrix-vector product, the convolutional tree dictionary computes $\D\x$ as follows
 \begin{align}
 	\D\x = \sum_{l \in \L} \x^l * \h^{*l}. \label{eq_Dx_as_conv}
 \end{align}
@@ -234,7 +232,7 @@ The dictionary update step associated with the \gls{treemodel} is defined as
 \begin{align}
 \underset{\substack{(\h^e)_{e}}}\min ~ & \lVert \D\x - \y \rVert_2^2 \tag{$FTL$} \label{eq_ftl}\\
 \text{s.t.~} & \s^e_p=0 \Rightarrow \h^e_p = 0 \quad & \forall p=1,\dots,N ,~\forall e \in \E \label{eq_ftl_in_support} \\
- & \lVert \h^e \rVert \le \gamma & \forall e \in \E\label{eq_ftl_kernel_finite_nrj}
+ & \lVert \h^e \rVert \le \gamma & \forall e \in \E.\label{eq_ftl_kernel_finite_nrj}
 \end{align} 
 The constraint in (\ref{eq_ftl_in_support}) guarantees that each kernel $\h^e$ has its non-zero values in its support $\s^e$. The constraint (\ref{eq_ftl_kernel_finite_nrj}) ensures that the overall energy of every support is finite and prevents a specific kernel to “explode” (similar to the constraint \eqref{eq_dl_finite_norm} of the \eqref{eq_dl} problem).
 
@@ -253,44 +251,41 @@ For later references, the objective function of \ac{FTL} will be denoted as
 \Phi[(\h^e)_{e \in \E}] = \lVert \D\x-\y \rVert^2_2
 \end{align}
 
+
 \subsubsection{Interesting properties of \ac{FTL}}
 
-The convolution of sparse kernels in \ac{FTL} leads to theoretically highly performant dictionaries. The computational cost of $\D\x$ using \cref{eq_Dx_as_conv} is reduced to $O(Q \cdot N)$ ($Q$ is the number of elements in all supports, i.e. $Q=|\{s^e_p ~|~ s^e_p = 1, \forall (e,p) \in \E \times \P\}|$). And because $Q$ only depends on the number of edges and is designed to be significantly smaller than  $N$, using the \gls{treemodel} decreases greatly the cost of using the dictionary and is comparable to the Fourier transform performance (in $O(N \log N)$).
+The convolution of sparse kernels in \ac{FTL} leads to performant dictionaries. The computational cost of the matrix-vector product $\D\x$ using \cref{eq_Dx_as_conv} is reduced to $O(Q \cdot N)$ ($Q$ is the number of elements in all supports, i.e., $Q=|\{s^e_p ~|~ s^e_p = 1, \forall (e,p) \in \E \times \P\}|$ with $|E|$ the cardinal of the set E). Because $Q$ only depends on the number of edges that is designed to be significantly smaller than  $N$, using the \gls{treemodel} is supposed to significantly reduce the computational cost of the dictionary learning algorithm\todo{Question: does it reduce the DL algorithm or only the cost of computing Dx ?}, which is comparable with the Fourier transform performance (of the order of $O(N \log N)$).
 
 \begin{table}[!ht] \centering 
 \caption{Computational cost of $\D\x$} \label{table_comparison_Dx_costs}
 \begin{tabular}{c|c}
-Using matrix-vector product & Using \gls{treemodel} \\\\ \hline \\
+Using the standard matrix-vector product & Using the \gls{treemodel} \\\\ \hline \\
 $O(K \cdot N)$ & $O(Q \cdot N)$
 \end{tabular}
 \end{table}
 
 
-However, the product $\D\x$ can be seen as a multivariable polynomial of degree the depth of $\T$ (variables are $(\h^e)_{e \in \E}$ and $\x$). This non-linearity makes the objective function possibly strongly non-convex, suggesting that we would end up trapped by its many suboptimal critical points of $\Phi$.
+\noindent However, the product $\D\x$ can be seen as a multivariable polynomial of degree the depth of $\T$ (variables are $(\h^e)_{e \in \E}$ and $\x$). This non-linearity makes the objective function possibly strongly non-convex, suggesting that we might be trapped around the many suboptimal critical points of $\Phi$.
 
-And yet, the authors of \cite{chabiron_optimization_2016} have successfully proved that this problem is actually tractable. More surprisingly, they discovered that optimizing \ac{FTL} is possible and that the solutions given by \acs{PALMTREE} are encouraging.
+\noindent Moreover, the authors of \cite{chabiron_optimization_2016} have proved that this problem is actually tractable. More surprisingly, they have shown that optimizing \ac{FTL} is possible and that the solutions given by \acs{PALMTREE} are encouraging.
 
 
 \section{The PALMTREE algorithm}\label{sec_palmtree}
 
-The authors of \cite{chabiron_optimization_2016} have shown that \eqref{eq_ftl2} can be solved using the \ac{PALM} algorithm proposed in \cite{bolte_proximal_2014}. The \ac{PALM} algorithm does a proximal gradient iteration successively on the different blocks of variables; \cite{bolte_proximal_2014} provides a proof of convergence towards a critical point for non-convex problems. In our case, one block corresponds to one kernel $\h^e$.
+The authors of \cite{chabiron_optimization_2016} have shown that \eqref{eq_ftl2} can be solved using the \ac{PALM} algorithm proposed in \cite{bolte_proximal_2014}. The \ac{PALM} algorithm performs a proximal gradient iteration successively on different blocks of variables; \cite{bolte_proximal_2014} provides a proof of convergence towards a critical point of the cost function for non-convex problems. In our case, one block corresponds to one kernel $\h^e$.
 
+The implementation of the generic \ac{PALM} algorithm for solving the \eqref{eq_ftl2} problem has been denoted as \ac{PALMTREE}. 
+An outline of the algorithm is given in \cref{alg_palmtree}, where $t^e$ denotes the step size and $\text{prox}^f_\gamma$ is the proximal operator of the “prior” function $f$ defined by \begin{equation*}\text{prox}^f_\gamma(y) = \underset{x}{\argmin}~ \underbrace{f(x)}_{\text{“Prior” or regularization term}} + \underbrace{\frac{\gamma}{2} \lVert x - y \rVert^2_2}_{\text{“Likelyhood” of data fidelity}}\end{equation*} which, for $f = \chi_{\Dspace^e}$, is easily computed by a projection onto the set $\Dspace^e$.
 
-regularizes the non-convex objective function using a simple linear approximation with respect to one block of variables. One block corresponds to one kernel $\h^e$.
+\noindent Details on the step-size $t^e$ (which requires the computation of a Lipschitz constant) and the proximal operator $\text{prox}^{\chi_{\Dspace^e}}_{t^e}$ are given in \cite{chabiron_optimization_2016}. We will focus on the way the gradient is computed to get more insight from \ac{PALMTREE}.
 
-The implementation of the generic \ac{PALM} algorithm for solving the \eqref{eq_ftl2} problem has been named \ac{PALMTREE}. 
+\noindent We define $\H^e$ as the convolution of all the branches that cross the edge $e$ except for the kernel $\h^e$, i.e., \begin{equation*}\H^e = \h^r * \dots * \h^{\text{above}(e)} * \bcancel{\h^{e}} * \sum_{l \in \text{leaves(e)}} \h^{\text{below}(e)^l} * \dots * \h^{l}\end{equation*} where $\text{leaves}(e)$ denotes the leaves that can be reached through $e$, $\text{above}(e)$  the edge right above $e$ and $\text{below}(e)^l$ the edge below $e$ that leads to the leaf $l$.
 
-An outline of the algorithm is given in \cref{alg_palmtree}, where $t^e$ denotes the step size and $\text{prox}^f_\gamma$ is the proximal operator for prior function $f$ defined by \begin{equation*}\text{prox}^f_\gamma(y) = \underset{x}{\argmin}~ f(x) + \frac{\gamma}{2} \lVert x - y \rVert^2_2\end{equation*} which, for $f = \chi_{\Dspace^e}$, is easily computed by a projection onto the $\Dspace^e$.
-
-Details on the step size $t^e$ (which requires the computation of a Lipschitz constant) and the proximal operator $\text{prox}^{\chi_{\Dspace^e}}_{t^e}$ are given in \cite{chabiron_optimization_2016}. We will focus on the way the gradient is computed to get more insight from \ac{PALMTREE}.
-
-We define $\H^e$ as the convolution of every branches that crosses the edge $e$ except for the kernel $\h^e$, i.e. \begin{equation*}\H^e = \h^r * \dots * \h^{\text{above}(e)} * \bcancel{\h^{e}} * \sum_{l \in \text{leaves(e)}} \h^{\text{below}(e)^l} * \dots * \h^{l}\end{equation*} where $\text{leaves}(e)$ denotes the leaves that can be reached through $e$, $\text{above}(e)$  the edge right above $e$ and $\text{below}(e)^l$ the edge below $e$ that leads to the leaf $l$.
-
-Using this notation, the authors of \cite{chabiron_optimization_2016} have shown that the partial gradient of $\Phi$ w.r.t. $\h^e$ is 
+\noindent Using this notation, the authors of \cite{chabiron_optimization_2016} have shown that the partial gradient of $\Phi$ w.r.t. $\h^e$ is 
 \begin{equation*}\nabla_{\h^e} \Phi[(\h^f)_{f \in \E}] = 2 \H^e * \Res\end{equation*} with $\Res$ the residual denoted by
-\begin{equation*}\Res = \D\x - \y\end{equation*}
+\begin{equation*}\Res = \D\x - \y. \end{equation*}
 
-Because of the projection onto the $\Dspace^e$ set, it is sufficient to compute the partial gradient at the support locations. As explained further in \cref{sec_full_grad}, this means that the convolution $2 \H^e * \Res$ can be efficiently computed using a simple convolution. However, computing the “full” gradient (meaning on every point of kernel $\h^e$) cannot be computed efficiently this way.
+\noindent Because of the projection onto the $\Dspace^e$ set, it is sufficient to compute the partial gradient at the support locations. As explained further in \cref{sec_full_grad}, this means that the convolution $2 \H^e * \Res$ can be efficiently computed using a simple convolution. However, computing the “full” gradient (meaning on every point of kernel $\h^e$) cannot be computed efficiently this way.
 
 \begin{algorithm}[!ht]
     \caption{\ac{PALMTREE} (Proximal Alternating Linearized Minimization for \Gls{treemodel}) algorithm for Dictionary Update}\label{alg_palmtree}
@@ -314,12 +309,12 @@ Because of the projection onto the $\Dspace^e$ set, it is sufficient to compute 
 
 
 \section{PALMTREE drawbacks}
-As explained in \cite[p. 23]{chabiron_optimization_2016}, the main drawbacks to use this \gls{treemodel} for practical dictionary learning (i.e. denoising or image recognition) is that it requires the user to pre-define and fix certain central elements of the model, which is likely to lead to suboptimal results. Among them are the design of the tree (number of children per node, depth) and the choice of the supports.
+As explained in \cite[p. 23]{chabiron_optimization_2016}, the main drawbacks of the \gls{treemodel} for practical dictionary learning (i.e., denoising or image recognition) is that it requires the user to pre-define and fix certain central elements of the model, which is likely to lead to suboptimal results. These elements include the design of the tree (number of children per node, depth) and the choice of the supports.
 % NOTE: dictionary learning is an application of machine learning specifically designed for image processing 
 \subsubsection{Choice of the tree}
-The authors of \cite{chabiron_optimization_2016} used a fixed tree structure, meaning that the tree has been created \emph{ad-hoc} on a per-experiment basis, trying to mimic the frequency pyramid tiling of a curvelet decomposition. The number of leaves was also specifically chosen to match the number of atoms that was generated on the target image.
+The authors of \cite{chabiron_optimization_2016} used a fixed tree structure, meaning that the tree was created \textit{ad-hoc} on a per-experiment basis, trying to mimic the frequency pyramid tiling of a curvelet decomposition. The number of leaves was also specifically chosen to match the number of atoms that was generated on the target image.
 
-But getting an actual adaptative dictionary update step implies that the design of the tree is also learned from the example images and incorporated into the formulation of the optimization problem. This research axis has not been explored in this work and will be part of future studies.
+\noindent However, an actual adaptative dictionary update step generally requires that the design of the tree is also learned from the example images and incorporated into the formulation of the optimization problem. This research axis has not been explored in this work and will be part of future studies.
 
 \subsubsection{Choice of the supports}
 
@@ -343,22 +338,18 @@ As described in \cref{sec_tree_model}, the supports $\s^e$ are part of the \gls{
 \caption{Example of PALMTREE solution. Supports are fixed on a simple binary tree binary. Codes $\x$ are handcrafted Diracs that exactly match the locations of atoms in $\y$.}\label{fig_exple_fixed_tree}
 \end{figure}
 
-Any actual image processing application would require to learn the dictionary on a large set of images (namely the $\Y$ matrix). However, \ac{PALMTREE} is still unable to handle more than one image.
-
-Moreover, most experiments on \ac{PALMTREE} have been focused on the dictionary update step; real applications would need to alternate between the dictionary update step and the sparse coding step. In fact, without the sparse coding step, \ac{PALMTREE} is limited to images like the one in \cref{fig_exple_fixed_tree}, where the atoms are well separated and located. Therefore no “real world” images.
+Any actual image processing application requires to learn the dictionary on a large set of images (namely the $\Y$ matrix). However, \ac{PALMTREE} is still unable to handle more than one image. Moreover, most experiments on \ac{PALMTREE} have focused on the dictionary update step, while real applications require to alternate between the dictionary update step and the sparse coding step. In fact, without the sparse coding step, \ac{PALMTREE} is limited to images like the one in \cref{fig_exple_fixed_tree}, where the atoms are well separated and located. Therefore no “real world” images.
 
 \FloatBarrier
 
-\section{Objectives of present work}
+\section{Objectives of the present work}
 
-So far, the supports of the convolutional tree dictionaries have been handcrafted. \Cref{fig_example_kernel} gives an example of typical support layout chosen for the experiments in \cite{chabiron_optimization_2016}. 
-
-To fix ideas, \cref{fig_fixed_vs_expected} illustrates what could be expected to be found as the solution for an “adaptive” support of same size: the support (b) would shape itself into (c) to better match the target atom.
+So far, the supports of the convolutional tree dictionaries have been handcrafted. \Cref{fig_example_kernel} shows an example of typical support layout chosen for the experiments in \cite{chabiron_optimization_2016}. More precisely, \cref{fig_fixed_vs_expected} illustrates what is an expected solution for an “adaptive” support of the same size: the support (b) would shape itself into (c) to better match the target atom.
 
 \begin{figure}[!ht]\centering
 \begin{subfigure}[b]{0.32\textwidth}\centering
 	\includegraphics[width=\textwidth]{figures/manual-better-support/target.pdf}
-	\caption{}\label{fig_fixed_vs_expected_y}
+	\caption{Target made out of a curvelet}\label{fig_fixed_vs_expected_y}
 \end{subfigure}
 \begin{subfigure}[b]{0.32\textwidth}\centering
 	\includegraphics[width=0.5\textwidth]{figures/manual-better-support/support.pdf}
@@ -368,13 +359,13 @@ To fix ideas, \cref{fig_fixed_vs_expected} illustrates what could be expected to
 	\includegraphics[width=\textwidth]{figures/manual-better-support/support-better.pdf}
 	\caption{Expected support}
 \end{subfigure}
-\caption{Generic versus expected supports. (a) is the target image made of one curvelet. (b) gives the locations of the support elements for one edge of the tree. (c) shows a handcrafted support that we expect to be giving better results as it follows the general direction of the curvelet.}\label{fig_fixed_vs_expected}
+\caption{Generic versus expected supports. (b) locations of the support elements for one edge of the tree. (c) a handcrafted support that is expected to provide better results as it follows the general direction of the curvelet.}\label{fig_fixed_vs_expected}
 \end{figure}
 \FloatBarrier
 
-Finally, \cref{fig_xp_fixed_vs_expected} experimentally confirms the assumption made in \Cref{fig_fixed_vs_expected}. We switched $\s^4$ from a generic (\textit{a priori}) support to a hand-made support that follows the general direction of $\y$ (\cref{fig_fixed_vs_expected_y}). The RMSE\footnotemark[1] is decreased by -16\% (lower is better). The approximation in \cref{fig_xp_fixed_vs_expected_approx2} looks visually better than the one in \cref{fig_xp_fixed_vs_expected_approx1}.
+\noindent Finally, \cref{fig_xp_fixed_vs_expected} experimentally confirms the assumption made in \Cref{fig_fixed_vs_expected}. After switching $\s^4$ from a generic (\textit{a priori}) support to a handmade support that follows the general direction of $\y$ (\cref{fig_fixed_vs_expected_y}), the RMSE\footnotemark[1] is decreased by 16\% (lower is better). This improvement is confirmed by the approximation in \cref{fig_xp_fixed_vs_expected_approx2} that looks visually better than the one in \cref{fig_xp_fixed_vs_expected_approx1}.
 
-Based on these observations, we propose in this work to make the supports “adaptative”, i.e. learning them during the optimization process.
+\noindent Based on these observations, we propose in this work to make the supports “adaptative”, i.e., to learn them during the optimization process.
 
 \footnotetext[1]{Let $\y^1$ and $\y^2 \in \R^N$; the Root Mean Square Error is defined by  \begin{equation*}\text{RMSE}(\y^1,\y^2) = \frac{1}{N} \sqrt{\sum_{i=1}^N (y^1_i - y^2_i)^2}\end{equation*}}
 
@@ -403,10 +394,10 @@ Based on these observations, we propose in this work to make the supports “ada
 
 \chapter{Experiments}
 
-This chapter covers the protocols and results of the various experiments aimed to learning the supports during the \ac{PALMTREE} algorithm. We first review the experiments that helped us better understand the information given by the gradient. The second part focuses on our actual goal: learning the supports (instead of having fixed ones) on a single branch and finally learning supports on trees.
+This chapter covers the protocols and results of the various experiments that have been conducted to learn the supports during the \ac{PALMTREE} algorithm. We first review the experiments that helped us to better understand the information given by the gradient. The second part focuses on our actual goal: learning the supports (instead of fixing them) on a single branch and finally learning supports on trees.
 
 \section{Experiment setup}
-Every experiment in the first part of this chapter is using a fixed single-branch tree of depth 4 associated with $\y$, $\h^e$, $\s^e$ and $\x^e$ of size $128 \times 128$. The figures only display the central $64 \times 64$ pixels as shown in \cref{fig_xp_explain}.
+Every experiment in the first part of this chapter uses a fixed single-branch tree of depth 4 associated with $\y$, $\h^e$, $\s^e$ and $\x^e$ of size $128 \times 128$. The figures only display the central $64 \times 64$ pixels as shown in \cref{fig_xp_explain}.
 
 \begin{figure}[!ht]\centering
 \begin{subfigure}[b]{0.32\textwidth}\centering
@@ -421,21 +412,21 @@ Every experiment in the first part of this chapter is using a fixed single-branc
 	\includegraphics[width=0.9\textwidth]{figures/xp_explain/code.pdf}
 	\caption{}
 \end{subfigure}
-\caption{Experiment setup. The experiments are using one image $\y$, one dictionary $\D$ (formed by $\T$, $(\s^e)_{e \in \E}$, $(\h^e)_{e \in \E}$) and one $\x$. The parameters $\y$, $\x$, $\T$, $(\s^e)_{e \in \E}$ are given and $(\h^e)_{e \in \E}$ is learned (the only variable).}\label{fig_xp_explain}
+\caption{Experiment setup. The experiments use one image $\y$, one dictionary $\D$ (formed by $\T$, $(\s^e)_{e \in \E}$, $(\h^e)_{e \in \E}$) and one code $\x$. The parameters $\y$, $\x$, $\T$, $(\s^e)_{e \in \E}$ are given and $(\h^e)_{e \in \E}$ is estimated from the observed image $\y$.}\label{fig_xp_explain}
 \end{figure}
-In the following experiments, the dictionary associated to this convolutional tree can be simply written as 
+In the following experiments, the dictionary associated with this convolutional tree is 
 \begin{equation*}\D\x = \h^1 * \h^2 * \h^3 * \h^4 * x.\end{equation*}
 
 \section{Using the gradient for choosing the element to add}
 
-The Orthogonal Matching Pursuit (\ac{OMP}, detailed in \cref{alg_omp}) chooses at \cref{alg_omp_pick_correlation} which component $\x_i$ should be “turned on” at each iteration, finding the atom $\d_i$ that has the greatest correlation with the residual $\Res = \D\x - \y$, i.e.
+The Orthogonal Matching Pursuit (\ac{OMP}, detailed in \cref{alg_omp}) chooses at \cref{alg_omp_pick_correlation} which component $\x_i$ should be “turned on” at each iteration, finding the atom $\d_i$ that has the greatest correlation with the residual $\Res = \D\x - \y$, i.e.,
 \begin{equation*} i = \underset{j}{\argmax} ~ | \D^T \Res |_j \end{equation*}
-which is litteraly the same as computing the gradient $\nabla \Phi(\x)$, with \begin{equation*}\Phi(\x) = \lVert \D\x - \y \rVert^2.\end{equation*}
+which is litteraly the same as computing the gradient $\nabla \Phi(\x)$ with \begin{equation*}\Phi(\x) = \lVert \D\x - \y \rVert^2.\end{equation*}
 
 \begin{algorithm}[!ht]
-    \caption{Orthogonal Matching Pursuit (OMP) algorithm for sparse approximation}\label{alg_omp}
+    \caption{Orthogonal Matching Pursuit (OMP) algorithm for standard sparse approximation}\label{alg_omp}
   \begin{algorithmic}[1]
-    \Input signal $\y$ of dimension $N$, dictionary of dim. $N \times K$ with $K \gg N$
+    \Input signal $\y$ of dimension $N$, dictionary of dimension $N \times K$ with $K \gg N$
     \Output A $k$-sparse code $\x$ of dimension $K$
     \State \textbf{Initialization} $S=\{\}$
     \For{$i = 1,\dots,k$}
@@ -446,14 +437,14 @@ which is litteraly the same as computing the gradient $\nabla \Phi(\x)$, with \b
   \end{algorithmic}
 \end{algorithm}
 
-Our idea is to use the same principle when adding elements to supports $(\s^e)_{e \in \E}$: add a new element to one of the supports between two minimizations of the \ac{PALMTREE} algorithm, using the greatest gradient component information.
+Our idea is to use the same principle when adding elements to supports $(\s^e)_{e \in \E}$: add a new element to one of the supports between two minimizations of the \ac{PALMTREE} algorithm, using the largest gradient component.
 
-\Cref{alg_omppalmtree} gives an adaptation of the \ac{OMP} algorithm for the \gls{treemodel}.
+\noindent \Cref{alg_omppalmtree} presents an adaptation of the \ac{OMP} algorithm for the \gls{treemodel}, denoted as OMP-PALMTREE.
 
 \begin{algorithm}[!ht]
-    \caption{\ac{OMP} algorithm using \ac{PALMTREE}}\label{alg_omppalmtree}
+    \caption{\ac{OMP} algorithm using \ac{PALMTREE} (OMP-PALMTREE)}\label{alg_omppalmtree}
   \begin{algorithmic}[1]
-    \Input signal $\y$ of dimension $N$, dictionary of dim $N \times K$ with $K = |\E| \cdot N$ and $K \gg N$
+    \Input signal $\y$ of dimension $N$, dictionary of dimension $N \times K$ with $K = |\E| \cdot N$ and $K \gg N$
     \Output A $k$-sparse code $\x$ of dimension $K$
     \State \textbf{Initialization} Initialize the supports $\s^e$ such that $k=1$
     \For{$i = 1,\dots,k$}
@@ -464,53 +455,50 @@ Our idea is to use the same principle when adding elements to supports $(\s^e)_{
   \end{algorithmic}
 \end{algorithm}
 
-
-However, three questions rose when designing this new “meta” algorithm:
+\noindent However, three questions rose when designing this new “meta” algorithm:
 \begin{enumerate}[label={\alph*)},noitemsep]
 	\item At \cref{alg_omppalmtree_find}, is it actually correct to choose the element to be added using a strictly local information of the gradient?
 	\item Also at \cref{alg_omppalmtree_find}, how would we get the “full” gradient while the current gradient is only computed on the points of the support?
-	\item Finally, at (\cref{alg_omppalmtree_ftl}), is it really necessary to wait for the convergence of \eqref{eq_ftl}?
+	\item Finally, at \cref{alg_omppalmtree_ftl}, is it really necessary to wait for the convergence of \eqref{eq_ftl}?
 \end{enumerate}
-  Also, 
 
-We will first review how the “full” gradient is computed and then describe a way to check that the “full” gradient gives a good direction towards a critical point, comparing it with what we call “gain-per-added-point”. Finally, we will give some thoughts on whether we should wait for \eqref{eq_ftl} to converge or if some iterations suffice between two iterations of \cref{alg_omppalmtree}.
+\noindent Before answering these questions, we will first review how the “full” gradient is computed and then describe a way to check that the “full” gradient gives a good direction towards a critical point, comparing it with what we call “gain-per-added-point”. Finally, we will give some thoughts on whether we should wait until \eqref{eq_ftl} converges or if some iterations suffice between two iterations of OMP-PALMTREE.
 
 
 \subsection{Computing the “full” gradient} \label{sec_full_grad}
-Up to now, the gradient was computed using a convolution based on translations, as mentioned in \cref{sec_palmtree}. It takes advantage of the sparsity of each kernel $\h^e$ as well as the fact that the proximal operator is projecting every kernel onto its support, meaning that only a few elements have to be computed.
+Up to now, the gradient was computed using a convolution based on translations, as mentioned in \cref{sec_palmtree}. This computation takes advantage of the sparsity of each kernel $\h^e$ as well as the fact that the proximal operator is projecting every kernel onto its support, meaning that only a few elements have to be computed.
 
-We basically chose to use the fast Fourier transform ($\F$) for computing the convolution on the whole kernels:
+\noindent We basically chose to use the fast Fourier transform ($\F$) for computing the convolution on the whole kernels, i.e.,
 \begin{align*}
 	\nabla_{\h^e} \Phi((\h^f)_{f \in \E})&= \F^{-1}(\F(\H^{e})^* \circ \F(\Res))
 \end{align*}
-with ${}^*$ denoting the adjoint operator, $\circ$ the Hadamard product (point-wise product); $\H^{e}$ as well as $\Res$ are notations defined in \cref{sec_palmtree}.
+with ${}^*$ denoting the adjoint operator, $\circ$ the Hadamard product (point-wise product). The notations $\H^e$ and $\Res$ have been defined in \cref{sec_palmtree}.
 
 \subsection{Validation of the “full” gradient}
-We had some trouble when trying to compute the gradient on the full kernels $(\h^e)_{e \in \E}$ (not only on the supports element locations). To be sure that the computed “full” gradient was correct, we compared it to a finite-difference gradient:
-
+We had some trouble when trying to compute the gradient on the full kernels $(\h^e)_{e \in \E}$ (not only on the support elements). To ensure that the computed “full” gradient was correct, we compared it to a finite-difference gradient:
 \begin{equation*}\lim_{\epsilon \rightarrow 0} \frac{\Phi((\h^e)_{e \in \E}+\epsilon e_i) - \Phi ((\h^e)_{e \in \E}) }{\epsilon} ~=~ \nabla_i \Phi ((\h^e)_{e \in \E})\end{equation*}
 
 \begin{figure}[!ht]\centering
 \begin{subfigure}[b]{0.30\textwidth}\centering
 \includegraphics[width=\textwidth]{figures/verif_gradient/gradient.pdf}
-\caption{“Full” gradient}
+\caption{“Full” gradient} \label{fig_verif_gradient-grad}
 \end{subfigure}
 \begin{subfigure}[b]{0.30\textwidth}\centering
 \includegraphics[width=\textwidth]{figures/verif_gradient/finite-diff.pdf}
-\caption{Finite-difference}
+\caption{Finite-difference} \label{fig_verif_gradient-finite}
 \end{subfigure}
 \begin{subfigure}[b]{0.35\textwidth}\centering
 \includegraphics[width=\textwidth]{figures/verif_gradient/finite-diff-vs-grad.pdf}
-\caption{Error w.r.t. $\epsilon$}
+\caption{Error w.r.t. $\epsilon$} \label{fig_verif_gradient-error}
 \end{subfigure}
-\caption{Checking that the “full” gradient is correct. We compare it to the finite-difference gradient and make the $\epsilon$ tend to 0.} \label{fig_verif_gradient}
+\caption{Full gradient, its estimation and the error between these two quantities.} \label{fig_verif_gradient}
 \end{figure}
 
-Figure \ref{fig_verif_gradient} compares the FFT-computed gradient to the finite-difference gradient (with $\epsilon=0.001$). The bottom left figure shows that the two gradients are very close in term of difference. The right figure shows that the finite-difference gradient converges to the “full” gradient, which confirms that our “full” gradient is correct.
+\noindent Figure \ref{fig_verif_gradient} compares the FFT-computed gradient to the finite-difference gradient (with $\epsilon=0.001$). \Cref{fig_verif_gradient-grad,fig_verif_gradient-finite} show that the two gradients are visually very close. \Cref{fig_verif_gradient-error} shows that the finite-difference gradient converges to the “full” gradient, which confirms that our “full” gradient implementation is correct.
 
 \section{Gain-per-added-point to the support}\label{sec_gain_per_added_point}
 
-This section details the method used for making sure that the “full” gradient is appropriate for adding points to supports at \cref{alg_omppalmtree_find} in \cref{alg_omppalmtree}.
+This section details the method used for making sure that the “full” gradient is appropriate for adding points to the supports at \cref{alg_omppalmtree_find} of \cref{alg_omppalmtree}.
 
 \begin{algorithm}[!h]
     \caption{Gain-per-added-point $\g^f$ for the support $\s^f$}\label{alg_gain_per_added_point}
@@ -527,7 +515,7 @@ This section details the method used for making sure that the “full” gradien
   \end{algorithmic}
 \end{algorithm}
 
-We designed \cref{alg_gain_per_added_point} for computing what we call the \emph{gain-per-added-point} matrix, denoted $\g^f$ ($f$ is the edge of the studied support). \Cref{alg_gain_per_added_point} tries every possible point that could be added to one given support $s^f$ and see how much the objective function decreases when adding the point and continuing the minimization.
+We designed \cref{alg_gain_per_added_point} for computing what we call the \emph{gain-per-added-point} matrix, denoted $\g^f$ ($f$ is the edge of the studied support). \Cref{alg_gain_per_added_point} tries every possible point that can be added to one given support $s^f$ and see how much the objective function decreases when adding the point and continuing the minimization.
 
 \begin{figure}[!h]\centering
 	\begin{subfigure}[b]{0.30\textwidth}\centering
@@ -536,30 +524,30 @@ We designed \cref{alg_gain_per_added_point} for computing what we call the \emph
 	\end{subfigure}
 	\begin{subfigure}[b]{0.34\linewidth}\centering
 	\includegraphics[width=\linewidth]{figures/xp/n4/xp_128x128_sc2_angl1_K3_S3_node4_objmatrix.pdf}
-	\caption{Gain-per-added-point for $\s^4$}
+	\caption{Gain-per-added-point for $\s^4$} \label{fig_gain_n4-gain}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.34\linewidth}\centering
 	\includegraphics[width=\linewidth]{figures/xp/n4/xp_128x128_sc2_angl1_K3_S3_node4_partgrad4.pdf}
-	\caption{Partial gradient w.r.t $\h^4$}
+	\caption{Partial gradient w.r.t $\h^4$} \label{fig_gain_n4-grad}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.30\linewidth}\centering
 	\includegraphics[width=\linewidth]{figures/xp/n4/xp_128x128_sc2_angl1_K3_S3_node4_approx.pdf}
-	\caption{Approximation $\D\x$} \label{fig_gain_n4_approx}
+	\caption{Approximation $\D\x$} \label{fig_gain_n4-approx}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.34\linewidth}\centering
 	\includegraphics[width=\linewidth]{figures/xp/n4/xp_128x128_sc2_angl1_K3_S3_node4_objmatrix_bestvalues.pdf}
-	\caption{Best values of above figure}
+	\caption{Best values of above figure} \label{fig_gain_n4-gain_best}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.34\linewidth}\centering
 	\includegraphics[width=\linewidth]{figures/xp/n4/xp_128x128_sc2_angl1_K3_S3_node4_partgrad4_bestvalues.pdf}
-	\caption{Best values of above figure}
+	\caption{Best values of above figure}\label{fig_gain_n4-grad_best}
 	\end{subfigure}
 \caption{Gain-per-added-point compared to “full” gradient. The “full” gradient is computed on the converged “common starting point” $\k$ (see \cref{alg_gain_per_added_point}). The gradient and gain-per-added-point maxima are almost at the same place. }\label{fig_gain_n4}
 \end{figure}
 
-\Cref{fig_gain_n4} compares (c) the gain-per-added-point of $\s^4$ to (d) the absolute value of the partial gradient w.r.t $\h^4$ after a convergence of \eqref{eq_ftl}. It is interesting to see that they share the same direction and shape. After selecting 20 of their best values in (e) and (f), we notice that they almost match, which reinforces our hypothesis that the gradient could give the right information for widening supports.
+\noindent \Cref{fig_gain_n4} compares the gain-per-added-point of $\s^4$ (\cref{fig_gain_n4-gain}) to the absolute value of the partial gradient w.r.t $\h^4$ after a convergence of \eqref{eq_ftl} (\cref{fig_gain_n4-grad}). It is interesting to see that they share the same direction and shape. \Cref{fig_gain_n4-gain_best,fig_gain_n4-grad_best} show the best values of \cref{fig_gain_n4-gain,fig_gain_n4-grad}. We notice that the two images almost match, which reinforces our hypothesis that the gradient could give the right information for support estimation.
 
-Note the null gradient values on the points of the support (small squares); with respect to those nine points, the necessary condition for optimality is met. However, the rest of the gradient is not null, meaning we are on a suboptimal solution.
+\noindent Note that the values of the gradient are equal to zero on the points of the support (small squares); with respect to those nine points, the optimality conditions are met. However, the other components of the gradient are different from zero, meaning that we have reached a suboptimal solution.
 
 \begin{figure}[!ht]\centering
 	\begin{subfigure}[b]{0.24\linewidth}\centering
@@ -581,7 +569,7 @@ Note the null gradient values on the points of the support (small squares); with
 \caption{Two other edges (1 and 2) for experiment in \cref{fig_gain_n4}. The image $\y$ and its approximation $\D\x$ are identical to \cref{fig_gain_n4}.}\label{fig_gain_n1_n2}
 \end{figure}
 
-\Cref{fig_gain_n1_n2} does the same comparison for two other kernels of the same tree (it is the same experiment). Whatever the kernel, the best values of the gradient seem to follow the same shape as the gain-per-added-point matrix. 
+\noindent \Cref{fig_gain_n1_n2} does the same comparison for two other kernels of the same tree (with the same experiment). Whatever the kernel, the best values of the gradient seem to follow the same shape as the gain-per-added-point matrix. 
 
 \begin{figure}[!h]\centering
 	\begin{subfigure}[b]{0.22\textwidth}\centering
@@ -600,63 +588,64 @@ Note the null gradient values on the points of the support (small squares); with
 	\includegraphics[width=\textwidth]{figures/xp/tilted_n4/xp_128x128_sc2_angl4_K3_S3_node4_objmatrix_bestvalues.pdf}
 	\caption{$\h^4$ gradient}
 	\end{subfigure}
-\caption{Trying a different $\y$.}\label{fig_gain_tilted_n4}
+\caption{Trying a different target image $\y$.}\label{fig_gain_tilted_n4}
 \end{figure}
 
-Finally, \cref{fig_gain_tilted_n4} presents the same experiment but with a different atom (this time, a curvelet with a different angle). And as for the two previous figures, the gradient matches the gain-per-added-point.
+\noindent Finally, \cref{fig_gain_tilted_n4} presents the same experiment but with a different target image (namely, a curvelet with a different angle). As for the two previous figures, the gradient matches the gain-per-added-point.
 
 \subsection{Visual gain when adding an element}
 
 \begin{figure}[!h]\centering
 \begin{subfigure}[b]{0.32\linewidth}\centering
 \includegraphics[width=\linewidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4before_target.pdf}
-	\caption{Target image}
+	\caption{Target image} \label{fig_beforeafter-target}
 \end{subfigure}
 \begin{subfigure}[b]{0.32\linewidth}\centering
 \includegraphics[width=\linewidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4before_approx.pdf}
-\caption{Before adding}
+\caption{Approx. before adding}\label{fig_beforeafter-approx_before}
 \end{subfigure}
 \begin{subfigure}[b]{0.32\linewidth}\centering
 \includegraphics[width=\linewidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4after_approx.pdf}
-\caption{After adding}
+\caption{Approx. after adding}\label{fig_beforeafter-approx_after}
 \end{subfigure}
 \begin{subfigure}[b]{0.32\linewidth}\centering
 \includegraphics[width=\linewidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4before_objmatrix.pdf}
-\caption{Gain-per-added-point} \label{fig_gain_matrix}
+\caption{Gain-per-added-point}\label{fig_beforeafter-gain}
 \end{subfigure}
 \begin{subfigure}[b]{0.32\linewidth}\centering
 \includegraphics[width=\linewidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4before_partgrad4.pdf}
-\caption{Gradient before} \label{fig_grad_before}
+\caption{Gradient before} \label{fig_beforeafter-grad_before}
 \end{subfigure}
 \begin{subfigure}[b]{0.32\linewidth}\centering
 \includegraphics[width=\linewidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4after_partgrad4.pdf}
-\caption{Gradient after} \label{fig_grad_after}
+\caption{Gradient after} \label{fig_beforeafter-grad_after}
 \end{subfigure}
 \begin{subfigure}[b]{0.32\linewidth}\centering
 \includegraphics[width=\linewidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4before_objmatrix_bestvalues.pdf}
-\caption{Best values of \ref{fig_gain_matrix}}
+\caption{Best values of \ref{fig_beforeafter-gain}} \label{fig_beforeafter-gain_best}
 \end{subfigure}
 \begin{subfigure}[b]{0.32\linewidth}\centering
 \includegraphics[width=\linewidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4before_partgrad4_bestvalues.pdf}
-\caption{Best values of \ref{fig_grad_before}}
+\caption{Best values of \ref{fig_beforeafter-grad_before}} \label{fig_beforeafter-grad_before_best}
 \end{subfigure}
 \begin{subfigure}[b]{0.32\linewidth}\centering
 \includegraphics[width=\linewidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4after_partgrad4_bestvalues.pdf}
-\caption{Best values of \ref{fig_grad_after}}
+\caption{Best values of \ref{fig_beforeafter-grad_after}} \label{fig_beforeafter-grad_after_best}
 \end{subfigure}
-\caption{Effect of adding one point to the support $\s^4$. The “before” tree is a converged solution of \ac{PALMTREE}. The “after” tree has been added a point where the gain-per-added-point was maximal.}\label{fig_before_after_adding}
+\caption{Effect of adding one point to the support $\s^4$. The “before” tree is a converged solution of \ac{PALMTREE}. The “after” tree has been added a point where the gain-per-added-point is maximal.}\label{fig_beforeafter}
 \end{figure}
 
-The experiment shown in \cref{fig_before_after_adding} is based on the results of \cref{fig_gain_n4_approx}, where figures (a,b,d,e,g,h) are the same as the previous experiment. The figures (c,j,i) show what  happens if we add the minimum point of gain-per-added-point to $\s^4$ and continue the minimization. We note that the approximation (c) looks visually closer to the target image; the RMSE is decreased by -16\% (lower is better).
+The experiment results shown in \cref{fig_beforeafter} are based on the results of \cref{fig_gain_n4-approx}, where \cref{fig_beforeafter-target,fig_beforeafter-approx_before,fig_beforeafter-gain,fig_beforeafter-grad_before,fig_beforeafter-gain_best,fig_beforeafter-grad_before_best} are the same meaning as for the previous experiment. 
+\cref{fig_beforeafter-approx_after,fig_beforeafter-grad_after,fig_beforeafter-grad_after_best} show what  happens if we add the minimum point of gain-per-added-point to $\s^4$ and continue the minimization. We note that the approximation in \cref{fig_beforeafter-approx_after} looks visually closer to the target image \cref{fig_beforeafter-target} and that the RMSE is decreased by 16\% (lower is better).
 
-We also observe that when adding a point to the support (materialized by the \nth{10} small square), the highest gradient values “shift” to the south-west. Adding a point to the support has an effect on every surrounding points.
+\noindent We also observe that when adding a point to the support (materialized by the \nth{10} small square), the highest gradient values “shift” to the south-west. Thus, adding a point to the support has an effect on the whole neighborhood.
 
 \FloatBarrier
 \subsection{Adding elements before the convergence of \ac{PALMTREE}} \label{sec_add_before_converged}
 
-At \cref{alg_omppalmtree_ftl} of \cref{alg_omppalmtree}, we do a full minimization, i.e. it stops as soon as \ac{PALMTREE} has converged. Because the minimization takes a lot of time, it was tempting to try adding elements every few iterations of \ac{PALMTREE} instead of waiting until it converges.
+When looking at \cref{alg_omppalmtree_ftl} of \cref{alg_omppalmtree} where a “full” minimization is performed (i.e., it stops as soon as \ac{PALMTREE} has converged), we wondered if it was necessary to wait until convergence. Because the minimization takes a lot of time, it is tempting to try adding elements every few iterations of \ac{PALMTREE}.
 
-The \cref{fig_gain_n4} has shown that the “full” gradient could be satisfactorily used for adding elements to the support $s$, provided that \cref{alg_palmtree} at \cref{alg_omppalmtree_ftl} has converged. Would the gradient still give a valid information on a not-yet converged solution $\k$ of \ac{PALMTREE}, for example after 5 iterations?
+\noindent Previously, we have seen in \Cref{fig_gain_n4} that the “full” gradient can be satisfactorily used for adding elements to the support $s$, provided that \cref{alg_palmtree} at \cref{alg_omppalmtree_ftl} has converged. Would the gradient still give a valid information on a not-yet converged solution $\k$ of \ac{PALMTREE}, for example after 5 iterations?
 
 \begin{figure}[!ht]\centering
 \begin{subfigure}[b]{0.49\linewidth}\centering
@@ -684,36 +673,36 @@ The \cref{fig_gain_n4} has shown that the “full” gradient could be satisfact
 \caption{Is the gradient giving the same information depending on the iteration of \ac{PALMTREE}? This is the same experiment as \cref{fig_gain_n4}. Only the best values are displayed.}\label{fig_iter_gain_vs_grad}
 \end{figure}
 
-\Cref{fig_iter_gain_vs_grad} compares the best values of gain-per-added-point to gradient snapshots taken during the minimization. This is reassuring: whatever the iteration, the gradient best values stay close to the gain-per-added-point best values. We may conclude that adding elements every few iterations of \ac{PALMTREE} works.
+\noindent \Cref{fig_iter_gain_vs_grad} compares the best values of gain-per-added-point to gradient snapshots obtained during the minimization. This result is encouraging: whatever the iteration, the gradient best values stay close to the gain-per-added-point best values. We conclude that adding elements every few iterations of \ac{PALMTREE} can provide interesting results.
 
 \FloatBarrier
 \section{Learning the supports for a single branch}
 
-After having shown that the gradient gives a good indication on which support elements should be added, we tried learning the support $\s$ using the \cref{alg_omppalmtree}. According to the conclusions of \cref{sec_add_before_converged} that indicates that the convergence of \ac{PALMTREE} is not mandatory before adding an element, we simply set a smaller maximum of iterations for \ac{PALMTREE}; we denote this number of iterations $T$.
+After showing that the gradient gives a good indication on which support elements should be added in the previous sections, we would like to learn the support $\s$ using the \cref{alg_omppalmtree}. According to the conclusions of \cref{sec_add_before_converged} that indicates that the convergence of \ac{PALMTREE} is not mandatory before adding an element, we simply set a maximum number of iterations for \ac{PALMTREE}, which is denoted by $T$.
 
 \begin{figure}[!ht]\centering
 \begin{subfigure}[b]{0.085\textwidth}\centering
 	\includegraphics[width=\textwidth]{figures/exple-better-support/tree_classic.pdf}
-	\caption{}
+	\caption{} \label{fig_learnsupp_branch-generic_tree}
 \end{subfigure}
 \begin{subfigure}[b]{0.39\textwidth}\centering
 \includegraphics[width=\textwidth]{figures/exple-better-support/xp_128x128_sc2_angl1_K3_S3_node4classic_approx.pdf}
-\caption{Approx. $\D\x$ with generic supports}\label{fig_xp_fixed_vs_expected_approx1}
+\caption{Approx. $\D\x$ with generic supports}\label{fig_xp_fixed_vs_expected_approx1}\label{fig_learnsupp_branch-generic_approx}
 \end{subfigure}
 \begin{subfigure}[b]{0.085\textwidth}\centering
 \includegraphics[width=\textwidth]{figures/variable_support/support.pdf}
-\caption{}\label{fig_variable_support_c}
+\caption{}\label{fig_learnsupp_branch-learned_tree}
 \end{subfigure}
 \begin{subfigure}[b]{0.39\textwidth}\centering
 \includegraphics[width=\textwidth]{figures/variable_support/xp_128x128_sc2_angl1_K3_S3_node4_variable_approx.pdf}
-\caption{Approx. $\D\x$ with learned supports} 
+\caption{Approx. $\D\x$ with learned supports}\label{fig_learnsupp_branch-learned_approx}
 \end{subfigure}
-\caption{Learning the supports for a single branch. Starting from Diracs, the best element is added to one of the supports every 5 iterations, up to 36 elements.}\label{fig_variable_support}
+\caption{Learning the supports for a single branch. Starting from Diracs, the best element is added to one of the supports every 5 iterations, up to 36 elements.}\label{fig_learnsupp_branch}
 \end{figure}
 
-In \cref{fig_variable_support_c}, the initial supports are simply centered Diracs; every $T=5$ iterations of \ac{PALMTREE}, one element is added where the gradient is the greatest, up to 36 elements. The experiment converges after about 200 iterations of \ac{PALMTREE}.
+\noindent In \cref{fig_learnsupp_branch-learned_tree}, the initial supports are simply centered Diracs; every $T=5$ iterations of \ac{PALMTREE}, one element is added at the location of the largest gradient, up to 36 elements. The OMP-PALMTREE algorithm (\cref{alg_omppalmtree}) algorithm converges after 200 cumulated iterations of \ac{PALMTREE}.
 
-The resulting approximation (d) is encouraging with a relative RMSE decrease of -76\% compared to the approximation (b) using the generic supports in (a).
+\noindent The resulting approximation \cref{fig_learnsupp_branch-learned_approx} is encouraging with a relative RMSE decrease of 76\% compared to the approximation in \cref{fig_learnsupp_branch-generic_approx} using the generic supports in \cref{fig_learnsupp_branch-generic_tree}.
 
 %\begin{subfigure}[b]{1\textwidth}\centering
 %\includegraphics[width=\textwidth]{figures/variable_support/xp_128x128_sc2_angl1_K3_S3_node4_variable_target.pdf}
@@ -722,27 +711,32 @@ The resulting approximation (d) is encouraging with a relative RMSE decrease of 
 
 \FloatBarrier
 \section{Learning supports for a tree}
+The following section details the experiments made on trees and a modified version of OMP-PALMTREE that embeds a regularization term for concentrating “scattered” supports.
 
 \subsection{Experiment setup}
+
+For testing our support learning algorithm OMP-PALMTREE (\cref{alg_omppalmtree}), we propose to use the convolutional tree defined in \cref{fig_learntree_setup}. The target $\y$ in \cref{fig_learntree_setup-target} is made of curvelets at different scales and angles; from left to right and top to bottom, the 16 curvelets of $\y$ (numbered 1 through 16) have the corresponding codes $\x^l$ with $l=1,\dots,16$. Note that the codes are located at the centers of their corresponding curvelets, as shown in \cref{fig_learntree_setup-codes}.
+The following experiments using OMP-PALMTREE have been set such that
+\begin{enumerate}[label=(\alph*)]
+	\item at the “adding elements” step, 5 elements are added instead of only 1;
+	\item at the the PALMTREE minimization step, PALMTREE does a maximum of 5 iterations.
+\end{enumerate}
 
 \begin{figure}[!h] \centering
 \begin{subfigure}[b]{0.325\textwidth}\centering
 \includegraphics[width=\textwidth]{figures/tree-learn/target.pdf} 
-	\caption{Target image $\y$}
+	\caption{Target image $\y$} \label{fig_learntree_setup-target}
 \end{subfigure}
 \begin{subfigure}[b]{0.325\textwidth}\centering
 \includegraphics[width=\textwidth]{figures/tree-learn/tree.pdf}
-	\caption{Tree defining $\D$}
+	\caption{Tree defining $\D$}\label{fig_learntree_setup-tree}
 \end{subfigure}
 \begin{subfigure}[b]{0.325\textwidth}\centering
 \includegraphics[width=\textwidth]{figures/tree-learn/codes.pdf} 
-	\caption{Some codes $\x^l$ (4 among 16)}
+	\caption{Some codes $\x^l$ (4 among 16)} \label{fig_learntree_setup-codes}
 \end{subfigure}
-\caption{Setup of the support learning experiments.}\label{fig_learntree_setup}
+\caption{Setup of the experiments on learning the supports of a tree.}\label{fig_learntree_setup}
 \end{figure}
-
-For testing our support learning algorithm \cref{alg_omppalmtree}, we use the convolutional tree defined in \cref{fig_learntree_setup}. The target $\y$ made of curvelets at different scales and angles. From left to right and top to bottom, the 16 curvelets of $\y$ (numbered 1 through 16) have the corresponding codes $\x^i$ with $i=1,\dots16$. The codes are located at the center of their corresponding curvelet.
-
 
 \begin{figure}[!h] \centering
 \begin{subfigure}[b]{0.49\textwidth}\centering
@@ -756,13 +750,12 @@ For testing our support learning algorithm \cref{alg_omppalmtree}, we use the co
 \caption{Results after using \cref{alg_omppalmtree}. The support elements in (b) are extremely scattered, thus making them indistinguishable.}\label{fig_test_omppalmtree}
 \end{figure}
 
-A first result using \cref{alg_omppalmtree} as-is is displayed in  \Cref{fig_test_omppalmtree}. The support elements are so distant from each other that we cannot distinguish them. A zoom on one of the supports is made in the next section.
-
+\noindent A first result using \cref{alg_omppalmtree} as-is is displayed in  \Cref{fig_test_omppalmtree}. The support elements are so distant from each other that we cannot distinguish them. A zoom on one of the supports is made in the next section.
 
 
 \subsection{Problem of scattered elements using \cref{alg_omppalmtree}}
  
-An unforeseen issue rose when trying the \cref{alg_omppalmtree} on a tree instead of a single branch: the gradient indicates elements that are far from each other. The selection of the best support element to be added can be unexpectedly far from previously added elements, hence producing scattered kernels. Having “gathered” supports is essential for the convolutional tree model. \todo[inline]{HELP: I can’t find explanations on why it is essential to have “gathered” kernels, contrary to “scattered” kernels} 
+An unexpected issue was observed when running the \cref{alg_omppalmtree} on a tree instead of a single branch: the gradient indicated elements that were far from each other. The selection of the best support element to be added was unexpectedly far from previously added elements, hence producing scattered kernels. Having “gathered” supports is essential for the convolutional tree model. \todo[inline]{HELP: I can’t find explanations on why it is essential to have “gathered” kernels, contrary to “scattered” kernels} 
 
 \begin{figure}[!h] \centering
 \begin{subfigure}[b]{0.65\textwidth}\centering
@@ -773,15 +766,16 @@ An unforeseen issue rose when trying the \cref{alg_omppalmtree} on a tree instea
 \includegraphics[width=1\textwidth]{figures/tree-scattered-supports/_partgrad1.pdf}
 \caption{Gradient for $\h^1$} \label{fig_scattered_support_grad}
 \end{subfigure}
-\caption{Scattered supports when using plain \cref{alg_omppalmtree}. The gradient in (b) has its maximum values in distant locations, therefore producing scattered supports.} \label{fig_scattered_support}
+\caption{Scattered supports when using the original OMP-PALMTREE (\cref{alg_omppalmtree}). The gradient in (b) has its maximum values in distant locations, therefore producing scattered supports.} \label{fig_scattered_support}
 \end{figure}
 
-\Cref{fig_scattered_support_tree} illustrates this problem; every support has its elements scattered instead of being gathered in one place. The corresponding gradient, shown in \cref{fig_scattered_support_grad}, has multiple “local” maxima that are far from the origin. Ideally, we would like all elements to be centered around the origin (in the figures, the origin is at the center of the image).
+\noindent \Cref{fig_scattered_support_tree} illustrates this problem; every support has its elements scattered instead of being gathered in one place. The corresponding gradient, shown in \cref{fig_scattered_support_grad}, has multiple “local” maxima that are far from the origin. Ideally, we would like all elements to be centered around the origin (in the figures, the origin is at the center of the image).
 
 \begin{algorithm}[!h]
-    \caption{\ac{OMP}-\ac{PALMTREE} (based on \cref{alg_omppalmtree})}\label{alg_omppalmtree2}
+    \caption{OMP-PALMTREE (version 2, based on the original OMP-PALMTREE in \cref{alg_omppalmtree})}\label{alg_omppalmtree2}
   \begin{algorithmic}[1]
-    \Input signal $\y$ of dimension $N$, dictionary of dim $N \times K$ with $K = |\E| \cdot N$ and $K \gg N$
+    \Input signal $\y$ of dimension $N$, dictionary of 
+   dimension$N \times K$ with $K = |\E| \cdot N$ and $K \gg N$
     \Output A $k$-sparse code $\x$ of dimension $K$
     \State \textbf{Initialization} Initialize the supports $\s^e$ such that $k=1$
     \For{$i = 1,\dots,k$}
@@ -808,18 +802,20 @@ An unforeseen issue rose when trying the \cref{alg_omppalmtree} on a tree instea
 \caption{Example of linear regularization using distance to origin (center of the figure).} \label{fig_grad_minus_dist}
 \end{figure}
 
-To address this issue, we added in \cref{alg_omppalmtree2} a regularization (or prior) term $f(p) \subset \R$ that prevents $p$ from being too far from the origin (center\footnote{The actual implementation relies on kernels centered on the origin $(1,1)$; for easier understanding, we translate the kernels so that the origin is centered.} of the support).
+\noindent To address this issue, we add in \cref{alg_omppalmtree2} a regularization (or “prior”) term $f(p)$ (with values in $\R$) that prevents the location $p$ from being too far from the origin (center\footnotemark[1] of the support); $f$ is defined as
 \begin{equation}
-f(p) = \frac{\text{dist}(o-p)}{\underset{p' \in 1,\dots,N}{\max}\text{dist}(o-p')} \quad \in [0,1] \label{eq_regularized1}
+f(p) = \frac{\text{dist}(o-p)}{\underset{p' \in \P}{\max}\text{dist}(o-p')} \quad \in [0,1] \label{eq_regularized1}
 \end{equation}
-with $o$ the origin, which is the center of the support. Note that $f$ simply normalizes \text{dist()} in $[0,1]$. \Cref{fig_grad_minus_dist} illustrates the effect on the regularization $f(p)$ on the objective function (at \cref{alg_omppalmtree2_find} of \cref{alg_omppalmtree2}).
-
-
-  $\text{dist}(p)$ is the circular euclidian norm defined on $p=1,\dots,N$ by\footnotemark[1]
+with $o$ the origin, which is the center of the support, and $\text{dist}(p)$ is the circular euclidian norm defined on $p=1,\dots,N$ by\footnotemark[2]
 \begin{equation*} \text{dist}(p) = \min\left[p \bmod N, (N-p) \bmod N\right]\end{equation*}
-with $\bmod$ the modulo operator.
+with $\bmod$ the modulo operator. Note that $f$ simply normalizes $\text{dist}()$ in $[0,1]$. 
 
-\footnotetext[1]{Note that the actual implementation uses non-vectorized images (matrices). This implies that this definition must be extended to two dimensional $\bm{p} = \begin{bmatrix}
+\noindent \Cref{fig_grad_minus_dist} illustrates the effect on the regularization $f(p)$ on the objective function (at \cref{alg_omppalmtree2_find} of \cref{alg_omppalmtree2}).
+
+
+
+\footnotetext[1]{Note that the actual implementation relies on kernels centered on the origin $(1,1)$; for easier understanding, we translate the kernels so that the origin is centered.}
+\footnotetext[2]{Note that the actual implementation uses non-vectorized images (matrices). This implies that this definition must be extended to two dimensional $\bm{p} = \begin{bmatrix}
 	p_1 \\ p_2\end{bmatrix}$. It is easily done with 
 	$\text{dist}(\bm{p}) = \left\| \begin{bmatrix} \text{dist}(p_1) \\ \text{dist}(p_2)\end{bmatrix} \right\|_2$.}
 
@@ -828,14 +824,14 @@ with $\bmod$ the modulo operator.
 \subsection{Tuning the regularization parameter $\alpha$}
 In the previous section, we proposed the regularization function $f$, which means that we must deal with an additional parameter $\alpha$.
 
-\subsubsection{Ad-hoc tuning of $\alpha$}
+\subsubsection{\textit{Ad-hoc} tuning of $\alpha$}
 \begin{figure}[!h] \centering
 \includegraphics[width=1\textwidth]{figures/tree-scattered-supports/gradient_used.pdf}
 	\caption{Blind tuning of $\alpha$}
 \end{figure}
 
-An ad-hoc way of finding the right $\alpha$ is to try every possible value. We launched the algorithm for every $\alpha$ ranging from 0 to 70. \Cref{fig_unbalanced_supports} compares the RMSE and compute time with respect to $\alpha$. The optimal $\alpha$ seems to be around 10.
-\Cref{fig_test_omppalmtree2} gives the result for $\alpha=10$ and $\alpha=30$. Compared to \cref{fig_test_omppalmtree}, the regularization with $\alpha=10$ improves the RMSE by -47\% (-29\% for $\alpha=30$). It confirms our intuition that “gathered” supports lead to better approximations.
+A strait-forward way of finding the right $\alpha$ is to try every possible value. We launched the algorithm for every $\alpha$ ranging from 0 to 70. \Cref{fig_unbalanced_supports} compares the RMSE and compute time with respect to $\alpha$. The optimal $\alpha$ seems to be around 10.
+\Cref{fig_test_omppalmtree2} gives the result for $\alpha=10$ and $\alpha=30$. Compared to \cref{fig_test_omppalmtree}, the regularization with $\alpha=10$ improves the RMSE by 47\% (29\% for $\alpha=30$). It confirms our intuition that “gathered” supports lead to better approximations.
 
 
 % (0.0079267-0)/0.0079267
@@ -873,7 +869,7 @@ An ad-hoc way of finding the right $\alpha$ is to try every possible value. We l
 %\end{algorithmic}
 %\end{algorithm}
 
-This brute-force method could be a possible way of tuning the $\alpha$. However, it requires many runs of OMP-PALMTREE. The average time of one run being about 200 seconds, using the algorithm is not conceivable.
+\noindent This brute-force method could be a possible way of tuning the $\alpha$. However, it requires many runs of OMP-PALMTREE. The average time of one run being about 200 seconds, using the algorithm is not conceivable.
 
 \subsubsection{Estimating $\alpha$ from the data}
 
@@ -893,24 +889,24 @@ The regularization allowed us to prevent scattered supports; another problem pro
 
 % The reason why we need “balanced” supports is linked to another research axis we would like to explore: learning the tree. In fact, if a support becomes a single Dirac, we can remove the edge it is associated with. This means that learning the tree 
 
-The reason why we need “balanced” supports is that an overly-complex support (like the middle one in \cref{fig_unbalanced_supports}) makes the convolution slow. The more uniformly distributed the support elements are, the faster the convolution.
+\noindent The reason why we need “balanced” supports is that an overly-complex support (like the middle one in \cref{fig_unbalanced_supports}) makes the convolution slow. The more uniformly distributed the support elements are, the faster the convolution.
 
 % In the couple $(e,p)$ chosen by the gradient, the choice of the support edge $e$ does not seem to effective, although the choice of $p$ is valid (as discussed in \cref{sec_gain_per_added_point}).
 
-\Cref{fig_unbalanced_supports} illustrates this issue: with $\alpha=10$, most elements are added on the support $\s^1$, while $\s^{27}$ has only 3 elements.
+\noindent \Cref{fig_unbalanced_supports} illustrates this issue: with $\alpha=10$, most elements have been added on the support $\s^1$, while $\s^{27}$ has only 3 elements.
 
-We found out that adjusting the regularization parameter $\alpha$ is not enough if we want “balanced” supports. We could simply make $\alpha$ dependent of $e$, which could lead to the following “find support element to add” step
+\noindent We found out that adjusting the regularization parameter $\alpha$ is not enough if we want “balanced” supports. We could simply make $\alpha$ dependent of $e$, which could lead to the following “find support element to add” step
 \begin{equation}
 (e,p) = \underset{(e,p) \in \E \times \P}{\argmax}~ |\nabla \Phi_{\h^e}(\h)_p| - \alpha_e f(p)
 \end{equation}
 with $\bm{\alpha} = \begin{bmatrix}\alpha_1 & \dots & \alpha_{|\L|}\end{bmatrix}$.
 
-Estimating this vector $\bm{\alpha}$ requires even more complex algorithms. We will let this possibility to future studies. 
+\noindent Estimating this vector $\bm{\alpha}$ requires even more complex algorithms. We let this possibility to future studies.
 
 \subsubsection{Empirical workaround using one single $\alpha$}
 Instead of estimating the vector $\bm{\alpha}$, we empirically developed a function $f$ for balancing the number of elements per support using one single $\alpha$. This method requires $\alpha$ to be estimated, though.
 
-The regularization function is
+\noindent The regularization function is
 \begin{equation}
 f’(\h,e,p) = \frac{\text{dist}(o-p)}{\underset{p' \in \P}{\max}\text{dist}(o-p')} \cdot G(\h,e) \quad \in [0,G(\h,e)]\label{eq_regularized1}
 \end{equation}
@@ -919,7 +915,7 @@ where $G(\h,e)$ is the maximum value of the gradient for the kernel $h^e$; we de
 G(\h,e)=\underset{p' \in \P}{\max} |\nabla \Phi_{\h^e}(\h)_{p'}|.
 \end{equation*}
 
-This regularization function is simply adjusted with respect to the amplitude of each partial gradient. This result is totally empirical and has not been proved (it may even lead to suboptimal supports).
+\noindent This regularization function is simply adjusted with respect to the amplitude of each partial gradient. This result is totally empirical and has not been proved (it may even lead to suboptimal supports).
 
 \begin{figure}[!h] \centering
 \begin{subfigure}[b]{0.49\textwidth}\centering
@@ -943,13 +939,13 @@ This regularization function is simply adjusted with respect to the amplitude of
 \caption{Comparison of sequential versus using gradient when choosing a support for adding an element.}\label{fig_cmp_seq_vs_grad}
 \end{figure}
 
-We compared in \cref{fig_cmp_seq_vs_grad} the results using $f’$ against a modified version of OMP-PALMTREE where the elements are added sequentially on every support (only $p$ is determined with the gradient).
+\noindent We compared in \cref{fig_cmp_seq_vs_grad} the results using $f’$ against a modified version of OMP-PALMTREE where the elements are added sequentially on every support (only $p$ is determined with the gradient).
 \begin{enumerate}[label=(\alph*)]
 	\item $e$ and $p$ are both chosen using the gradient (\cref{fig_cmp_grad_tree});
 	\item $p$ is chosen using the gradient, $e$ is sequentially selected: we add an element to $\s^1$, then to $\s^2$\dots so that every support has the exact same number of elements (\cref{fig_cmp_seq_tree}).
 \end{enumerate}
 
-Sequentially choosing the support for adding a new element in \cref{fig_cmp_grad_tree} obviously leads to uniformly distributed supports. And as we wanted, using $f’$ also gives more of less balanced supports. Curiously, choosing the supports sequentially gives better results in terms of RMSE.
+\noindent Sequentially choosing the support for adding a new element in \cref{fig_cmp_grad_tree} obviously leads to uniformly distributed supports. And as we wanted, using $f’$ also gives more of less balanced supports. Curiously, choosing the supports sequentially gives better results in terms of RMSE.
 
 \begin{figure}[!h] \centering
 \begin{subfigure}[b]{0.49\textwidth}\centering
@@ -963,9 +959,9 @@ Sequentially choosing the support for adding a new element in \cref{fig_cmp_grad
 \caption{RMSE versus compute time of OMP-PALMTREE for many $\alpha$} \label{fig_cmp_rmse_vs_time}
 \end{figure}
 
-\Cref{fig_cmp_rmse_vs_time} compares the RMSE to the time spent for many $\alpha$ from 0 to 70, as in \cref{sec_pbm_unbalanced_supports}. 
+\noindent \Cref{fig_cmp_rmse_vs_time} compares the RMSE to the time spent for many $\alpha$ from 0 to 70, as in \cref{sec_pbm_unbalanced_supports}. 
 
-For both \cref{fig_cmp_rmse_vs_time_grad} and \cref{fig_cmp_rmse_vs_time_seq}, the best $\alpha$ is located in the range from 20 to 30. It is interesting to note that choosing the supports sequentially significantly reduces the compute time as well as the RMSE; this result was unexpected.
+\noindent For both experiments \cref{fig_cmp_rmse_vs_time_grad} and \cref{fig_cmp_rmse_vs_time_seq}, the best value of $\alpha$ is located between 20 and 30. It is interesting to note that choosing the supports sequentially significantly reduces the execution time of the algorithm, as well as the RMSE. These two last results were completely unexpected.
 
 \begin{figure}[!h] \centering
 \begin{subfigure}[b]{0.49\textwidth}\centering
@@ -976,8 +972,8 @@ For both \cref{fig_cmp_rmse_vs_time_grad} and \cref{fig_cmp_rmse_vs_time_seq}, t
 \includegraphics[width=0.9\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad1_every5_add5_totinit0_totadd279_alpha30_tree.pdf} 
 	\caption{Tree with learned supports, $\alpha=30$(87 secondes)}
 \end{subfigure}
-\end{figure}
-\begin{figure} \ContinuedFloat
+%\end{figure}
+%\begin{figure} \ContinuedFloat
 \begin{subfigure}[b]{0.49\textwidth}\centering
 \includegraphics[width=0.9\textwidth]{figures/tree-learn/xp_learnsupp256_curvelet_decomp3[tree-binary_dpth4]_supp-generic3x3_[fixed-supports]_approx.pdf}
 	\caption{Approximation $\D\x$ (generic supports)}
@@ -986,10 +982,10 @@ For both \cref{fig_cmp_rmse_vs_time_grad} and \cref{fig_cmp_rmse_vs_time_seq}, t
 \includegraphics[width=0.9\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad1_every5_add5_totinit0_totadd279_alpha30_approx.pdf} 
 	\caption{Approximation $\D\x$ (learned supports)}
 \end{subfigure}
-\caption{Comparison of generic versus learned supports. The RMSE decreases by -58\%.}\label{fig_learnsupp_vs_generic}
+\caption{Comparison of generic versus learned supports. The RMSE decreases by 58\%.}\label{fig_learnsupp_vs_generic}
 \end{figure}
 
-Finally, \cref{fig_learnsupp_vs_generic} shows the difference between  generic supports (left) and a learned supports using $f’$ with $\alpha=30$ (right). As expected, learning the supports strongly decreases the RMSE (-58\%); the compute times are equivalent (87 seconds with no retries and same stopping criteria).
+Finally, \cref{fig_learnsupp_vs_generic} shows the different approximations obtained with generic supports (left) and supports learned using $f’$ and with $\alpha=30$ (right). As expected, learning the supports strongly decreases the RMSE (58\%); the compute times are equivalent (87 seconds with no retries and the same stopping criteria).
 
 
 \FloatBarrier
@@ -1037,7 +1033,7 @@ From the “real applications” point of view, this work does not (yet) give an
 	\State For each atom $\d_k^{old}$ of $\D^{old}$, \Comment{\textbf{Dictionary Update step}}\label{alg_ksvd_dict_update}
 	\begin{enumerate}[leftmargin=15mm,label=(\alph*)]
 		\item find the images $\y_i$ that use the atom $\d_k^{old}$, meaning $\x_i^k \ne 0$ \label{item_atom_used}
-		\item compute the error matrix associated to this atom,
+		\item compute the error matrix associated with this atom,
 		\begin{align*}
 			\bm{E}_k = \Y-\sum_{i\ne k} \x_i^T\d_i^{old}
 		\end{align*}
@@ -1093,7 +1089,7 @@ with $C^i$ the block-circular matrix for $\h^i$; it represents the final convolu
 One atom $d_i$ with $i = 1,\dots,K$ ($K=N \cdot |\L|$) of the dictionary matrix $\D$ corresponds to one column of the block-circulant matrix $C(h^{*l})$; $\D$ can thus be rewritten as
 \begin{align}\D = \begin{bmatrix} C(h^{*1}) & \dots & C(h^{*{|\L|}}) \end{bmatrix}.\label{eq_matrix_factorized} \end{align}
 
-To sum up, the matrix associated to the convolutional tree dictionary $\D$ can be understood as a factorization of sparse matrices $C^i$. Under the “developed” form \eqref{eq_matrix_developed}, the matrix $\D$ is of dimension $N \times K$.
+To sum up, the matrix associated with the convolutional tree dictionary $\D$ can be understood as a factorization of sparse matrices $C^i$. Under the “developed” form \eqref{eq_matrix_developed}, the matrix $\D$ is of dimension $N \times K$.
 
 
 
