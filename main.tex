@@ -939,6 +939,7 @@ G(\h,e)=\underset{p' \in \P}{\max} |\nabla \Phi_{\h^e}(\h)_{p'}|.
 \caption{Comparison of sequential versus using gradient when choosing a support for adding an element.}\label{fig_cmp_seq_vs_grad}
 \end{figure}
 
+\FloatBarrier
 \noindent We compared in \cref{fig_cmp_seq_vs_grad} the results using $f’$ against a modified version of OMP-PALMTREE where the elements are added sequentially on every support (only $p$ is determined with the gradient).
 \begin{enumerate}[label=(\alph*)]
 	\item $e$ and $p$ are both chosen using the gradient (\cref{fig_cmp_grad_tree});
@@ -958,6 +959,7 @@ G(\h,e)=\underset{p' \in \P}{\max} |\nabla \Phi_{\h^e}(\h)_{p'}|.
 \end{subfigure}	
 \caption{RMSE versus compute time of OMP-PALMTREE for many $\alpha$} \label{fig_cmp_rmse_vs_time}
 \end{figure}
+\FloatBarrier
 
 \noindent \Cref{fig_cmp_rmse_vs_time} compares the RMSE to the time spent for many $\alpha$ from 0 to 70, as in \cref{sec_pbm_unbalanced_supports}. 
 
@@ -972,8 +974,8 @@ G(\h,e)=\underset{p' \in \P}{\max} |\nabla \Phi_{\h^e}(\h)_{p'}|.
 \includegraphics[width=0.9\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad1_every5_add5_totinit0_totadd279_alpha30_tree.pdf} 
 	\caption{Tree with learned supports, $\alpha=30$(87 secondes)}
 \end{subfigure}
-%\end{figure}
-%\begin{figure} \ContinuedFloat
+\end{figure}
+\begin{figure} \ContinuedFloat
 \begin{subfigure}[b]{0.49\textwidth}\centering
 \includegraphics[width=0.9\textwidth]{figures/tree-learn/xp_learnsupp256_curvelet_decomp3[tree-binary_dpth4]_supp-generic3x3_[fixed-supports]_approx.pdf}
 	\caption{Approximation $\D\x$ (generic supports)}
