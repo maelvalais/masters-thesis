@@ -400,7 +400,7 @@ Based on these observations, we propose in this work to make the supports “ada
 This chapter covers the protocols and results of the various experiments aimed to learning the supports during the \ac{PALMTREE} algorithm. We first review the experiments that helped us better understand the information given by the gradient. The second part focuses on our actual goal: learning the supports (instead of having fixed ones) on a single branch and finally learning supports on trees.
 
 \section{Experiment setup}
-Every experiment in this chapter is using a fixed single-branch tree of depth 4 associated with $\y$, $\h^e$, $\s^e$ and $\x^e$ of size $128 \times 128$. The figures only display the central $64 \times 64$ pixels as shown in \cref{fig_xp_explain}.
+Every experiment in the first part of this chapter is using a fixed single-branch tree of depth 4 associated with $\y$, $\h^e$, $\s^e$ and $\x^e$ of size $128 \times 128$. The figures only display the central $64 \times 64$ pixels as shown in \cref{fig_xp_explain}.
 
 \begin{figure}[!ht]\centering
 \begin{subfigure}[b]{0.32\textwidth}\centering
@@ -773,7 +773,7 @@ An unforeseen issue rose when trying the \cref{alg_omppalmtree} on a tree instea
 \Cref{fig_scattered_support_tree} illustrates this problem; every support has its elements scattered instead of being gathered in one place. The corresponding gradient, shown in \cref{fig_scattered_support_grad}, has multiple “local” maxima that are far from the origin. Ideally, we would like all elements to be centered around the origin (in the figures, the origin is at the center of the image).
 
 \begin{algorithm}[!h]
-    \caption{\ac{OMP} algorithm using \ac{PALMTREE} (version 2)}\label{alg_omppalmtree2}
+    \caption{\ac{OMP}-\ac{PALMTREE} (based on \cref{alg_omppalmtree})}\label{alg_omppalmtree2}
   \begin{algorithmic}[1]
     \Input signal $\y$ of dimension $N$, dictionary of dim $N \times K$ with $K = |\E| \cdot N$ and $K \gg N$
     \Output A $k$-sparse code $\x$ of dimension $K$
@@ -819,34 +819,64 @@ with $\bmod$ the modulo operator.
 
 
 
-\subsection{Tuning of regularization parameter $\alpha$}
+\subsection{Tuning the regularization parameter $\alpha$}
 In the previous section, we proposed the regularization function $f$, which means that we must deal with an additional parameter $\alpha$.
 
+\subsubsection{Ad-hoc tuning of $\alpha$}
 \begin{figure}[!h] \centering
-\includegraphics[width=0.6\textwidth]{figures/tree-learn/gradient-vs-sequential/gradient_used.pdf}
-	\caption{Tuning of $\alpha$}
+\includegraphics[width=1\textwidth]{figures/tree-scattered-supports/gradient_used.pdf}
+	\caption{Blind tuning of $\alpha$}
 \end{figure}
 
-We launched the algorithm for every $\alpha$ ranging from 0 to 70. \Cref{fig_unbalanced_supports} compares the RMSE and compute time with respect to $\alpha$. The optimal range of $\alpha$ seems to be between 20 and 30.
+An ad-hoc way of finding the right $\alpha$ is to try every possible value. We launched the algorithm for every $\alpha$ ranging from 0 to 70. \Cref{fig_unbalanced_supports} compares the RMSE and compute time with respect to $\alpha$. The optimal $\alpha$ seems to be around 10.
+\Cref{fig_test_omppalmtree2} gives the result for $\alpha=10$ and $\alpha=30$. Compared to \cref{fig_test_omppalmtree}, the regularization with $\alpha=10$ improves the RMSE by -47\% (-29\% for $\alpha=30$). It confirms our intuition that “gathered” supports lead to better approximations.
+
+
+% (0.0079267-0)/0.0079267
 
 \begin{figure}[!h] \centering
 \begin{subfigure}[b]{0.49\textwidth}\centering
+\includegraphics[width=0.8\textwidth]{figures/tree-unbalanced-supp/xp_learnsupp256_curvelet_decomp3[tree-binary_dpth4]_supp-diracs_[usegrad1_every5_add5_totinit0_totadd279_alpha10]_approx.pdf}
+\caption{Approximation $\D\x$ ($\alpha=10$)}
+\end{subfigure}
+\begin{subfigure}[b]{0.49\textwidth}\centering
+\includegraphics[width=0.8\textwidth]{figures/tree-unbalanced-supp/xp_learnsupp256_curvelet_decomp3[tree-binary_dpth4]_supp-diracs_[usegrad1_every5_add5_totinit0_totadd279_alpha10]_tree.pdf}
+\caption{Learned support tree ($\alpha=10$)}
+\end{subfigure}
+\end{figure}
+\begin{figure}[!h] \ContinuedFloat
+\begin{subfigure}[b]{0.49\textwidth}\centering
 \includegraphics[width=0.8\textwidth]{figures/tree-unbalanced-supp/xp_learnsupp256_curvelet_decomp3[tree-binary_dpth4]_supp-diracs_[usegrad1_every5_add5_totinit0_totadd279_alpha30]_approx.pdf}
-\caption{Approximation $\D\x$}
+\caption{Approximation $\D\x$ ($\alpha=30$)}
 \end{subfigure}
 \begin{subfigure}[b]{0.49\textwidth}\centering
 \includegraphics[width=0.8\textwidth]{figures/tree-unbalanced-supp/xp_learnsupp256_curvelet_decomp3[tree-binary_dpth4]_supp-diracs_[usegrad1_every5_add5_totinit0_totadd279_alpha30]_tree.pdf}
-\caption{Learned support tree}
+\caption{Learned support tree ($\alpha=30$)}
 \end{subfigure}
-\caption{Learned dictionary using \cref{alg_omppalmtree2} with $\alpha=30$.} \label{fig_test_omppalmtree2}
+\caption{Learned dictionary using \cref{alg_omppalmtree2} with $\alpha=10$ and $\alpha=30$.} \label{fig_test_omppalmtree2}
 \end{figure}
 
-\Cref{fig_test_omppalmtree2} is the result of \cref{alg_omppalmtree2} for $\alpha=30$. Compared to \cref{fig_test_omppalmtree}, the regularization improves the RMSE by -29\%. It confirms our intuition that “gathered” supports lead to better approximations.
+%\begin{algorithm}[!h]
+%    \caption{Bruteforce method for estimating $\alpha$}\label{alg_alpha_bruteforce_method}
+%  \begin{algorithmic}[0]
+%  	\State Set $\alpha$ to a large value, set $r < 1$
+%  	\Repeat
+%	  	\State Run OMP-PALMTREE using $\alpha$
+%	  	\State $\alpha \leftarrow r\alpha$
+%  	\Until{stopping criteria is met}
+%\end{algorithmic}
+%\end{algorithm}
 
+This brute-force method could be a possible way of tuning the $\alpha$. However, it requires many runs of OMP-PALMTREE. The average time of one run being about 200 seconds, using the algorithm is not conceivable.
 
+\subsubsection{Estimating $\alpha$ from the data}
+
+The regularization parameter $\alpha$ should be estimated from the target image, meaning that finding the right $\alpha$ should be a part of the algorithm. Many methods are available in the literature; one of the simplest is the Blind Method proposed in \cite{almeida_parameter_2013}. We can also mention the state-of-the-art SURE method (Stein’s unbiased risk estimate), proposed in \cite{eldar_generalized_2009} as well as the bayesian regularization method developed in \cite{archer_bayesian/regularization_1995}.
+
+These algorithms have not been investigated during this internship and will be conducted in a PhD thesis.
 
 \subsection{Regularization problem: unbalanced supports} \label{sec_pbm_unbalanced_supports}
-Beyond the issue of “scattered” supports, another problem appeared when using the gradient for both choosing $e$. Although The $p$ indicated by the gradient seems appropriate (discussed in \cref{sec_gain_per_added_point}), the maximum value of the gradient for choosing $e$ leads to unbalanced supports: some supports contain most elements, while others have only one or two elements.
+The regularization allowed us to prevent scattered supports; another problem probably caused by the gradient is the “unbalanced” supports: some supports contain most elements, while others have only one or two elements. 
 
 \begin{figure}[!h] \centering
 \begin{subfigure}[b]{1\textwidth}\centering
@@ -855,98 +885,90 @@ Beyond the issue of “scattered” supports, another problem appeared when usin
 \caption{Problem of unbalanced support choosing ($\alpha=10$).} \label{fig_unbalanced_supports}
 \end{figure}
 
+% The reason why we need “balanced” supports is linked to another research axis we would like to explore: learning the tree. In fact, if a support becomes a single Dirac, we can remove the edge it is associated with. This means that learning the tree 
+
+The reason why we need “balanced” supports is that an overly-complex support (like the middle one in \cref{fig_unbalanced_supports}) makes the convolution slow. The more uniformly distributed the support elements are, the faster the convolution.
+
+% In the couple $(e,p)$ chosen by the gradient, the choice of the support edge $e$ does not seem to effective, although the choice of $p$ is valid (as discussed in \cref{sec_gain_per_added_point}).
+
 \Cref{fig_unbalanced_supports} illustrates this issue: with $\alpha=10$, most elements are added on the support $\s^1$, while $\s^{27}$ has only 3 elements.
 
-We found out that simply adjusting the “concentrating term” \eqref{eq_regularized1}, with respect to each support, gives much better results. The adjusted “concentrating term” for the modified \cref{alg_omppalmtree3} is
+We found out that adjusting the regularization parameter $\alpha$ is not enough if we want “balanced” supports. We could simply make $\alpha$ dependent of $e$, which could lead to the following “find support element to add” step
 \begin{equation}
-f’(p) = \frac{\text{dist}(o-p)}{\underset{p' \in 1,\dots,N}{\max}\text{dist}(o-p')} \cdot \underset{p'=1,\dots,N}{\max} |\nabla \Phi_{\h^e}(\h)_{p'}| \quad \in [0,1] \label{eq_regularized1}
+(e,p) = \underset{(e,p) \in \E \times \P}{\argmax}~ |\nabla \Phi_{\h^e}(\h)_p| - \alpha_e f(p)
 \end{equation}
+with $\bm{\alpha} = \begin{bmatrix}\alpha_1 & \dots & \alpha_{|\L|}\end{bmatrix}$.
 
-\begin{algorithm}[!h]
-    \caption{\ac{OMP} algorithm using \ac{PALMTREE} (version 3)}\label{alg_omppalmtree3}
-  \begin{algorithmic}[1]
-    \Input signal $\y$ of dimension $N$, dictionary of dim $N \times K$ with $K = |\E| \cdot N$ and $K \gg N$
-    \Output A $k$-sparse code $\x$ of dimension $K$
-    \State \textbf{Initialization} Initialize the supports $\s^e$ such that $k=1$
-    \For{$i = 1,\dots,k$}
-      \State $(e,p) = \underset{(e,p) \in \E \times \P}{\argmax}~ |\nabla \Phi_{\h^e}(\h)_p| - \alpha \underbrace{\lVert p \rVert_c \cdot \frac{\underset{p'}{\max} |\nabla \Phi_{\h^e}(\h)_{p'}|}{\underset{p'}{\max}\lVert p' \rVert_c}}_{\text{Concentrate support (adjusted to each support)}}$ \label{alg_omppalmtree3_find}
-      \State $\s^e_p = 1$
-      \State $\h = \underset{\h^e \in \Dspace^e}{\argmin}~ \Phi(\h)$
-    \EndFor
-  \end{algorithmic}
-\end{algorithm}
+Estimating this vector $\bm{\alpha}$ requires even more complex algorithms. We will let this possibility to future studies. 
+
+\subsubsection{Empirical workaround using one single $\alpha$}
+Instead of estimating the vector $\bm{\alpha}$, we empirically developed a function $f$ for balancing the number of elements per support using one single $\alpha$. This method requires $\alpha$ to be estimated, though.
+
+The regularization function is
+\begin{equation}
+f’(\h,e,p) = \frac{\text{dist}(o-p)}{\underset{p' \in \P}{\max}\text{dist}(o-p')} \cdot G(\h,e) \quad \in [0,G(\h,e)]\label{eq_regularized1}
+\end{equation}
+where $G(\h,e)$ is the maximum value of the gradient for the kernel $h^e$; we define it as 
+\begin{equation*} 
+G(\h,e)=\underset{p' \in \P}{\max} |\nabla \Phi_{\h^e}(\h)_{p'}|.
+\end{equation*}
+
+This regularization function is simply adjusted with respect to the amplitude of each partial gradient. This result is totally empirical and has not been proved (it may even lead to suboptimal supports).
 
 \begin{figure}[!h] \centering
 \begin{subfigure}[b]{0.49\textwidth}\centering
 \includegraphics[width=0.9\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad1_every5_add5_totinit0_totadd279_alpha30_tree.pdf}
-	\caption{Supports chosen using gradient}
+	\caption{Supports chosen using gradient} \label{fig_cmp_grad_tree}
 \end{subfigure}
 \begin{subfigure}[b]{0.49\textwidth}\centering
 \includegraphics[width=0.9\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad0_every5_add5_totinit0_totadd279_alpha30_tree.pdf} 
-	\caption{Supports chosen sequentially}
+	\caption{Supports chosen sequentially} \label{fig_cmp_seq_tree}
 \end{subfigure}
 \end{figure}
 \begin{figure}[!h] \ContinuedFloat
 \begin{subfigure}[b]{0.49\textwidth}\centering
 \includegraphics[width=0.9\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad1_every5_add5_totinit0_totadd279_alpha30_approx.pdf}
-	\caption{Approximation $\D\x$ of above tree}
+	\caption{Approximation $\D\x$ of above tree} \label{fig_cmp_grad_approx}
 \end{subfigure}
 \begin{subfigure}[b]{0.49\textwidth}\centering
 \includegraphics[width=0.9\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad0_every5_add5_totinit0_totadd279_alpha30_approx.pdf} 
-	\caption{Approximation $\D\x$ of above tree}
+	\caption{Approximation $\D\x$ of above tree} \label{fig_cmp_seq_approx}
 \end{subfigure}
-\caption{Comparison of sequential versus using gradient when choosing a support for adding an element.}\label{fig_cmp_sequential_vs_grad}
+\caption{Comparison of sequential versus using gradient when choosing a support for adding an element.}\label{fig_cmp_seq_vs_grad}
 \end{figure}
 
-To make sure that the support that is chosen using the gradient with this adjusted “concentrating term” \eqref{eq_regularized2} actually gives appropriate results, we compare in \cref{fig_cmp_sequential_vs_grad} the learned supports when 
+We compared in \cref{fig_cmp_seq_vs_grad} the results using $f’$ against a modified version of OMP-PALMTREE where the elements are added sequentially on every support (only $p$ is determined with the gradient).
 \begin{enumerate}[label=(\alph*)]
-	\item $e$ and $p$ are both chosen using the gradient;
-	\item $p$ is chosen using the gradient, $e$ is sequentially selected: we add an element to $\s^1$, then to $\s^2$\dots so that every support has the exact same amount of elements.
+	\item $e$ and $p$ are both chosen using the gradient (\cref{fig_cmp_grad_tree});
+	\item $p$ is chosen using the gradient, $e$ is sequentially selected: we add an element to $\s^1$, then to $\s^2$\dots so that every support has the exact same number of elements (\cref{fig_cmp_seq_tree}).
 \end{enumerate}
-We can note that both ways lead to balanced supports. Curiously, choosing the supports sequentially gives better results in terms of RMSE.
 
-
-\subsection{Choosing the right $\alpha$}
+Sequentially choosing the support for adding a new element in \cref{fig_cmp_grad_tree} obviously leads to uniformly distributed supports. And as we wanted, using $f’$ also gives more of less balanced supports. Curiously, choosing the supports sequentially gives better results in terms of RMSE.
 
 \begin{figure}[!h] \centering
 \begin{subfigure}[b]{0.49\textwidth}\centering
 \includegraphics[width=\textwidth]{figures/tree-learn/gradient-vs-sequential/gradient_used.pdf}
-	\caption{}
+	\caption{Using $f’$ regularization} \label{fig_cmp_rmse_vs_time_grad}
 \end{subfigure}
 \begin{subfigure}[b]{0.49\textwidth}\centering
 \includegraphics[width=\textwidth]{figures/tree-learn/gradient-vs-sequential/gradient_not_used.pdf} 
-	\caption{}
+	\caption{Using the sequential variant}\label{fig_cmp_rmse_vs_time_seq}
 \end{subfigure}	
-\caption{RMSE versus compute time for many $\alpha$. Each graph sums up 35 runs (at $\alpha=0,2,4\dots$) of the \cref{alg_omppalmtree3}.} \label{fig_cmp_obj_vs_time}
+\caption{RMSE versus compute time of OMP-PALMTREE for many $\alpha$} \label{fig_cmp_rmse_vs_time}
 \end{figure}
 
-\Cref{alg_omppalmtree3} suffers from having one more parameter to be chosen: $\alpha$. \Cref{fig_cmp_obj_vs_time} compares the RMSE to the time spent for many $\alpha$ from 0 to 70. We did this experiment with both (a) gradient chosen supports and (b) sequentially chosen supports (as described in \cref{sec_pbm_unbalanced_supports}).
+\Cref{fig_cmp_rmse_vs_time} compares the RMSE to the time spent for many $\alpha$ from 0 to 70, as in \cref{sec_pbm_unbalanced_supports}. 
 
-For both (a) and (b), the best $\alpha$ is located in the range from 20 to 30. It is interesting to note that choosing the supports sequentially  significantly reduces the compute time. The objective functions are although similar.
-
-\FloatBarrier
-\subsection{Final results using \cref{alg_omppalmtree3}}
-\Cref{fig_learnsupp_vs_generic} shows the difference between a tree with generic supports (left) and a learned supports tree (right). Both have the same number of support elements $Q = 279$. Here is some numbers for comparison:
-\begin{table}[!h] \centering
-\begin{tabular}{@{}lll@{}} \toprule
- & Generic supports (left) & Learned supports (right) \\ \midrule
-Initial supports & fixed $3\times3$ supports & diracs \\
-RMSE & 0.0102 & 0.0043 (-58\%) \\
-Converged after & 358 iterations & 286 iterations \\
-Compute time & 87.8 seconds & 89.1 seconds \\ \bottomrule
-\end{tabular}
-\end{table}
-
-As expected, learning the supports strongly decreases the RMSE. As for the single-branch experiment, the supports are “shaped” into their target atom.
+For both \cref{fig_cmp_rmse_vs_time_grad} and \cref{fig_cmp_rmse_vs_time_seq}, the best $\alpha$ is located in the range from 20 to 30. It is interesting to note that choosing the supports sequentially significantly reduces the compute time as well as the RMSE; this result was unexpected.
 
 \begin{figure}[!h] \centering
 \begin{subfigure}[b]{0.49\textwidth}\centering
 \includegraphics[width=0.9\textwidth]{figures/tree-learn/xp_learnsupp256_curvelet_decomp3[tree-binary_dpth4]_supp-generic3x3_[fixed-supports]_tree.pdf}
-	\caption{Tree with generic supports}
+	\caption{Tree with (fixed) generic supports}
 \end{subfigure}
 \begin{subfigure}[b]{0.49\textwidth}\centering
 \includegraphics[width=0.9\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad1_every5_add5_totinit0_totadd279_alpha30_tree.pdf} 
-	\caption{Tree with learned supports}
+	\caption{Tree with learned supports, $\alpha=30$(87 secondes)}
 \end{subfigure}
 \end{figure}
 \begin{figure} \ContinuedFloat
@@ -961,12 +983,15 @@ As expected, learning the supports strongly decreases the RMSE. As for the singl
 \caption{Comparison of generic versus learned supports. The RMSE decreases by -58\%.}\label{fig_learnsupp_vs_generic}
 \end{figure}
 
+Finally, \cref{fig_learnsupp_vs_generic} shows the difference between  generic supports (left) and a learned supports using $f’$ with $\alpha=30$ (right). As expected, learning the supports strongly decreases the RMSE (-58\%); the compute times are equivalent (87 seconds with no retries and same stopping criteria).
+
 
 \FloatBarrier
 \section{Conclusions and perspectives}
 
  
-During this study, we found out that the gradient can be used for learning the support in an \ac{OMP} manner. We also noticed that learning supports on a branch gives excellent results, although being less conclusive on a tree. After some adaptations, the algorithm OMP-PALMTREE gave promising results for curvelets – with the downside of having a new parameter to tune.
+During this study, we found out that the gradient can be used for learning the support in an \ac{OMP} manner, alternating between adding element supports and minimizing with PALMTREE. We experimentally showed that we could add multiple elements at each OMP iteration, and that it wasn’t necessry to wait until PALMTREE convergence before going to the next OMP iteration. 
+Using these  also noticed that learning supports on a branch gives excellent results, although being less conclusive on a tree. After some adaptations, the algorithm OMP-PALMTREE gave promising results for curvelets – with the downside of having a new parameter to tune.
 
 These comforting results on simple curvelet targets should be deepened using other kinds of atoms. In \cite{chabiron_optimization_2016}, wavelet packets have been used as target atoms. Testing our algorithms on different atoms would give us more feedback on how to tune the support learning.
 
@@ -983,9 +1008,38 @@ Finally, the whole \gls{treemodel} has only been designed for learning on a sing
 \addcontentsline{toc}{chapter}{Appendix}
 \appendix
 
-\chapter{Miscellaneous}
+\chapter{}
+
+\section{Detail of the \ac{KSVD} algorithm} \label{sec_ksvd_detail}
+\begin{algorithm}
+    \caption{\ac{KSVD} (K-Singular Value Decomposition) algorithm for \eqref{eq_dl_ksvd}} \label{alg_ksvd}
+  \begin{algorithmic}[1]
+    \Input signal samples $\y_i$ of dimension $N$ forming the $S$ columns of $\Y$
+    \Output dictionary $\D$ of dim. $K \times N$ with $K \gg N$
+    \State \textbf{Initialization} Initialize $\D$ such that every column is $l^2$ normalized
+    \While{not converged}
+	\State For each image $\y_i$, solve \Comment{\textbf{Sparse Coding step}} \label{alg_ksvd_sparse_coding}
+		\begin{align*}
+			\quad \min_{\x_i}~ & \lVert \y_i-\D\x_i\rVert^2 \quad \text{s.t.}~ \lVert \x_i \rVert_0 \le \gamma
+		\end{align*}
+	\State $\D^{old} = \D$
+	\State For each atom $\d_k^{old}$ of $\D^{old}$, \Comment{\textbf{Dictionary Update step}}\label{alg_ksvd_dict_update}
+	\begin{enumerate}[leftmargin=15mm,label=(\alph*)]
+		\item find the images $\y_i$ that use the atom $\d_k^{old}$, meaning $\x_i^k \ne 0$ \label{item_atom_used}
+		\item compute the error matrix associated to this atom,
+		\begin{align*}
+			\bm{E}_k = \Y-\sum_{i\ne k} \x_i^T\d_i^{old}
+		\end{align*}
+		\item keep only columns of $\bm{E}_k$ found in \cref{item_atom_used}
+		\item Apply SVD decomposition $\bm{E}_k - \bm{U} \Delta V^T$. The first column of $\bm{U}$ becomes the new $\d_k$. $\x_k$ is updated using the first column of $\bm{V}$ multiplied by $\Delta(1,1)$ (highest eigenvalue)
+	\end{enumerate}
+    \EndWhile
+  \end{algorithmic}
+\end{algorithm}
 
 
+
+\FloatBarrier
 \section{Link between \gls{treemodel} and dictionary matrix}\label{sec_matrix_vs_tree} 
 
 It is useful to introduce the circulant matrix when trying to translate the convolutional product into a matrix-vector product. The circulant matrix of a vector $\h$ of dimension $N$ is defined as the $N \times N$ matrix $C(\h)$ such that
@@ -1034,36 +1088,6 @@ To sum up, the matrix associated to the convolutional tree dictionary $\D$ can b
 
 
 \FloatBarrier
-
-\section{Detail of the \ac{KSVD} algorithm} \label{sec_ksvd_detail}
-\begin{algorithm}
-    \caption{\ac{KSVD} (K-Singular Value Decomposition) algorithm for \eqref{eq_dl_ksvd}} \label{alg_ksvd}
-  \begin{algorithmic}[1]
-    \Input signal samples $\y_i$ of dimension $N$ forming the $S$ columns of $\Y$
-    \Output dictionary $\D$ of dim. $K \times N$ with $K \gg N$
-    \State \textbf{Initialization} Initialize $\D$ such that every column is $l^2$ normalized
-    \While{not converged}
-	\State For each image $\y_i$, solve \Comment{\textbf{Sparse Coding step}} \label{alg_ksvd_sparse_coding}
-		\begin{align*}
-			\quad \min_{\x_i}~ & \lVert \y_i-\D\x_i\rVert^2 \quad \text{s.t.}~ \lVert \x_i \rVert_0 \le \gamma
-		\end{align*}
-	\State $\D^{old} = \D$
-	\State For each atom $\d_k^{old}$ of $\D^{old}$, \Comment{\textbf{Dictionary Update step}}\label{alg_ksvd_dict_update}
-	\begin{enumerate}[leftmargin=15mm,label=(\alph*)]
-		\item find the images $\y_i$ that use the atom $\d_k^{old}$, meaning $\x_i^k \ne 0$ \label{item_atom_used}
-		\item compute the error matrix associated to this atom,
-		\begin{align*}
-			\bm{E}_k = \Y-\sum_{i\ne k} \x_i^T\d_i^{old}
-		\end{align*}
-		\item keep only columns of $\bm{E}_k$ found in \cref{item_atom_used}
-		\item Apply SVD decomposition $\bm{E}_k - \bm{U} \Delta V^T$. The first column of $\bm{U}$ becomes the new $\d_k$. $\x_k$ is updated using the first column of $\bm{V}$ multiplied by $\Delta(1,1)$ (highest eigenvalue)
-	\end{enumerate}
-    \EndWhile
-  \end{algorithmic}
-\end{algorithm}
-
-\FloatBarrier
-
 \section{Why is sparse coding used for denoising?}
 
 The figure \ref{sparse_reduce_noise} shows a noisy signal $\y$ living in a high-dimensional subspace of dimension $N$ and defined by
