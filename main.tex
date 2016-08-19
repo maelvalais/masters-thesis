@@ -10,7 +10,13 @@
 \pagestyle{empty} \restoregeometry
 %\cleardoublepage % White until the next even page
 \pagestyle{body}
-{\let\clearpage\relax \abstract{}} \todo[inline]{Write an abstract}
+{\let\clearpage\relax \abstract{
+This master’s thesis presents the algorithm OMP-PALMTREE for optimizing convolutional tree dictionaries from a unique image; inspired from the construction of supports in OMP, this algorithm enhances  PALMTREE by learning the supports (instead of fixed ones). The  support adding step, as for OMP, is based on the maximum value of the gradient – which is shown to be giving convincing indications on the best element that should be added. OMP-PALMTREE constitutes the “dictionary update” step in a standard dictionary learning algorithm, and must be associated with a “sparse coding” step (yet to be developed) for it to be used in applications like denoising or image recognition. Thanks to the Convolutional tree model, dictionaries learned using OMP-PALMTREE are faster than any dictionary learned using a standard matrix-vector product  (quadratic computational cost), with a linear computational cost with respect to the size of the image.
+
+
+\keywords{Deep learning, dictionary learning, sparse image representation, non-convex optimization, machine learning, image processing}
+
+}}
 {\let\clearpage\relax \centering \subsection*{Foreword}} \addcontentsline{toc}{subsection}{Foreword}\todo[inline]{Write a foreword}
 \tableofcontents
 %{\let\clearpage\relax\listoffigures}
@@ -25,7 +31,7 @@ In this chapter, we introduce and review the main existing dictionaries that hav
 
 \section{The need for sparse representations}
 
-A sparse signal over some representation means that it can be expressed using only a few elements of the representation – in other words, sparse means with many zeros. Many applications ranging from machine learning to image denoising and image recognition heavily rely on the property that we can summarize (or more exactly approximate) any signal using a proper sparse representation. The job of obtaining the raw\footnote{A “raw” signal is represented in the canonical basis} signal from its sparse counterpart can be written in terms of an operator, often called \emph{dictionary} or \emph{transform}.
+A sparse signal over some representation means that it can be expressed using only a few elements of the representation – in other words, sparse means with many zeros. Many applications ranging from machine learning to image denoising and image recognition heavily rely on the property that we can summarize (or more exactly approximate) any signal using a proper sparse representation. The job of obtaining the raw\footnote{A “raw” signal is represented in the canonical basis} signal from its sparse counterpart can be written in terms of an operator, often called \emph{dictionary} or \emph{transform}. We review some of the most important ones throughout the next sections.
 
 \section{Basis and redundant dictionaries}
 
@@ -990,19 +996,24 @@ Finally, \cref{fig_learnsupp_vs_generic} shows the difference between  generic s
 \section{Conclusions and perspectives}
 
  
-During this study, we found out that the gradient can be used for learning the support in an \ac{OMP} manner, alternating between adding element supports and minimizing with PALMTREE. We experimentally showed that we could add multiple elements at each OMP iteration, and that it wasn’t necessry to wait until PALMTREE convergence before going to the next OMP iteration. 
-Using these  also noticed that learning supports on a branch gives excellent results, although being less conclusive on a tree. After some adaptations, the algorithm OMP-PALMTREE gave promising results for curvelets – with the downside of having a new parameter to tune.
+During this study, we found out that the gradient can be used for learning the support in an \ac{OMP} manner, alternating between adding element supports and minimizing with PALMTREE. We experimentally showed that we could add multiple elements at each OMP iteration, and that it is not necessary to do all the iterations of PALMTREE (until convergence) before going to the next OMP iteration. 
 
-These comforting results on simple curvelet targets should be deepened using other kinds of atoms. In \cite{chabiron_optimization_2016}, wavelet packets have been used as target atoms. Testing our algorithms on different atoms would give us more feedback on how to tune the support learning.
+\noindent While testing the proposed support learning algorithm OMP-PALMTREE, we noticed that despite the excellent results of the support learning algorithm on single branch dictionaries, it is much less efficient on a tree (problem of “scattered” supports). After having proposed a regularization scheme using the parameter $\alpha$ to solve this problem, we gave some ideas on how to estimate this new parameter. Doing so, we faced another problem of “unbalanced” supports (elements are poorly distributed across the supports and often concentrated on $s^1$, the root support). 
 
-Before beginning this study, we had in mind an algorithm for support learning that would add elements – as we actually did – but also remove useless elements. This part has not been studied, even though some of the implementation has been done (for removing elements).
+\noindent We finally described an empirical workaround for the “unbalanced” supports that allows us to learn the support in an almost uniformly distributed way; we confronted it to a modified version of OMP-PALMTREE that chooses sequentially the supports on which we add an element. Surprisingly, this sequential version resulted in better RMSE and compute time, which makes us wonder if adding sequentially would be better than totally rely on the gradient.
 
-Beyond this internship, the idea was to learn most parameters for the \gls{treemodel}; including the supports and the tree structure. In our experiments, we have let aside the tree structure, using a simple binary tree that would fit our needs. But a tiling-like tree, as shown in \cite{chabiron_optimization_2016}, would perform much better. 
+\noindent Although these results on simple curvelet atoms are promising, the study should be deepened using other kinds of atoms (e.g., wavelet packets, cosines); note that in \cite{chabiron_optimization_2016}, wavelet packets has been tested besides curvelets.
 
-Also, this work only focuses on the dictionary update step – this is why we use simplified codes and targets with well separated atoms. For this model to be useful in real applications, we should integrate it to a full dictionary learning algorithm that includes a sparse coding step. This has been investigated in \cite{chabiron_optimization_2016}.
+This work only tackles a few of the objectives we had in mind at the beginning the the internship (these objectives were also part of the PhD thesis). Our idea was to make the PALMTREE algorithm learn all the model parameters (tree and supports). We eventually managed to learn the supports (to some extent, because the regularization parameters still needs to be taken care of); but learning could also mean “remove” useless elements from supports, which we did not try.
+ 
+\noindent Regarding the learning of the tree, nothing has been done; we basically worked on binary trees, and these might be totally suboptimal. As an example, \cite{chabiron_optimization_2016} showed that a tiling-like tree design performs much better (specifically for curvelets).
 
-Finally, the whole \gls{treemodel} has only been designed for learning on a single image $\y$; a future goal would be to modify the algorithm to use multiple images when learning, as well as make it scalable (like the Online Dictionary Learning algorithm).
+From the “real applications” point of view, this work does not (yet) give any usable algorithms (such as for denoising or for image recognition); more precisely, no dictionary learning algorithm has been tested. In fact, only focuses on the “dictionary update” step – this is why we use simplified codes and targets with well separated atoms. For this model to be useful in real applications, we should integrate it to a full dictionary learning algorithm that includes a sparse coding step. Note that some tests on dictionary learning have been reported in \cite{chabiron_optimization_2016}. 
 
+\noindent The algorithm scalability (to be able to learn on many images) has not been investigated yet; the Convolutional tree model has been designed from the start to use a single image $\y$. Another future goal would be to modify the algorithm to use multiple images when learning, as well as make it scalable (like the Online Dictionary Learning algorithm).
+
+
+% In a broader perpective, 
 
 \clearpage
 \addcontentsline{toc}{chapter}{Appendix}
