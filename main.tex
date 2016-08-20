@@ -4,13 +4,14 @@
 \input{acronyms.tex}  % <-- acronyms (\ac{PALM}...)
 \author{Maël Valais}
 \date{Updated on \today}
-\title{Optimization of dictionaries structured in convolutional trees for sparse image representation - Master’s Thesis}
+\title{Optimization of Dictionaries Structured as Convolutional Trees for Sparse Image Representation - Master’s Thesis}
 \begin{document}
 \input{titlepage} % Uncomment to show title page
 \pagestyle{empty} \restoregeometry
-%\cleardoublepage % White until the next even page
+\cleardoublepage % White until the next even page
 \pagestyle{body}
-{\let\clearpage\relax \abstract{
+%{\let\clearpage\relax 
+\abstract{
 This master’s thesis presents the algorithm OMP-PALMTREE for optimizing convolutional tree dictionaries from a unique image; inspired from the construction of supports in OMP, this algorithm enhances  PALMTREE by learning the supports (instead of fixing them). The  support adding step, as for OMP, is based on the maximum value of the gradient – which is shown to be giving convincing indications on the best element that should be added. OMP-PALMTREE constitutes the “dictionary update” step in a standard dictionary learning algorithm, and must be associated with a “sparse coding” step (yet to be developed) for it to be used in applications like denoising or image recognition. Thanks to the Convolutional tree model, dictionaries learned using OMP-PALMTREE are faster than any dictionary learned using a standard matrix-vector product  (quadratic computational cost), with a linear computational cost with respect to the size of the image.
 
 
