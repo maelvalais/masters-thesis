@@ -113,7 +113,7 @@ Note that the non-linearity caused by the product $\D\X$ induces a non-convex ob
 Among the many available algorithms (and their multiple versions) for dictionary learning, the \ac{KSVD} algorithm is a typical example. Introduced in \cite{aharon_k-svd:_2006} and inspired by the widely known \gls{KMeans} algorithm, it is used in many image processing applications. This algorithm is detailed in the next section.
 
 \noindent
-Another approach, more scalable, is denoted as “online” dictionary learning. The Online Dictionary Learning algorithm, proposed in \cite{mairal_online_2010}, learns one image after the other instead of learning the whole set of images simultaneously. Thus it is very suitable for huge sets of learning images.
+Another approach, more scalable, is denoted as “online” dictionary learning. The Online Dictionary Learning algorithm, proposed in \cite{mairal_online_2010}, learns one image after the other instead of learning the whole set of images simultaneously. Thus, it is very suitable for huge sets of learning images.
 
 \noindent
 For a thorough review of every transform available (developed before 2010), the reader is invited to take a look at  \cite{rubinstein_dictionaries_2010}.
@@ -193,7 +193,7 @@ Two other teams are currently actively working on multi-resolution transforms:
 	\item[--] the team lead by Mickeal Elad proposed a dictionary model based on wavelets in \cite{sulam_trainlets:_2016};
 	\item[--] Rémi Gribonval’s team has proposed a factorization-based dictionary model in  \cite{le_magoarou_flexible_2016}.
 \end{itemize}
-Their work have been published very recently (in early 2016); this master's thesis does not consider the approaches investigated in these papers. However, studying these advances will conducted just after the end of this internship during a PhD thesis.
+Their work have been published very recently (in early 2016); this master's thesis does not consider the approaches investigated in these papers. However, studying these advances will be conducted just after the end of this internship during a PhD thesis.
 
 
 \chapter{State of the art}
@@ -370,7 +370,7 @@ As described in \cref{sec_tree_model}, the supports $\s^e$ are part of the \gls{
 \caption{Example of PALMTREE solution. Supports are fixed on a simple binary tree. Codes $\x$ are handcrafted Diracs that exactly match the locations of atoms in $\y$.}\label{fig_exple_fixed_tree}
 \end{figure}
 
-Any actual image processing application requires to learn the dictionary on a large set of images (namely the $\Y$ matrix). However, \ac{PALMTREE} is still unable to handle more than one image. Moreover, most experiments on \ac{PALMTREE} have focused on the dictionary update step, while real applications require to alternate between the dictionary update step and the sparse coding step. In fact, without the sparse coding step, \ac{PALMTREE} is limited to images like the one in \cref{fig_exple_fixed_tree}, where the atoms are well separated and located. Therefore no “real world” images.
+Any actual image processing application requires learning the dictionary on a large set of images (namely the $\Y$ matrix). However, \ac{PALMTREE} is still unable to handle more than one image. Moreover, most experiments on \ac{PALMTREE} have focused on the dictionary update step, while real applications require alternating between the dictionary update step and the sparse coding step. In fact, without the sparse coding step, \ac{PALMTREE} is limited to images like the one in \cref{fig_exple_fixed_tree}, where the atoms are well separated and located. Therefore, no “real world” images.
 
 \FloatBarrier
 
@@ -882,7 +882,7 @@ In the previous section, we proposed the regularization function $f$, which mean
 	\caption{Blind tuning of $\alpha$}
 \end{figure}
 
-A strait-forward way of finding the right $\alpha$ is to try every possible value. We launched the algorithm for every $\alpha$ ranging from 0 to 70. \Cref{fig_unbalanced_supports} compares the RMSE and compute time with respect to $\alpha$. The optimal $\alpha$ seems to be around 10.
+A straightforward way of finding the right $\alpha$ is to try every possible value. We launched the algorithm for every $\alpha$ ranging from 0 to 70. \Cref{fig_unbalanced_supports} compares the RMSE and computation time with respect to $\alpha$. The optimal $\alpha$ seems to be around 10.
 \Cref{fig_test_omppalmtree2} gives the result for $\alpha=10$ and $\alpha=30$. Compared to \cref{fig_test_omppalmtree}, the regularization with $\alpha=10$ improves the RMSE by 47\% (29\% for $\alpha=30$). It confirms our intuition that “gathered” supports lead to better approximations.
 
 
@@ -979,7 +979,7 @@ This regularization function is simply adjusted with respect to the amplitude of
 \begin{figure}[!h] \centering
 \begin{subfigure}[b]{0.49\textwidth}\centering
 \includegraphics[width=0.9\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad1_every5_add5_totinit0_totadd279_alpha30_tree.pdf}
-	\caption{Supports chosen using gradient}\label{fig_cmp_grad_tree}
+	\caption{Supports chosen using the gradient}\label{fig_cmp_grad_tree}
 \end{subfigure}
 \begin{subfigure}[b]{0.49\textwidth}\centering
 \includegraphics[width=0.9\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad0_every5_add5_totinit0_totadd279_alpha30_tree.pdf} 
@@ -995,7 +995,7 @@ This regularization function is simply adjusted with respect to the amplitude of
 \includegraphics[width=0.9\textwidth]{figures/tree-learn/gradient-vs-sequential/xp_learnsupp256_curvelet_decomp3_tree-binary_dpth4_supp-diracs_usegrad0_every5_add5_totinit0_totadd279_alpha30_approx.pdf} 
 	\caption{Approximation $\D\x$ of above tree}\label{fig_cmp_seq_approx}
 \end{subfigure}
-\caption{Comparison of sequential versus using gradient when choosing a support for adding an element.}\label{fig_cmp_seq_vs_grad}
+\caption{Comparison of sequential versus using the gradient when choosing a support for adding an element.}\label{fig_cmp_seq_vs_grad}
 \end{figure}
 
 \FloatBarrier
@@ -1018,7 +1018,7 @@ Sequentially choosing the support for adding a new element in \cref{fig_cmp_grad
 \includegraphics[width=\textwidth]{figures/tree-learn/gradient-vs-sequential/gradient_not_used.pdf} 
 	\caption{Using the sequential variant}\label{fig_cmp_rmse_vs_time_seq}
 \end{subfigure}	
-\caption{RMSE versus compute time of OMP-PALMTREE for many $\alpha$}\label{fig_cmp_rmse_vs_time}
+\caption{RMSE versus computation time of OMP-PALMTREE for many $\alpha$}\label{fig_cmp_rmse_vs_time}
 \end{figure}
 \FloatBarrier
 
@@ -1050,7 +1050,7 @@ For both experiments \cref{fig_cmp_rmse_vs_time_grad} and \cref{fig_cmp_rmse_vs_
 \caption{Comparison of generic versus learned supports. The RMSE decreases by 58\%.}\label{fig_learnsupp_vs_generic}
 \end{figure}
 
-Finally, \cref{fig_learnsupp_vs_generic} shows the different approximations obtained with generic supports (left) and supports learned using $f’$ and with $\alpha=30$ (right). As expected, learning the supports strongly decreases the RMSE (58\%); the compute times are equivalent (87 seconds with no retries and the same stopping criteria).
+Finally, \cref{fig_learnsupp_vs_generic} shows the different approximations obtained with generic supports (left) and supports learned using $f’$ and with $\alpha=30$ (right). As expected, learning the supports strongly decreases the RMSE (58\%); the computation times are equivalent (87 seconds with no retries and the same stopping criteria).
 
 
 \FloatBarrier
@@ -1063,12 +1063,12 @@ During this study, we found out that the gradient can be used for learning the s
 While testing the proposed support learning algorithm OMP-PALMTREE, we noticed that despite the excellent results of the support learning algorithm on single branch dictionaries, it is much less efficient on a tree (problem of “scattered” supports). After having proposed a regularization scheme using the parameter $\alpha$ to solve this problem, we gave some ideas on how to estimate this new parameter. Doing so, we faced another problem of “unbalanced” supports (elements are poorly distributed across the supports and often concentrated on $s^1$, the root support). 
 
 \noindent
-We finally described an empirical workaround for the “unbalanced” supports that allows us to learn the support in an almost uniformly distributed way; we confronted it to a modified version of OMP-PALMTREE that chooses sequentially the supports on which we add an element. Surprisingly, this sequential version resulted in better RMSE and compute time, which makes us wonder if adding sequentially would be better than totally rely on the gradient.
+We finally described an empirical workaround for the “unbalanced” supports that allows us to learn the support in an almost uniformly distributed way; we confronted it to a modified version of OMP-PALMTREE that chooses sequentially the supports on which we add an element. Surprisingly, this sequential version resulted in better RMSE and computation time, which makes us wonder if adding sequentially would be better than totally rely on the gradient.
 
 \noindent
 Although these results on simple curvelet atoms are promising, the study should be deepened using other kinds of atoms (e.g., wavelet packets, cosines); note that in \cite{chabiron_optimization_2016}, wavelet packets has been tested besides curvelets.
 
-This work only tackles a few of the objectives we had in mind at the beginning the the internship (these objectives were also part of the PhD thesis). Our idea was to make the PALMTREE algorithm learn all the model parameters (tree and supports). We eventually managed to learn the supports (to some extent, because the regularization parameters still needs to be taken care of); but learning could also mean “remove” useless elements from supports, which we did not try.
+This work only tackles a few of the objectives we had in mind at the beginning of the internship (these objectives were also part of the PhD thesis). Our idea was to make the PALMTREE algorithm learn all the model parameters (tree and supports). We eventually managed to learn the supports (to some extent, because the regularization parameters still needs to be taken care of); but learning could also mean “remove” useless elements from supports, which we did not try.
  
 \noindent
 Regarding the learning of the tree, nothing has been done; we basically worked on binary trees, and these might be totally suboptimal. As an example, \cite{chabiron_optimization_2016} showed that a tiling-like tree design performs much better (specifically for curvelets).
@@ -1108,7 +1108,7 @@ The algorithm scalability (to be able to learn on many images) has not been inve
 			\bm{E}_k = \Y-\sum_{i\ne k} \x_i^T\d_i^{old}
 		\end{align*}
 		\item keep only columns of $\bm{E}_k$ found in \cref{item_atom_used}
-		\item Apply SVD decomposition $\bm{E}_k - \bm{U} \Delta V^T$. The first column of $\bm{U}$ becomes the new $\d_k$. $\x_k$ is updated using the first column of $\bm{V}$ multiplied by $\Delta(1,1)$ (highest eigenvalue)
+		\item Apply SVD decomposition $\bm{E}_k - \bm{U} \Delta V^T$. The first column of $\bm{U}$ becomes the new $\d_k$. $\x_k$ is updated using the first column of $\bm{V}$ multiplied by $\Delta(1,1)$ (the highest eigenvalue)
 	\end{enumerate}
     \EndWhile
   \end{algorithmic}
