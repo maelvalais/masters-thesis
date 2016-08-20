@@ -17,8 +17,12 @@ This master’s thesis presents the algorithm OMP-PALMTREE for optimizing convol
 
 \keywords{deep learning, dictionary learning, sparse image representation, non-convex optimization, machine learning, image processing}
 
-}}
-{\let\clearpage\relax \centering \subsection*{Foreword}} \addcontentsline{toc}{subsection}{Foreword}\todo[inline]{Write a foreword}
+}
+%{\let\clearpage\relax \centering 
+{\centering \subsection*{Foreword and acknowledgements}} %\addcontentsline{toc}{subsection}{Foreword}
+This master's thesis is the product of the six months internship hold at the Institut de Mathématiques de Toulouse. This 
+
+
 \tableofcontents
 %{\let\clearpage\relax\listoffigures}
 %{\let\clearpage\relax\listoftables}
@@ -28,7 +32,7 @@ This master’s thesis presents the algorithm OMP-PALMTREE for optimizing convol
 
 \chapter{Introduction} %\markboth{Introduction}{}}
 
-In this chapter, we introduce and review the main existing dictionaries that have been used for sparse representations, from non-adaptative transforms to learned dictionaries via the intermediate over-complete dictionaries. The second part of this chapter provides the general motivations and objectives of this work as well as the related works.
+In this chapter, we introduce and review the main existing dictionaries that have been used for sparse representations, from non-adaptive transforms to learned dictionaries via the intermediate over-complete dictionaries. The second part of this chapter provides the general motivations and objectives of this work as well as the related works.
 
 \section{The need for sparse representations}
 
@@ -48,12 +52,12 @@ The \ac{DFT} is a classical example of an operator used for sparsity. The \ac{DF
 \end{figure}
 
 \noindent
-However, the Fourier transform is quite different from the representations we have in mind, namely the convolutional tree structures. First, Fourier coefficients form a basis, implying that it is an one-to-one representation in the sense that every code $\x$ is associated with a unique image $\y$. This basis is also orthogonal, meaning that the operator is stable (it does not amplify errors), as well as normed (each element has a norm equal to 1).
+However, the Fourier transform is quite different from the representations we have in mind, namely the convolutional tree structures. First, Fourier coefficients form a basis, implying that it is a one-to-one representation in the sense that every code $\x$ is associated with a unique image $\y$. This basis is also orthogonal, meaning that the operator is stable (it does not amplify errors), as well as normed (each element has a norm equal to 1).
 
 \noindent
 More importantly, the \ac{DFT} has interesting properties that allow fast implementations. For example, applying the Matlab function \texttt{fft2} to the \cref{fig_fourier} takes less than a millisecond. If we assume $N$ to be the dimension of the concatenated\footnotemark[2] image, instead of computing a time-expensive $O(N^2)$ matrix-vector product, the fast Fourier transform only requires a computational cost of the order $O(N \log N)$.
 
-\footnotetext[2]{Also referred as “vectorized”; we consider 2-D images as one-dimensional vectors. A $16 \times 16$ image would give a vector of dimension 256.}
+\footnotetext[2]{Also referred as “vectorized”; we consider 2-D images as one-dimensional vectors. An image of size $16 \times 16$ would give a vector of dimension 256.}
 
 \noindent
 The Fourier transform is widely used as an operator for sparse representations, mainly when dealing with smooth signals that can be approximated by a sum of sinusoids. However, this operator does not generally perform well on images since they contain many discontinuities that are far from being representable using sinusoids.
@@ -77,11 +81,11 @@ Other redundant dictionaries, like the curvelet transform, do not have the usefu
 % 3. orthogonal means that it is stable
 
 \noindent
-Although offering excellent performances for sparse representations thanks to their fast implementations, redundant dictionaries have the drawback to lack adaptativity.
+Although offering excellent performances for sparse representations thanks to their fast implementations, redundant dictionaries have the drawback to lack adaptivity.
 
 
 \section{Learned dictionaries}
-Previously mentioned dictionaries are said to be “non-adaptative”, meaning that they are not able to sparsely code every possible type of signal. Dictionary learning allows us to create “adaptative” dictionaries. Instead of being fixed, the atoms of an “adaptative” dictionary are based on a learning set of example images, denoted by
+Previously mentioned dictionaries are said to be “non-adaptive”, meaning that they are not able to sparsely code every possible type of signal. Dictionary learning allows us to create “adaptive” dictionaries. Instead of being fixed, the atoms of an “adaptive” dictionary are based on a learning set of example images, denoted by
 \begin{equation*}\Y = \begin{bmatrix} \y_1 & \dots & \y_S \end{bmatrix}\end{equation*}
 where the columns of $\Y$ are the vectorized\footnote{A vectorized matrix of dimension $R \times C$ of an image is the concatenation of all columns to form a vector of size $R \cdot C$} images $\y_i \in \R^N$, and $S$ the number of sample images. The dictionary $\D$ is made of $K$ columns $\d_i$ (the atoms) such that the number of atoms is much larger than the dimension of a single image $\y_i$ ($K \gg N$):
 \begin{equation*}\D = \begin{bmatrix} \d_1 & \dots & \d_K \end{bmatrix}.\end{equation*}
@@ -177,12 +181,12 @@ Many state-of-the-art machine learning techniques are based on trees of convolut
 Sparse representations have been used successfully in many applications. The use of these representations is only limited by the performance of their transforms. By performance, we mean that the transform must be
 \begin{itemize}
 \item[--] fast (fast computation of $\D\x$),
-\item[--] adaptative (must be learned on a set of images)
+\item[--] adaptive (must be learned on a set of images)
 \item[--] and stable (does not amplify errors).
 \end{itemize}
 
 \noindent
-As mentioned, many algorithms are available in the literature. However, they are often fast but not adaptative (such as the Fourier transform) or adaptative and not fast (such as \ac{KSVD}).
+As mentioned, many algorithms are available in the literature. However, they are often fast but not adaptive (such as the Fourier transform) or adaptive and not fast (such as \ac{KSVD}).
 
 \noindent
 The main objectives of this work is to develop a multi-resolution dictionary model (allowing large atoms to be considered) that is fast and adaptive, based on the principle of convolutional trees. During his PhD thesis, Olivier Chabiron has been working on a \Gls{treemodel}, presented in the paper \citetitle{chabiron_optimization_2016} (\cite{chabiron_optimization_2016}). Our work will focus on this model for \eqref{eq_dl}.
@@ -347,7 +351,7 @@ As explained in \cite[p. 23]{chabiron_optimization_2016}, the main drawbacks of 
 The authors of \cite{chabiron_optimization_2016} used a fixed tree structure, meaning that the tree was created \textit{ad-hoc} on a per-experiment basis, trying to mimic the frequency pyramid tiling of a curvelet decomposition. The number of leaves was also specifically chosen to match the number of atoms that was generated on the target image.
 
 \noindent
-However, an actual adaptative dictionary update step generally requires that the design of the tree is also learned from the example images and incorporated into the formulation of the optimization problem. This research axis has not been explored in this work and will be part of future studies.
+However, an actual adaptive dictionary update step generally requires that the design of the tree is also learned from the example images and incorporated into the formulation of the optimization problem. This research axis has not been explored in this work and will be part of future studies.
 
 \subsubsection{Choice of the supports}
 
@@ -400,7 +404,7 @@ So far, the supports of the convolutional tree dictionaries have been handcrafte
 Finally, \cref{fig_xp_fixed_vs_expected} experimentally confirms the assumption made in \Cref{fig_fixed_vs_expected}. After switching $\s^4$ from a generic (\textit{a priori}) support to a handmade support that follows the general direction of $\y$ (\cref{fig_fixed_vs_expected_y}), the RMSE\footnotemark[1] is decreased by 16\% (lower is better). This improvement is confirmed by the approximation in \cref{fig_xp_fixed_vs_expected_approx2} that looks visually better than the one in \cref{fig_xp_fixed_vs_expected_approx1}.
 
 \noindent
-Based on these observations, we propose in this work to make the supports “adaptative”, i.e., to learn them during the optimization process.
+Based on these observations, we propose in this work to make the supports “adaptive”, i.e., to learn them during the optimization process.
 
 \footnotetext[1]{Let $\y^1$ and $\y^2 \in \R^N$; the Root Mean Square Error is defined by  \begin{equation*}\text{RMSE}(\y^1,\y^2) = \frac{1}{N} \sqrt{\sum_{i=1}^N (y^1_i - y^2_i)^2}\end{equation*}}
 
