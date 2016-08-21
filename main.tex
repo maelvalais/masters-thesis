@@ -55,7 +55,7 @@ The \ac{DFT} is a classical example of an operator used for sparsity. The \ac{DF
 However, the Fourier transform is quite different from the representations we have in mind, namely the convolutional tree structures. First, Fourier coefficients form a basis, implying that it is a one-to-one representation in the sense that every code $\x$ is associated with a unique image $\y$. This basis is also orthogonal, meaning that the operator is stable (it does not amplify errors), as well as normed (each element has a norm equal to 1).
 
 \noindent
-More importantly, the \ac{DFT} has interesting properties that allow fast implementations. For example, applying the Matlab function \texttt{fft2} to the \cref{fig_fourier} takes less than a millisecond. If we assume $N$ to be the dimension of the concatenated\footnotemark[2] image, instead of computing a time-expensive $O(N^2)$ matrix-vector product, the fast Fourier transform only requires a computational cost of the order $O(N \log N)$.
+More importantly, the \ac{DFT} has interesting properties that allow fast implementations. For example, applying the Matlab function \texttt{fft2} to the \cref{fig_fourier} takes less than a millisecond. If we assume $N$ to be the dimension of the concatenated\footnotemark[2] image, instead of computing a time-expensive $\O(N^2)$ matrix-vector product, the fast Fourier transform only requires a computational cost of the order $\O(N \log N)$.
 
 \footnotetext[2]{Also referred as “vectorized”; we consider 2-D images as one-dimensional vectors. An image of size $16 \times 16$ would give a vector of dimension 256.}
 
@@ -162,7 +162,7 @@ The dictionary in \cref{fig_ksvd_dict} can now be used for denoising the noisy i
 
 
 \subsection{Problem of atom scalability: multi-scale dictionaries}
-As the learned \ac{KSVD} dictionary relies on the $O(N \cdot K)$ matrix-vector product and has to be over-complete ($K \gg N$) in order to achieve sparsity, we easily understand that $N$ cannot take an arbitrarily large value. In practice, the example images (also called patches) and atoms of the dictionary are generally of size at most $16 \times 16$.
+As the learned \ac{KSVD} dictionary relies on the $\O(N \cdot K)$ matrix-vector product and has to be over-complete ($K \gg N$) in order to achieve sparsity, we easily understand that $N$ cannot take an arbitrarily large value. In practice, the example images (also called patches) and atoms of the dictionary are generally of size at most $16 \times 16$.
 
 \noindent
 Dictionaries with bigger atoms are known as multi-resolution (also called multi-scale), meaning that the atoms can contain either details or large features computed from the images.
@@ -205,7 +205,7 @@ Their work have been published very recently (in early 2016); this master's thes
 This chapter introduces the \Gls{treemodel} as well as its associated dictionary learning problem, \acs{FTL}, and the algorithm \ac{PALMTREE} that solves this problem. The end of this chapter is dedicated to detailing the specific objectives of this internship.
 
 \section{Dictionary structured by the \Gls{treemodel}}\label{sec_tree_model}
-The work studied in \cite{chabiron_toward_2015} and \cite{chabiron_optimization_2016} offers a different way of structuring the matrix $\D$, namely the \emph{\Gls{treemodel}}. Instead of using “plain” atoms as columns and dealing with the matrix-vector product with complexity $O(N \cdot K)$, $\D$ is defined by a convolutional tree structure \begin{equation*}\T(\V,\E)\end{equation*} where each edge $e$ of $\E$ is characterized by a kernel $\h^e$ and a support $\s^e$. The leaves $l \in \L \subset \V$ associated with the root $r \in \V$ allow us to define a branch as the successive edges growing from the root (top) to one of the leaves (bottom).
+The work studied in \cite{chabiron_toward_2015} and \cite{chabiron_optimization_2016} offers a different way of structuring the matrix $\D$, namely the \emph{\Gls{treemodel}}. Instead of using “plain” atoms as columns and dealing with the matrix-vector product with complexity $\O(N \cdot K)$, $\D$ is defined by a convolutional tree structure \begin{equation*}\T(\V,\E)\end{equation*} where each edge $e$ of $\E$ is characterized by a kernel $\h^e$ and a support $\s^e$. The leaves $l \in \L \subset \V$ associated with the root $r \in \V$ allow us to define a branch as the successive edges growing from the root (top) to one of the leaves (bottom).
 
 \begin{figure}[!ht]\centering
 \includegraphics[width=\textwidth]{figures/tree.pdf}
@@ -284,13 +284,13 @@ For later references, the objective function of \ac{FTL} will be denoted as
 
 \subsubsection{Interesting properties of \ac{FTL}}
 
-The convolution of sparse kernels in \ac{FTL} leads to performant dictionaries. The computational cost of the matrix-vector product $\D\x$ using \cref{eq_Dx_as_conv} is reduced to $O(Q \cdot N)$ ($Q$ is the number of elements in all supports, i.e., $Q=|\{s^e_p ~|~ s^e_p = 1, \forall (e,p) \in \E \times \P\}|$ with $|E|$ the cardinal of the set E). Because $Q$ only depends on the number of edges that is designed to be significantly smaller than  $N$, using the \gls{treemodel} is supposed to significantly reduce the computational cost of the dictionary learning algorithm\todo{Question: does it reduce the DL algorithm or only the cost of computing Dx ?}, which is comparable with the Fourier transform performance (of the order of $O(N \log N)$).
+The convolution of sparse kernels in \ac{FTL} leads to efficient dictionaries. The computational cost of the matrix-vector product $\D\x$ using \cref{eq_Dx_as_conv} is reduced to $\O(Q \cdot N)$ ($Q$ is the number of elements in all supports, i.e., $Q=|\{s^e_p ~|~ s^e_p = 1, \forall (e,p) \in \E \times \P\}|$ with $|E|$ the cardinal of the set E). Because $Q$ only depends on the number of edges that is designed to be significantly smaller than  $N$, using the \gls{treemodel} is supposed to significantly reduce the computational cost of the dictionary learning algorithm\todo{Question: does it reduce the DL algorithm or only the cost of computing Dx ?}, which is comparable with the Fourier transform performance (of the order of $\O(N \log N)$).
 
 \begin{table}[!ht] \centering 
 \caption{Computational cost of $\D\x$}\label{table_comparison_Dx_costs}
 \begin{tabular}{c|c}
 Using the standard matrix-vector product & Using the \gls{treemodel} \\\\ \hline \\
-$O(K \cdot N)$ & $O(Q \cdot N)$
+$\O(K \cdot N)$ & $\O(Q \cdot N)$
 \end{tabular}
 \end{table}
 
@@ -345,7 +345,7 @@ Because of the projection onto the $\Dspace^e$ set, it is sufficient to compute 
 
 
 \section{PALMTREE drawbacks}
-As explained in \cite[p. 23]{chabiron_optimization_2016}, the main drawbacks of the \gls{treemodel} for practical dictionary learning (i.e., denoising or image recognition) is that it requires the user to pre-define and fix certain central elements of the model, which is likely to lead to suboptimal results. These elements include the design of the tree (number of children per node, depth) and the choice of the supports.
+As explained in \cite[p. 23]{chabiron_optimization_2016}, the main drawbacks of the \gls{treemodel} for practical dictionary learning (i.e., denoising or image recognition) is that it requires the user to predefine and fix certain central elements of the model, which is likely to lead to suboptimal results. These elements include the design of the tree (number of children per node, depth) and the choice of the supports.
 % NOTE: dictionary learning is an application of machine learning specifically designed for image processing 
 \subsubsection{Choice of the tree}
 The authors of \cite{chabiron_optimization_2016} used a fixed tree structure, meaning that the tree was created \textit{ad-hoc} on a per-experiment basis, trying to mimic the frequency pyramid tiling of a curvelet decomposition. The number of leaves was also specifically chosen to match the number of atoms that was generated on the target image.
@@ -355,7 +355,7 @@ However, an actual adaptive dictionary update step generally requires that the d
 
 \subsubsection{Choice of the supports}
 
-As described in \cref{sec_tree_model}, the supports $\s^e$ are part of the \gls{treemodel}. In \cite{chabiron_toward_2015}, the authors experimentally showed that using fixed supports for approximating many kinds of atoms (curvelets, wavelet packets) is possible. For the specific purpose of approximating existing atoms, the results turned out to be very promising. However, the proposed model was supposed to be able to approximate any kind of image, which is pratically not possible with fixed supports.
+As described in \cref{sec_tree_model}, the supports $\s^e$ are part of the \gls{treemodel}. In \cite{chabiron_toward_2015}, the authors experimentally showed that using fixed supports for approximating many kinds of atoms (curvelets, wavelet packets) is possible. For the specific purpose of approximating existing atoms, the results turned out to be very promising. However, the proposed model was supposed to be able to approximate any kind of image, which is practically not possible with fixed supports.
 
 \subsubsection{Still a prototype}
 
@@ -460,7 +460,7 @@ In the following experiments, the dictionary associated with this convolutional 
 
 The Orthogonal Matching Pursuit (\ac{OMP}, detailed in \cref{alg_omp}) chooses at \cref{alg_omp_pick_correlation} which component $\x_i$ should be “turned on” at each iteration, finding the atom $\d_i$ that has the greatest correlation with the residual $\Res = \D\x - \y$, i.e.,
 \begin{equation*} i = \underset{j}{\argmax} ~ | \D^T \Res |_j \end{equation*}
-which is litteraly the same as computing the gradient $\nabla \Phi(\x)$ with \begin{equation*}\Phi(\x) = \lVert \D\x - \y \rVert^2.\end{equation*}
+which is litterally the same as computing the gradient $\nabla \Phi(\x)$ with \begin{equation*}\Phi(\x) = \lVert \D\x - \y \rVert^2.\end{equation*}
 
 \begin{algorithm}[!ht]
     \caption{Orthogonal Matching Pursuit (OMP) algorithm for standard sparse approximation}\label{alg_omp}
@@ -499,7 +499,7 @@ Our idea is to use the same principle when adding elements to supports $(\s^e)_{
 However, three questions rose when designing this new “meta” algorithm:
 \begin{enumerate}[label={\alph*)},noitemsep]
 	\item At \cref{alg_omppalmtree_find}, is it actually correct to choose the element to be added using a strictly local information of the gradient?
-	\item Also at \cref{alg_omppalmtree_find}, how would we get the “full” gradient while the current gradient is only computed on the points of the support?
+	\item Also, at \cref{alg_omppalmtree_find}, how would we get the “full” gradient while the current gradient is only computed on the points of the support?
 	\item Finally, at \cref{alg_omppalmtree_ftl}, is it really necessary to wait for the convergence of \eqref{eq_ftl}?
 \end{enumerate}
 
@@ -752,7 +752,7 @@ After showing that the gradient gives a good indication on which support element
 \end{figure}
 
 \noindent
-In \cref{fig_learnsupp_branch-learned_tree}, the initial supports are simply centered Diracs; every $T=5$ iterations of \ac{PALMTREE}, one element is added at the location of the largest gradient, up to 36 elements. The OMP-PALMTREE algorithm (\cref{alg_omppalmtree}) algorithm converges after 200 cumulated iterations of \ac{PALMTREE}.
+In \cref{fig_learnsupp_branch-learned_tree}, the initial supports are simply centered Diracs; every $T=5$ iterations of \ac{PALMTREE}, one element is added at the location of the largest gradient, up to 36 elements. The OMP-PALMTREE algorithm (\cref{alg_omppalmtree}) algorithm converges after a cumulative number of 200 iterations of \ac{PALMTREE}.
 
 \noindent
 The resulting approximation \cref{fig_learnsupp_branch-learned_approx} is encouraging with a relative RMSE decrease of 76\% compared to the approximation in \cref{fig_learnsupp_branch-generic_approx} using the generic supports in \cref{fig_learnsupp_branch-generic_tree}.
@@ -1073,7 +1073,7 @@ We finally described an empirical workaround for the “unbalanced” supports t
 \noindent
 Although these results on simple curvelet atoms are promising, the study should be deepened using other kinds of atoms (e.g., wavelet packets, cosines); note that in \cite{chabiron_optimization_2016}, wavelet packets has been tested besides curvelets.
 
-This work only tackles a few of the objectives we had in mind at the beginning of the internship (these objectives were also part of the PhD thesis). Our idea was to make the PALMTREE algorithm learn all the model parameters (tree and supports). We eventually managed to learn the supports (to some extent, because the regularization parameters still needs to be taken care of); but learning could also mean “remove” useless elements from supports, which we did not try.
+This work only tackles a few of the objectives we had in mind at the beginning of the internship (these objectives were also part of the PhD thesis). Our idea was to make the \ac{PALMTREE} algorithm learn all the model parameters (tree and supports). We eventually managed to learn the supports (to some extent, because the regularization parameters still needs to be taken care of); but learning could also mean “remove” useless elements from supports, which we did not try.
  
 \noindent
 Regarding the learning of the tree, nothing has been done; we basically worked on binary trees, and these might be totally suboptimal. As an example, \cite{chabiron_optimization_2016} showed that a tiling-like tree design performs much better (specifically for curvelets).
@@ -1200,7 +1200,7 @@ which is much better than the previous distance, provided that $k \ll N$.
 
 \FloatBarrier
 
-\section{Prooving $\F(\widetilde{A}) = \F(A)^*$}Thus\label{sec_proof_fourier_flip_adjoint}
+\section{Proving $\F(\widetilde{A}) = \F(A)^*$}\label{sec_proof_fourier_flip_adjoint}
 When dealing with periodic images (images are periodically repeated such that every point $p \in \mathcal{Z}$ is defined), computing the Fourier transform of a “flipped” image $\F(\widetilde{A})$, with $\widetilde{A}_p = A_{-p}$, can be simplified using the property
 \begin{equation*}
 \F(\widetilde{A}) = \F(A)^*
