@@ -19,6 +19,11 @@
 %\SetAlCapNameSty{textit} % text style for  algo captions
 \usepackage{algpseudocode,algorithm,algorithmicx}
 
+
+\usepackage[acronym,toc,shortcuts]{glossaries}
+\usepackage{relsize}
+
+
 \usepackage[toc,page]{appendix}
 \usepackage[nottoc,numbib]{tocbibind} % Make the bibliography appear in Summary
 \usepackage{fancyhdr} % For titlepage \lhead, \rhead... 
@@ -50,6 +55,13 @@
 }}
 \def\endkeywords{\par}
 
+\newenvironment{foreword}[1][Foreword]{
+	\begin{center}% 
+		{\bfseries #1}%
+	\end{center}%
+}{}
+
+
 %\usepackage{multirow} % Pour colonnes multiples des tableaux
 %\usepackage{longtable} % Pour longs tableaux
 %\usepackage{array} % Pour \texttt sur tout une colonne
@@ -72,12 +84,11 @@
 \usepackage{bm} % \bm{} for bold font in text and math modes
 \usepackage[colorinlistoftodos,prependcaption,textsize=scriptsize]{todonotes} %,textsize=tiny
 \usepackage[pdfusetitle]{hyperref} % for linkable refs and title in pdf meta
-\usepackage[acronym,toc,shortcuts]{glossaries}
 \usepackage[english,capitalise]{cleveref} % capitalise = Fig. instead of fig.
 
 \hypersetup{pdfauthor={Maël Valais, François Malgouyres, Jean-Yves Tourneret, Herwig Wendt},%
             %pdftitle={Your Title},%
-            pdfsubject={This master’s thesis presents the algorithm OMP-PALMTREE for optimizing convolutional tree dictionaries from a unique image; inspired from the construction of supports in OMP, this algorithm enhances  PALMTREE by learning the supports (instead of fixing them). The  support adding step, as for OMP, is based on the maximum value of the gradient – which is shown to be giving convincing indications on the best element that should be added. OMP-PALMTREE constitutes the “dictionary update” step in a standard dictionary learning algorithm, and must be associated with a “sparse coding” step (yet to be developed) for it to be used in applications like denoising or image recognition. Thanks to the Convolutional tree model, dictionaries learned using OMP-PALMTREE are faster than any dictionary learned using a standard matrix-vector product  (quadratic computational cost), with a linear computational cost with respect to the size of the image.},%
+            pdfsubject={This master’s thesis presents the algorithm OMP-PALMTREE for optimizing fast dictionaries using the convolutional tree model},%
             pdfkeywords={deep learning, dictionary learning, sparse image representation, non-convex optimization, machine learning, image processing},%
             pdfproducer={LaTeX},%
             pdfcreator={pdfLaTeX}
