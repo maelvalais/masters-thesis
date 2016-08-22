@@ -472,9 +472,10 @@ While reviewing our options for overcoming the “fixed support” drawback of t
 	\item \emph{How to solve for one branch?}
 	\item \emph{How to solve for a tree?}
 \end{enumerate}
-This chapter covers the protocols and results of the various experiments that have been conducted to solve the above problems.
+This chapter covers the protocols and results of the various experiments that have been conducted to solve the above problems.\todo{Re-do this intro}
 
 \section{Choice of the element to add}
+\todo{Add an intro}
 
 \subsection{Experimental setup}
 Every experiment in the first part of this chapter uses a fixed single-branch tree of depth 4 associated with $\y$, $\h^e$, $\s^e$ and $\x^e$ of size $128 \times 128$. The figures only display the central $64 \times 64$ pixels as shown in \cref{fig_xp_explain}.
@@ -729,7 +730,7 @@ Finally, \cref{fig_gain_tilted_n4} presents the same experiment but with a diffe
 \caption{Best values of \ref{fig_beforeafter-grad_after}}\label{fig_beforeafter-grad_after_best}
 \end{subfigure}
 \caption{Effect of adding one point to the support $\s^4$. The “before” tree is a converged solution of \ac{PALMTREE}. The “after” tree has been added a point where the gain-per-added-point is maximal.}\label{fig_beforeafter}
-\end{figure}
+\end{figure}\todo{Add figures with “after adding best grad”}
 
 The experimental results shown in \cref{fig_beforeafter} are based on the results of \cref{fig_gain_n4-approx}, where \cref{fig_beforeafter-target,fig_beforeafter-approx_before,fig_beforeafter-gain,fig_beforeafter-grad_before,fig_beforeafter-gain_best,fig_beforeafter-grad_before_best} are the same meaning as for the previous experiment. 
 \cref{fig_beforeafter-approx_after,fig_beforeafter-grad_after,fig_beforeafter-grad_after_best} show what  happens if we add the minimum point of gain-per-added-point to $\s^4$ and continue the minimization. We note that the approximation in \cref{fig_beforeafter-approx_after} looks visually closer to the target image \cref{fig_beforeafter-target} and that the RMSE is decreased by 16\% (lower is better).
@@ -854,11 +855,11 @@ The following experiments using OMP-PALMTREE have been set such that
 	\caption{Learned support tree}\label{fig_test_omppalmtree_tree}
 \end{subfigure}
 \caption{Results after using \cref{alg_omppalmtree}. The support elements in (b) are extremely scattered, thus making them indistinguishable.}\label{fig_test_omppalmtree}
-\end{figure}
+\end{figure}\todo{tell the size of each square}
 
 \noindent
 A first result using the original OMP-PALMTREE (\cref{alg_omppalmtree}) is displayed in \Cref{fig_test_omppalmtree}. Note that we cannot distinguish the elements of the supports. A zoom on one of the supports is made in \cref{fig_scattered_support_tree} (section below).
-
+\todo[inline]{explain that “heuristically”, the problem of scattered gradients is due to...}
 
 \subsection{Problem of scattered elements using \cref{alg_omppalmtree}}
  
@@ -913,7 +914,7 @@ An unexpected issue was observed when running the \cref{alg_omppalmtree} on a tr
 \noindent
 To address this issue, we add in \cref{alg_omppalmtree2} a regularization (or “prior”) term $f(p)$ (with values in $\R$) that prevents the location $p$ from being too far from the origin (center\footnotemark[1] of the support); $f$ is defined as
 \begin{equation}
-f(p) = \frac{\text{dist}(o-p)}{\underset{p' \in \P}{\max}\text{dist}(o-p')} \quad \in [0,1]\label{eq_regularize}
+f(p) = \frac{\text{dist}(o-p)}{\underset{p' \in \P}{\max}~\text{dist}(o-p')} \quad \in [0,1]\label{eq_regularize}
 \end{equation}
 with $o$ the origin, which is the center of the support, and $\text{dist}(p)$ is the circular euclidian norm defined on $p=1,\dots,N$ by\footnotemark[2]
 \begin{equation*} \text{dist}(p) = \min\left[p \bmod N, (N-p) \bmod N\right]\end{equation*}
@@ -1024,11 +1025,11 @@ Instead of estimating the vector $\bm{\alpha}$, we empirically developed a funct
 \noindent
 The regularization function is
 \begin{equation}
-f’(\h,e,p) = \frac{\text{dist}(o-p)}{\underset{p' \in \P}{\max}\text{dist}(o-p')} \cdot G(\h,e) \quad \in [0,G(\h,e)]\label{eq_regularize2}
+f’(\h,e,p) = \frac{\text{dist}(o-p)}{\underset{p' \in \P}{\max}~\text{dist}(o-p')} \cdot G(\h,e) \quad \in [0,G(\h,e)]\label{eq_regularize2}
 \end{equation}
 where $G(\h,e)$ is the maximum value of the gradient for the kernel $h^e$; we define it as 
 \begin{equation*} 
-G(\h,e)=\underset{p' \in \P}{\max} |\nabla \Phi_{\h^e}(\h)_{p'}|.
+G(\h,e)=\underset{p' \in \P}{\max}~ |\nabla \Phi_{\h^e}(\h)_{p'}|.
 \end{equation*}
 
 \noindent
@@ -1068,15 +1069,15 @@ We compared in \cref{fig_cmpunbalanced-seq_vs_grad} the results using $f’$ aga
 \begin{figure}[!ht] \centering
 \begin{subfigure}[b]{0.325\textwidth}\centering
 \includegraphics[width=\textwidth]{figures/tree-unbalanced-supp/histo_alpha10_grad1.pdf}
-	\caption{Distribution of \cref{fig_test_omppalmtree2-approx_alpha10}}\label{fig_histo-1}
+	\caption{Distribution of \cref{fig_test_omppalmtree2-approx_alpha10} (using regularization $f$)}\label{fig_histo-1}
 \end{subfigure}	
 \begin{subfigure}[b]{0.325\textwidth}\centering
 \includegraphics[width=\textwidth]{figures/tree-gradient-vs-sequential/histo_alpha30_grad1.pdf}
-	\caption{Distribution of \cref{fig_cmpunbalanced-grad_tree}}\label{fig_histo-2}
+	\caption{Distribution of \cref{fig_cmpunbalanced-grad_tree} (using regularization $f’$)}\label{fig_histo-2}
 \end{subfigure}
 \begin{subfigure}[b]{0.325\textwidth}\centering
 \includegraphics[width=\textwidth]{figures/tree-gradient-vs-sequential/histo_alpha30_grad0.pdf} 
-	\caption{Distribution of \cref{fig_cmpunbalanced-seq_tree}}\label{fig_histo-3}
+	\caption{Distribution of \cref{fig_cmpunbalanced-seq_tree} (sequential variant)}\label{fig_histo-3}
 \end{subfigure}	
 \caption{Comparison of the distributions of the elements in supports.}\label{fig_histo}
 \end{figure}
@@ -1217,6 +1218,7 @@ It is useful to introduce the circulant matrix when trying to translate the conv
 \caption{Rewriting the convolution into a metrix-vector product.}\label{fig_block_circular}
 \end{figure}
 
+\noindent
 We can then rewrite the convolutions used in
 \begin{equation*}\D\x = \sum_{l \in \L} \x^l * \h^{*l}\end{equation*}
 using circular matrices. We denote $C^i = C(\h^i)$ the circular matrix for edge $i$. \Cref{fig_tree_as_matrix} compares the convolutional tree (a) to the product $\D\x$ ($\D$ being the dictionary $\D$ written as a matrix). For the convolutional tree given in (a), $\D$ can be summarized as
@@ -1237,9 +1239,11 @@ with $C^i$ the block-circular matrix for $\h^i$; it represents the final convolu
 \caption{From $\D$ as a convolutional tree to $\D$ as a matrix}\label{fig_tree_as_matrix}
 \end{figure}
 
+\noindent
 One atom $d_i$ with $i = 1,\dots,K$ ($K=N \cdot |\L|$) of the dictionary matrix $\D$ corresponds to one column of the block-circulant matrix $C(h^{*l})$; $\D$ can thus be rewritten as
 \begin{align}\D = \begin{bmatrix} C(h^{*1}) & \dots & C(h^{*{|\L|}}) \end{bmatrix}.\label{eq_matrix_factorized} \end{align}
 
+\noindent
 To sum up, the matrix associated with the convolutional tree dictionary $\D$ can be understood as a factorization of sparse matrices $C^i$. Under the “developed” form \eqref{eq_matrix_developed}, the matrix $\D$ is of dimension $N \times K$.
 
 
@@ -1252,6 +1256,7 @@ To sum up, the matrix associated with the convolutional tree dictionary $\D$ can
 \begin{equation*}\y=\hat{\y} + \bm{b}\end{equation*}
 with $\bm{b}$ following a centered Gaussian distribution $\mathcal{N}(0,\sigma^2I)$ and $\hat{\y}$ the noiseless signal. We see that the distance $||\bm{b}||$ is always smaller than the projected distance.
 
+\noindent
 This is because the variance in the $N$-dimensional space can be written as
 \begin{align*}
 \sigma^2(\bm{b}) =& \mathbb{E}\left[\lVert \bm{b}-\mathbb{E}(\bm{b}) \rVert^2 \right]\\
