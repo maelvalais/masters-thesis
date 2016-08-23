@@ -24,6 +24,11 @@
 \usepackage{relsize}
 
 
+
+\usepackage{gitinfo2}
+
+
+
 \usepackage[toc,page]{appendix}
 \usepackage[nottoc,numbib]{tocbibind} % Make the bibliography appear in Summary
 \usepackage{fancyhdr} % For titlepage \lhead, \rhead... 
@@ -79,7 +84,7 @@
 \usepackage{mathtools} % for \shortintertext{} in align block
 
 %\usepackage[]{minitoc} % Intermediate 
-\usepackage{etoolbox} % For toggle function (to hide titlepage)
+\usepackage{etoolbox} % For toggle function (to hide t itlepage)
 \usepackage{nth} % 1st, 3rd, 4th...
 \usepackage{bm} % \bm{} for bold font in text and math modes
 \usepackage[colorinlistoftodos,prependcaption,textsize=scriptsize]{todonotes} %,textsize=tiny
@@ -90,8 +95,10 @@
             %pdftitle={Your Title},%
             pdfsubject={This master’s thesis presents the algorithm OMP-PALMTREE for optimizing fast dictionaries using the convolutional tree model},%
             pdfkeywords={deep learning, dictionary learning, sparse image representation, non-convex optimization, machine learning, image processing},%
-            pdfproducer={LaTeX},%
-            pdfcreator={pdfLaTeX}
+            pdfcreator={pdfLaTeX},%
+            pdfinfo={
+                GitVersion={azdazdzadaz}
+            } %\gitAbbrevHash
 }
 
 

@@ -1,3 +1,9 @@
+% Note: arara is like “make” for latex. Run with “arara main”.
+% arara: pdflatex: { draft: true }
+% arara: biber
+% arara: makeindex: { style: main.ist }
+% arara: pdflatex: { synctex: true }
+% arara: pdflatex: { synctex: true }
 \input{packages.tex}  % <-- all the \usepackages
 \input{pagestyle.tex} % <-- \pagestyle{body}
 \input{macros.tex}    % <-- \x, \y, \D...
@@ -1305,6 +1311,3 @@ with $\F$ the \ac{DFT}, $^*$ the adjoint operator. Here is the proof:
 
 
 \end{document}
-
-
-
