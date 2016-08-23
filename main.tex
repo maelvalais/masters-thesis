@@ -867,33 +867,45 @@ The following experiments using OMP-PALMTREE have been set such that
 \end{subfigure}
 \begin{subfigure}[b]{0.56\textwidth}\centering
 \includegraphics[width=1\textwidth]{figures/tree-scattered-supports/tree.pdf}
-	\caption{Learned support tree}\label{fig_test_omppalmtree_tree}
+	\caption{Learned support tree}\label{fig_test_omppalmtree-tree}
 \end{subfigure}
-\caption{Results after using \cref{alg_omppalmtree}. The “range” of the elements is given under each support. For example, with $\s^1$ (middle support), the number 141 means that all elements fit in a square of width 141.}\label{fig_test_omppalmtree}
+\caption{Results after using \cref{alg_omppalmtree}. Each support has been cropped to the minimal square that contains all elements; the number under each support gives the width of that square.}\label{fig_test_omppalmtree}
 \end{figure}\todo{tell the size of each square}
 
 \noindent
-A first result using the original OMP-PALMTREE (\cref{alg_omppalmtree}) is displayed in \Cref{fig_test_omppalmtree}. Note that we cannot distinguish the elements of the supports. A zoom on one of the supports is made in \cref{fig_scattered_support_tree} (section below).
+A first result using the original OMP-PALMTREE (\cref{alg_omppalmtree}) is displayed in \Cref{fig_test_omppalmtree}. Note that we cannot distinguish the elements of the supports. A zoom on one of the supports is made in \cref{fig_scattered_support-tree} (section below).
 \todo[inline]{explain that “heuristically”, the problem of scattered gradients is due to...}
 
 \subsection{Problem of scattered elements using \cref{alg_omppalmtree}}
  
-An unexpected issue was observed when running the \cref{alg_omppalmtree} on a tree instead of a single branch: the gradient indicated elements that were far from each other. The selection of the best support element to be added was unexpectedly far from previously added elements, hence producing scattered kernels. Having “gathered” supports is essential for the convolutional tree model. \todo[inline]{HELP: I can’t find explanations on why it is essential to have “gathered” kernels, contrary to “scattered” kernels} 
+An unexpected issue was observed in \cref{fig_test_omppalmtree} when running the \cref{alg_omppalmtree} on a tree instead of a single branch: as shown in \cref{fig_scattered_support-tree}, the elements of the learned supports are scattered in distant clusters. 
+
+\noindent 
+This can be interpreted as an identifiability problem of the atoms. (one feature corresponds to one curvelet among the 16 that forms the target).
+An atom is said to be well identified when it can explain one feature of the image without any contributions from the other atoms. A poorly identified atom will result in having features that are represented using multiple atoms at once. For example, in our experiments, the 16 curvelets of the target image are 16 different features. The learned dictionary can be either composed of 16 well identified atoms (one atom represents one feature) or it can be composed of a “single” huge atom that is made of 16 small and scattered pieces.
+This problem can also be considered (to an extent) as an \emph{overlearning} problem as it reflects atoms that are too specialized with respect to the learning images and thus, cannot be used for other images.
+
+\noindent
+Ideally, we would like all elements to be centered around the origin\footnote{In the figures, the origin is at the center of the image} in order to have well identified atoms. However, the gradient indicated elements that were far from each other.
+
+
 
 \begin{figure}[!ht] \centering
 \begin{subfigure}[b]{0.65\textwidth}\centering
 \includegraphics[width=1\textwidth]{figures/tree-scattered-supports/supports_with_zoom.pdf}
-\caption{Supports with magnified $\s^1$}\label{fig_scattered_support_tree}
+\caption{Supports with magnified $\s^1$}\label{fig_scattered_support-tree}
 \end{subfigure}
 \begin{subfigure}[b]{0.34\textwidth}\centering
 \includegraphics[width=1\textwidth]{figures/tree-scattered-supports/_partgrad1.pdf}
-\caption{Gradient for $\h^1$}\label{fig_scattered_support_grad}
+\caption{Gradient for $\h^1$}\label{fig_scattered_support-grad}
 \end{subfigure}
 \caption{Scattered supports when using the original OMP-PALMTREE (\cref{alg_omppalmtree}). The gradient in (b) has its maximum values in distant locations, therefore producing scattered supports.}\label{fig_scattered_support}
 \end{figure}
 
 \noindent
-\Cref{fig_scattered_support_tree} illustrates this problem; every support has its elements scattered instead of being concentrated around the origin. The corresponding gradient, shown in \cref{fig_scattered_support_grad}, has multiple “local” maxima that are far from the origin. Ideally, we would like all elements to be centered around the origin (in the figures, the origin is at the center of the image).
+\Cref{fig_scattered_support-tree} illustrates this problem; every support has its elements scattered instead of being concentrated around the origin. The corresponding gradient, shown in \cref{fig_scattered_support-grad}, has multiple “local” maxima that are far from the origin. 
+
+
 
 \begin{algorithm}[!ht]
     \caption{OMP-PALMTREE (version 2, based on the original OMP-PALMTREE in \cref{alg_omppalmtree})}\label{alg_omppalmtree2}
@@ -950,7 +962,7 @@ with $\bmod$ the modulo operator. Note that $f$ simply normalizes $\text{dist}()
 \subsection{Tuning the regularization parameter $\alpha$}
 In the previous section, we proposed the regularization function $f$, which means that we must deal with an additional parameter $\alpha$.
 
-\subsubsection{ad hoc tuning of $\alpha$}
+\subsubsection{Ad hoc tuning of $\alpha$}
 \begin{figure}[!ht] \centering
 \includegraphics[width=1\textwidth]{figures/tree-scattered-supports/gradient_used.pdf}
 	\caption{Blind tuning of $\alpha$}
