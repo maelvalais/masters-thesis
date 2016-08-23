@@ -57,7 +57,6 @@ Finally, I wish to thank my fellows of the M2R “Operations research” 2016 pr
 \begin{flushright}Maël Valais\end{flushright}
 
 \vfill
-
 \begin{table}[hbt]\centering
   \begin{tabular}{>{\bf}rl}
    Document version & \gitFirstTagDescribe{} \\
@@ -65,7 +64,7 @@ Finally, I wish to thank my fellows of the M2R “Operations research” 2016 pr
    Author & \gitAuthorName{} (\gitAuthorEmail{})
   \end{tabular}
 \end{table}
-
+\vfill
 
 \footnotetext[1]{Institut de Recherche en Informatique de Toulouse}
 \footnotetext[2]{École Nationale Supérieure d'Électrotechnique, d'Électronique, d'Informatique, d'Hydraulique et des Télécommunications}
@@ -862,15 +861,15 @@ The following experiments using OMP-PALMTREE have been set such that
 \end{figure}
 
 \begin{figure}[!ht] \centering
-\begin{subfigure}[b]{0.49\textwidth}\centering
-\includegraphics[width=0.8\textwidth]{figures/tree-scattered-supports/xp_learnsupp256_curvelet_decomp3+tree-binary_dpth4+supp-diracs+usegrad0_every5_add5_totinit0_totadd279_a0_b1_approx.pdf}
+\begin{subfigure}[b]{0.41\textwidth}\centering
+\includegraphics[width=1\textwidth]{figures/tree-scattered-supports/xp_learnsupp256_curvelet_decomp3+tree-binary_dpth4+supp-diracs+usegrad0_every5_add5_totinit0_totadd279_a0_b1_approx.pdf}
 \caption{Approximation $\D\x$}
 \end{subfigure}
-\begin{subfigure}[b]{0.49\textwidth}\centering
-\includegraphics[width=0.8\textwidth]{figures/tree-scattered-supports/xp_learnsupp256_curvelet_decomp3+tree-binary_dpth4+supp-diracs+usegrad0_every5_add5_totinit0_totadd279_a0_b1_tree.pdf}
+\begin{subfigure}[b]{0.56\textwidth}\centering
+\includegraphics[width=1\textwidth]{figures/tree-scattered-supports/tree.pdf}
 	\caption{Learned support tree}\label{fig_test_omppalmtree_tree}
 \end{subfigure}
-\caption{Results after using \cref{alg_omppalmtree}. The support elements in (b) are extremely scattered, thus making them indistinguishable.}\label{fig_test_omppalmtree}
+\caption{Results after using \cref{alg_omppalmtree}. The “range” of the elements is given under each support. For example, with $\s^1$ (middle support), the number 141 means that all elements fit in a square of width 141.}\label{fig_test_omppalmtree}
 \end{figure}\todo{tell the size of each square}
 
 \noindent
