@@ -652,12 +652,11 @@ In this purpose, we designed \cref{alg_gain_per_added_point} for computing what 
 \end{figure}
 
 \noindent
-\Cref{fig_gain_n4} compares the gain-per-added-point of $\s^4$ (\cref{fig_gain_n4-gain}) to the absolute value of the partial gradient w.r.t.\@ $\h^4$ after a convergence of \eqref{eq_ftl} (\cref{fig_gain_n4-grad}). It is interesting to see that they share the same direction and shape. \Cref{fig_gain_n4-gain_best,fig_gain_n4-grad_best} show the best values of \cref{fig_gain_n4-gain,fig_gain_n4-grad}. We notice that the two images are reminiscent of each other and share common features: for both, we note two stripes located on the  diagonal; they only vary in that the two stripes are more distant in \cref{fig_gain_n4-grad}, as if they were “dilated”. This similarity reinforces our hypothesis that the gradient could give the right information for support estimation.
+\Cref{fig_gain_n4} compares the gain-per-added-point of $\s^4$ (\cref{fig_gain_n4-gain}) to the absolute value of the partial gradient w.r.t.\@ $\h^4$ after a convergence of \eqref{eq_ftl} (\cref{fig_gain_n4-grad}). It is interesting to see that they share the same direction and shape. \Cref{fig_gain_n4-gain_best,fig_gain_n4-grad_best} show the best values of \cref{fig_gain_n4-gain,fig_gain_n4-grad}. We notice that the two images are reminiscent of each other and share common features: for both, we note two stripes located on the  diagonal; they only vary in that the two stripes are more distant from the center in \cref{fig_gain_n4-grad}, as if they were “dilated”. This similarity reinforces our hypothesis that the gradient could give the right information for support estimation.
 
 \noindent
-Note that the values of the gradient are equal to zero on the points of the support (small squares); with respect to those nine points, the optimality conditions are met. However, the other components of the gradient are different from zero, meaning that we have reached a suboptimal solution.
+Note that the values of the gradient are equal to zero on the points of the support (small squares); with respect to those nine points, the optimality conditions are met. However, the other components of the gradient are different from zero, meaning that the solution could be improved if these components were added to the support.
 
-the solution would not yet be optimal if these components were added to the support.
 
 \begin{figure}[!ht]\centering
 	\begin{subfigure}[b]{0.24\linewidth}\centering
@@ -708,44 +707,65 @@ Finally, \cref{fig_gain_tilted_n4} presents the same experiment but with a diffe
 \subsubsection{Visual gain when adding an element}
 
 \begin{figure}[!ht]\centering
-\begin{subfigure}[b]{0.32\linewidth}\centering
-\includegraphics[width=\linewidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4before_target.pdf}
+\begin{subfigure}[b]{0.28\linewidth}\centering
+\includegraphics[width=\linewidth]{figures/before_after/target.pdf}
 	\caption{Target image}\label{fig_beforeafter-target}
 \end{subfigure}
-\begin{subfigure}[b]{0.32\linewidth}\centering
-\includegraphics[width=\linewidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4before_approx.pdf}
-\caption{Approx.\@ before adding}\label{fig_beforeafter-approx_before}
-\end{subfigure}
-\begin{subfigure}[b]{0.32\linewidth}\centering
-\includegraphics[width=\linewidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4after_approx.pdf}
-\caption{Approx.\@ after adding}\label{fig_beforeafter-approx_after}
-\end{subfigure}
-\begin{subfigure}[b]{0.32\linewidth}\centering
-\includegraphics[width=\linewidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4before_objmatrix.pdf}
+\begin{subfigure}[b]{0.34\linewidth}\centering
+\includegraphics[width=\linewidth]{figures/before_after/before_gain.pdf}
 \caption{Gain-per-added-point}\label{fig_beforeafter-gain}
 \end{subfigure}
-\begin{subfigure}[b]{0.32\linewidth}\centering
-\includegraphics[width=\linewidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4before_partgrad4.pdf}
-\caption{Gradient before}\label{fig_beforeafter-grad_before}
-\end{subfigure}
-\begin{subfigure}[b]{0.32\linewidth}\centering
-\includegraphics[width=\linewidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4after_partgrad4.pdf}
-\caption{Gradient after}\label{fig_beforeafter-grad_after}
-\end{subfigure}
-\begin{subfigure}[b]{0.32\linewidth}\centering
-\includegraphics[width=\linewidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4before_objmatrix_bestvalues.pdf}
+\begin{subfigure}[b]{0.34\linewidth}\centering
+\includegraphics[width=\linewidth]{figures/before_after/before_gain_bestvalues.pdf}
 \caption{Best values of \ref{fig_beforeafter-gain}}\label{fig_beforeafter-gain_best}
 \end{subfigure}
-\begin{subfigure}[b]{0.32\linewidth}\centering
-\includegraphics[width=\linewidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4before_partgrad4_bestvalues.pdf}
+
+\begin{subfigure}[b]{0.28\linewidth}\centering
+\includegraphics[width=\linewidth]{figures/before_after/before_approx.pdf}
+\caption{Approx.\@ before adding}\label{fig_beforeafter-approx_before}
+\end{subfigure}
+\begin{subfigure}[b]{0.34\linewidth}\centering
+\includegraphics[width=\linewidth]{figures/before_after/before_partgrad4.pdf}
+\caption{Gradient before}\label{fig_beforeafter-grad_before}
+\end{subfigure}
+\begin{subfigure}[b]{0.34\linewidth}\centering
+\includegraphics[width=\linewidth]{figures/before_after/before_partgrad4_bestvalues.pdf}
 \caption{Best values of \ref{fig_beforeafter-grad_before}}\label{fig_beforeafter-grad_before_best}
 \end{subfigure}
-\begin{subfigure}[b]{0.32\linewidth}\centering
-\includegraphics[width=\linewidth]{figures/before_after/xp_128x128_sc2_angl1_K3_S3_node4after_partgrad4_bestvalues.pdf}
-\caption{Best values of \ref{fig_beforeafter-grad_after}}\label{fig_beforeafter-grad_after_best}
+
+\begin{subfigure}[b]{0.28\linewidth}\centering
+\includegraphics[width=\linewidth]{figures/before_after/gainafter_approx.pdf}
+\caption{Approx.\@ after adding}\label{fig_beforeafter-gainadd-approx_after}
 \end{subfigure}
+\begin{subfigure}[b]{0.34\linewidth}\centering
+\includegraphics[width=\linewidth]{figures/before_after/gainafter_partgrad4.pdf}
+\caption{Gradient after}\label{fig_beforeafter-gainadd-grad_after}
+\end{subfigure}
+\begin{subfigure}[b]{0.34\linewidth}\centering
+\includegraphics[width=\linewidth]{figures/before_after/gainafter_partgrad4_bestvalues.pdf}
+\caption{Best values of \ref{fig_beforeafter-gainadd-grad_after}}\label{fig_beforeafter-grad_after_best}
+\end{subfigure}
+
+\begin{subfigure}[b]{0.28\linewidth}\centering
+\includegraphics[width=\linewidth]{figures/before_after/gradafter_approx.pdf}
+\caption{Approx.\@ after adding}\label{fig_beforeafter-grad-approx_after}
+\end{subfigure}
+\begin{subfigure}[b]{0.34\linewidth}\centering
+\includegraphics[width=\linewidth]{figures/before_after/gradafter_partgrad4.pdf}
+\caption{Gradient after}\label{fig_beforeafter-gradadd-grad_after}
+\end{subfigure}
+\begin{subfigure}[b]{0.34\linewidth}\centering
+\includegraphics[width=\linewidth]{figures/before_after/gradafter_partgrad4_bestvalues.pdf}
+\caption{Best values of \ref{fig_beforeafter-gradadd-grad_after}}\label{fig_beforeafter-gradadd-grad_after_best}
+\end{subfigure}
+
 \caption{Effect of adding one point to the support $\s^4$. The “before” tree is a converged solution of \ac{PALMTREE}. The “after” tree has been added a point where the gain-per-added-point is maximal.}\label{fig_beforeafter}
-\end{figure}\todo{Add figures with “after adding best grad”}
+\end{figure}
+
+
+
+
+
 
 The experimental results shown in \cref{fig_beforeafter} are based on the results of \cref{fig_gain_n4-approx}, where \cref{fig_beforeafter-target,fig_beforeafter-approx_before,fig_beforeafter-gain,fig_beforeafter-grad_before,fig_beforeafter-gain_best,fig_beforeafter-grad_before_best} are the same meaning as for the previous experiment. 
 \cref{fig_beforeafter-approx_after,fig_beforeafter-grad_after,fig_beforeafter-grad_after_best} show what  happens if we add the minimum point of gain-per-added-point to $\s^4$ and continue the minimization. We note that the approximation in \cref{fig_beforeafter-approx_after} looks visually closer to the target image \cref{fig_beforeafter-target} and that the RMSE is decreased by 16\% (lower is better).
@@ -869,26 +889,15 @@ The following experiments using OMP-PALMTREE have been set such that
 \includegraphics[width=1\textwidth]{figures/tree-scattered-supports/tree.pdf}
 	\caption{Learned support tree}\label{fig_test_omppalmtree-tree}
 \end{subfigure}
-\caption{Results after using \cref{alg_omppalmtree}. Each support has been cropped to the minimal square that contains all elements; the number under each support gives the width of that square.}\label{fig_test_omppalmtree}
-\end{figure}\todo{tell the size of each square}
+\caption{Results after using \cref{alg_omppalmtree}. Each support has been cropped to the minimal square that contains all elements; the number under each support gives the width of that square. The smaller the number is, the more gathered the elements are.}\label{fig_test_omppalmtree}
+\end{figure}
 
 \noindent
 A first result using the original OMP-PALMTREE (\cref{alg_omppalmtree}) is displayed in \Cref{fig_test_omppalmtree}. Note that we cannot distinguish the elements of the supports. A zoom on one of the supports is made in \cref{fig_scattered_support-tree} (section below).
-\todo[inline]{explain that “heuristically”, the problem of scattered gradients is due to...}
 
 \subsection{Problem of scattered elements using \cref{alg_omppalmtree}}
  
 An unexpected issue was observed in \cref{fig_test_omppalmtree} when running the \cref{alg_omppalmtree} on a tree instead of a single branch: as shown in \cref{fig_scattered_support-tree}, the elements of the learned supports are scattered in distant clusters. 
-
-\noindent 
-This can be interpreted as an identifiability problem of the atoms. (one feature corresponds to one curvelet among the 16 that forms the target).
-An atom is said to be well identified when it can explain one feature of the image without any contributions from the other atoms. A poorly identified atom will result in having features that are represented using multiple atoms at once. For example, in our experiments, the 16 curvelets of the target image are 16 different features. The learned dictionary can be either composed of 16 well identified atoms (one atom represents one feature) or it can be composed of a “single” huge atom that is made of 16 small and scattered pieces.
-This problem can also be considered (to an extent) as an \emph{overlearning} problem as it reflects atoms that are too specialized with respect to the learning images and thus, cannot be used for other images.
-
-\noindent
-Ideally, we would like all elements to be centered around the origin\footnote{In the figures, the origin is at the center of the image} in order to have well identified atoms. However, the gradient indicated elements that were far from each other.
-
-
 
 \begin{figure}[!ht] \centering
 \begin{subfigure}[b]{0.65\textwidth}\centering
@@ -903,9 +912,12 @@ Ideally, we would like all elements to be centered around the origin\footnote{In
 \end{figure}
 
 \noindent
-\Cref{fig_scattered_support-tree} illustrates this problem; every support has its elements scattered instead of being concentrated around the origin. The corresponding gradient, shown in \cref{fig_scattered_support-grad}, has multiple “local” maxima that are far from the origin. 
+This can be interpreted as an identifiability problem of the atoms (one feature corresponds to one curvelet among the 16 that form the target).
+An atom is said to be well identified when it can explain one feature of the image without any contributions from the other atoms. A poorly identified atom will result in having features that are represented using multiple atoms at once. For example, in our experiments, the 16 curvelets of the target image are 16 different features. The learned dictionary can be either composed of 16 well identified atoms (one atom represents one feature) or it can be composed of a “single” huge atom that is made of 16 small and scattered pieces.
+The latter can be interpreted as an instance of overfitting, that is, the learned atoms are too specialized with respect to the learning images and thus, cannot be used for other images.
 
-
+\noindent
+Ideally, we would like all elements to be centered around the origin\footnote{In the figures, the origin is at the center of the image} in order to have well identified atoms. However, the gradient in \cref{fig_scattered_support-grad} indicates elements that are far from each other, leading to scattered support elements.
 
 \begin{algorithm}[!ht]
     \caption{OMP-PALMTREE (version 2, based on the original OMP-PALMTREE in \cref{alg_omppalmtree})}\label{alg_omppalmtree2}
@@ -1286,20 +1298,14 @@ with $\bm{b}$ following a centered Gaussian distribution $\mathcal{N}(0,\sigma^2
 \noindent
 This is because the variance in the $N$-dimensional space can be written as
 \begin{align*}
-\sigma^2(\bm{b}) =& \mathbb{E}\left[\lVert \bm{b}-\mathbb{E}(\bm{b}) \rVert^2 \right]\\
-=& \mathbb{E}\left(\lVert \bm{b} \rVert^2 \right)\\
-=& \mathbb{E}\left(\sum^N_{i=1} b_i^2 \right)\\
-\shortintertext{And as the variance is also $\sigma^2(\bm{b})= \frac{1}{N}\left(\sum_{i=1}^N b_i^2 \right) - \mathbb{E}(\bm{b})^2$, it becomes}
-=& \mathbb{E} \left(N\sigma^2(\bm{b}) + N\mathbb{E}(\bm{b})^2\right)\\
-=& N \mathbb{E} \left(\sigma^2(\bm{b})\right)\\
-=& ... \\
-=& \frac{1}{N}\lVert \bm{b} \rVert^2
-\end{align*}\todo{Ask for help}
-which gives 
+\mathbb{E}\left(\lVert \bm{b} \rVert^2 \right) =& \mathbb{E}\left(\sum^N_{i=1} b_i^2 \right) = \sum^N_{i=1} \mathbb{E}(b_i^2)  = N\sigma^2 \\
+\Leftrightarrow \sqrt{\mathbb{E}\left(\lVert \bm{b} \rVert^2 \right)} =& \sigma \sqrt{N}.
+\end{align*}
+The above expected value $\sqrt{\mathbb{E}\left(\lVert \bm{b} \rVert^2 \right)}$ can be roughly\footnote{I didn't work on the proof of this assumption.} seen as the expected value $\mathbb{E}(\|\bm{b}\|)$; with such hypothesis, we can write
 \begin{equation*} \lVert \bm{b} \rVert = \sigma\sqrt{N} \end{equation*}
 When projected onto the $k$-dimensional space, the noise deviation becomes
 \begin{equation*}\lVert \bm{b} \rVert = \sigma\sqrt{k} \end{equation*}
-which is much better than the previous distance, provided that $k \ll N$. 
+which is much better than the previous distance, provided that $k \ll N$.
 
 \begin{figure}[!ht]\centering
 \includegraphics[width=0.4\textwidth]{figures/sparse-reduce-noise.pdf}
