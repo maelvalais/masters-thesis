@@ -478,7 +478,7 @@ In the previous chapter, we studied the convolutional tree model proposed in \ci
 
 \noindent
 This chapter reviews our attempts for learning the supports within PALMTREE. More specifically, we identified and studied three sub-problems that are presented in the three next sections: 
-\begin{enumerate}[label=--,noitemsep,topsep=-5pt]
+\begin{enumerate}[label=--,noitemsep,nolistsep]
 	\item \emph{How to decide on which elements to add?} For this problem, we propose a solution based on the gradient and inspired from the \acs{OMP} algorithm;
 	\item \emph{How to solve for one branch?} For this sub-problem, we propose a multi-adding scheme with a partial PALMTREE solution for each \acs{OMP} iteration;
 	\item \emph{How to solve for a tree?} For this sub-problem, which is actually a problem on its own, we introduce a regularization parameter in order to concentrate the supports.
@@ -864,11 +864,8 @@ The resulting approximation plotted in \cref{fig_learnsupp_branch-learned_approx
 \FloatBarrier
 \section{Learning supports for a tree}
 
-The previous section has shown encouraging results for a single branch dictionary. In this section, we investigate the use of the gradient for adding support elements in a tree. 
-
-\noindent
-More specifically, we study two sub-problems that came up with the use of the tree:
-\begin{enumerate}[label=--,noitemsep,topsep=-5pt]
+The previous section has shown encouraging results for a single branch dictionary. In this section, we investigate the use of the gradient for adding support elements in a tree. More specifically, we study two sub-problems that came up with the use of the tree:
+\begin{enumerate}[label=--,noitemsep,nolistsep]
 	\item \emph{How to prevent the elements from being scattered?} For this problem, we propose a simple regularization scheme based on the distance to the center of the gradient;
 	\item \emph{How to prevent the number of elements per support from being unbalanced?} In order to solve this issue, we present a modified regularization function which takes into account the specificity of every support.
 \end{enumerate}
@@ -879,8 +876,8 @@ More specifically, we study two sub-problems that came up with the use of the tr
 For testing our support learning algorithm OMP-PALMTREE (\cref{alg_omppalmtree}), we propose to use the convolutional tree defined in \cref{fig_learntree_setup}. The target $\y$ in \cref{fig_learntree_setup-target} is made of curvelets at different scales and angles; from left to right and top to bottom, the 16 curvelets of $\y$ (numbered 1 through 16) have the corresponding codes $\x^l$ with $l=1,\dots,16$. Note that the codes are located at the centers of their corresponding curvelets, as shown in \cref{fig_learntree_setup-codes}.
 The following experiments using OMP-PALMTREE have been set such that
 \begin{enumerate}[label=(\roman*),noitemsep,nolistsep]
-	\item at the “adding elements” step, 5 elements are added instead of only 1;
-	\item at the PALMTREE minimization step, PALMTREE does a maximum of 5 iterations.
+\item at the “adding elements” step, 5 elements are added instead of only 1;
+\item at the PALMTREE minimization step, PALMTREE does a maximum of 5 iterations.
 \end{enumerate}
 
 \begin{figure}[!ht] \centering
@@ -1045,6 +1042,7 @@ This brute-force method could be a possible way of tuning the $\alpha$. However,
 
 The regularization parameter $\alpha$ should be estimated from the target image, meaning that finding the right $\alpha$ should be a part of the algorithm. Many methods are available in the literature; one of the simplest is the Blind Method proposed in \cite{almeida_parameter_2013}. We can also mention the state-of-the-art SURE method (Stein’s unbiased risk estimate), proposed in \cite{eldar_generalized_2009} as well as the Bayesian regularization method developed in \cite{archer_bayesian/regularization_1995}.
 
+\noindent
 These algorithms have not been investigated during this internship and will be conducted in a PhD thesis.
 
 \subsection{Regularization problem: unbalanced supports}\label{sec_pbm_unbalanced_supports}
@@ -1118,7 +1116,7 @@ This regularization function is simply adjusted with respect to the amplitude of
 \FloatBarrier
 \noindent
 We compared in \cref{fig_cmpunbalanced-seq_vs_grad} the results using $f’$ against a modified version of OMP-PALMTREE where the elements are added sequentially on every support (only $p$ is determined with the gradient).
-\begin{enumerate}[label=(\alph*)]
+\begin{enumerate}[label=(\alph*),noitemsep,]
 	\item $e$ and $p$ are both chosen using the gradient (\cref{fig_cmpunbalanced-grad_tree});
 	\item $p$ is chosen using the gradient, $e$ is sequentially selected: we add an element to $\s^1$, then to $\s^2$\dots so that every support has the exact same number of elements (\cref{fig_cmpunbalanced-seq_tree}).
 \end{enumerate}
