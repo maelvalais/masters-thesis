@@ -24,24 +24,11 @@ This master’s thesis presents the algorithm OMP-PALMTREE for training fast dic
 \end{abstract}
 
 
-\vfill
 \begin{foreword}[Foreword]
 This master's thesis is the result of a six months internship  at the Institut de Mathématiques de Toulouse in the Mathematics for the Industry and Physics (MIP) team, in collaboration with the Signal and Communication (SC) team at IRIT\footnotemark[1]-ENSEEIHT\footnotemark[2]. This thesis is a requirement for the M2R Computer Science and Telecommunications, specialty “Operations Research” at the Paul Sabatier University (the courses are jointly taught at ENAC, INSA and ISAE-Supaéro).
 \end{foreword}
 
 
-%My first and foremost thanks goes to my family. They are wonderfully helpful and supportive people that I would give my everything for. From the bottom of my heart, thank you for being who you are.%My supervisors Fredrik Sandin and Jens Eliasson have my thanks for their steady guidance and thought-provoking advice. My friend and fellow student Joakim Nilsson have my thanks for his support and hard work developing the hardware necessary for running my algorithm.%I would also like to thank the good people at SKF UTC. You have all been a tremendously fun group to spend the past four months with!
-
-%I would first like to thank my adviser, Mahmood R. Azimi-Sadjadi, for his support and invalu- able guidance throughout the course of my research. He has taught me the value of well-developed research. His time and assistance has been greatly appreciated throughout my graduate education.%I would also like to thank my committee members, Dr. Ali Pezeshki and Dr. F. Jay Breidt, for their time and assistance.%I would like to thank the Office of Naval Research (ONR) and the Naval Surface Warfare Center (NSWC) in Panama City, Florida for providing the funding and the data used in this project. This project has been funded by the Office of Naval Research (ONR-3210E) under contract number N00014-12-C-0017. Without the funding from ONR and the data from NSWC, this work would have never been completed.%I would also like to thank my colleagues in the Signal and Image Processing Lab. They have provided an excellent working environment. Special thanks to Nick Klausner for his much needed help and advice.%Finally, I would like to thank my family for their support and guidance throughout my entire education.
-
-
-%I would like to extend my sincere appreciation to Professor Javad Alirezaie, my MASc. supervisor in Department of Electrical and Computer Engineering, Ryerson University for helping me to research in my interested area, image and signal processing, and for his advices through my researches and studies.%I would like to express my appreciation to Dr. Paul Babyn for his support and comments on my papers and my research trend.%I am very grateful to my spouse, Ms. Hoda Mofidinasrabadi for accompanying me and for her great emotional support during my study at the Ryerson University.%Also, I would like to thank my parents for their encouragement and support and also, many thanks to my friends at the Ryerson University to help me better achieve my purpose.
-
-
-%Firstly, I would like to thank Professor Kozerke, with whom I had done my semester project, for suggesting this thesis and for taking his time to oversee my project. Secondly, a big thanks to my two advisors, Con- stantin and Georg: both of you were fantastic throughout the entire project and especially towards the end, when things got a little hectic. They were always there when I got stuck and without them this project would have been impossible to complete.%A big thanks to the people in the offices F69 and F71, past and present, for making the time of this thesis and the semester project last year more fun and providing some distractions: Mark (or Marc, I always for- get), Momo, Gari, Arturo (commonly known as R2), MingMingMingMingMingMingMing, Datta, Eleanor, Mock, Peeeeeeeter, Livie, Claude, and Sascha (who is actually Alexander).%Also a big thanks to the rest of the students of the Biomedical Engineering Program, the old as well as the new, especially Yoran, Enrico, Emma, Silvan, and Robert Bobert of Bobington.%A big thanks to my parents and my brother for their continued love and support, and another thanks to my brother for proofreading my report.%This time, before they insist on being mentioned, a shout-out to the ex2c-crowd (in a very particular order): Ba ̈bi, Big Pete, (Little) Pete, Erik, Thomas, Roman, Juchli, Sa ̈mi, and our youngest and newest friend, Noah.
-
-
-%First and foremost, I would like to express my deep gratitude to my research supervisor Dr.Kaamran Raahemifar, for his patient guidance, enthusiastic encouragement and useful critiques of this research work. I would also like to thank Dr. Raahemifar, for his advice and assistance in keeping my progress on schedule throughout my academic years at Ryerson.%I would like to thank Mathi for his input and supportive criticism towards the thesis and continued support in all my endeavors.%Finally, I wish to thank my parents, Manonmany and Tharmalingam, and my wife Kasthuri for their continued love, support and encouragement in all my endeavors.
 \begin{foreword}[Acknowledgements]First and foremost, I would like to extend my sincere gratitude to my research supervisors François Malgouyres, Jean-Yves Tourneret and Herwig Wendt for their enthusiastic encouragement and enlighten critiques. Thanks you,
 \begin{enumerate}[label=--,noitemsep,nolistsep]
 	\item François, for your kindness whatever the level of non-understanding I was going through;
@@ -53,10 +40,13 @@ A big thanks to the mathematicians of the “Trainee Office”: Timothée Mathie
 
 Finally, I wish to thank my fellows of the M2R “Operations research” 2016 promotion: Miezan Thomas, Luca Mossina, Benjamin Simon and Mustapha Ouaada. This was a tough but so much worth it; I really enjoyed the many week-end spent at ENAC working together (and eating for cheap).
 
-
 \begin{flushright}Maël Valais\end{flushright}
 
-\vfill
+\footnotetext[1]{Institut de Recherche en Informatique de Toulouse}
+\footnotetext[2]{École Nationale Supérieure d'Électrotechnique, d'Électronique, d'Informatique, d'Hydraulique et des Télécommunications}
+\end{foreword}
+
+% Document revision and last updated date
 \begin{table}[hbt]\centering
   \begin{tabular}{>{\bf}rl}
    Document revision & \gitFirstTagDescribe{} \\
@@ -64,11 +54,8 @@ Finally, I wish to thank my fellows of the M2R “Operations research” 2016 pr
    Author & \gitAuthorName{} (\gitAuthorEmail{})
   \end{tabular}
 \end{table}
-\vfill
+\vskip 2cm
 
-\footnotetext[1]{Institut de Recherche en Informatique de Toulouse}
-\footnotetext[2]{École Nationale Supérieure d'Électrotechnique, d'Électronique, d'Informatique, d'Hydraulique et des Télécommunications}
-\end{foreword}
 
 \tableofcontents
 %{\let\clearpage\relax\listoffigures}

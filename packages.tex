@@ -61,10 +61,12 @@
 \def\endkeywords{\par}
 
 \newenvironment{foreword}[1][Foreword]{
+	\topskip0pt
+	\vspace*{\fill}
 	\begin{center}% 
 		{\bfseries #1}%
 	\end{center}%
-}{}
+}{\vspace*{\fill}}
 
 
 %\usepackage{multirow} % Pour colonnes multiples des tableaux
