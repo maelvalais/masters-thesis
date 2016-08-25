@@ -25,7 +25,7 @@ This master’s thesis presents the algorithm OMP-PALMTREE for training fast dic
 
 
 \begin{foreword}[Foreword]
-This master's thesis is the result of a six months internship  at the Institut de Mathématiques de Toulouse in the Mathematics for the Industry and Physics (MIP) team, in collaboration with the Signal and Communication (SC) team at IRIT\footnotemark[1]-ENSEEIHT\footnotemark[2]. This thesis is a requirement for the M2R Computer Science and Telecommunications, specialty “Operations Research” at the Paul Sabatier University (the courses are jointly taught at ENAC, INSA and ISAE-Supaéro).
+This master's thesis is the result of a six months internship  at the \ac{IMT} in the Mathematics for the Industry and Physics (MIP) team, in collaboration with the Signal and Communication (SC) team at IRIT\footnotemark[1]-ENSEEIHT\footnotemark[2]. This thesis is a requirement for the M2R Computer Science and Telecommunications, specialty “Operations Research” at the Paul Sabatier University (the courses are jointly taught at ENAC, INSA and ISAE-Supaéro).
 \end{foreword}
 
 
@@ -38,12 +38,13 @@ This master's thesis is the result of a six months internship  at the Institut d
 
 A big thanks to the mathematicians of the “Trainee Office”: Timothée Mathieu, Maylis Varvenne, Mickael Albertus and Laurence Denneulin. Special thanks to Timothée, who has excellent teaching skills and to whom I will be eternally grateful!
 
-Finally, I wish to thank my fellows of the M2R “Operations research” 2016 promotion: Miezan Thomas, Luca Mossina, Benjamin Simon and Mustapha Ouaada. This was a tough but so much worth it; I really enjoyed the many week-end spent at ENAC working together (and eating for cheap).
+Finally, I wish to thank my fellows of the M2R “Operations research” (M2RIT\_RO15) 2015 promotion: Miezan Thomas, Luca Mossina, Benjamin Simon and Mustapha Ouaada. This was a tough but so much worth it; I really enjoyed the many week-end spent at ENAC\footnotemark[3] working together (and eating for cheap).
 
 \begin{flushright}Maël Valais\end{flushright}
 
 \footnotetext[1]{Institut de Recherche en Informatique de Toulouse}
 \footnotetext[2]{École Nationale Supérieure d'Électrotechnique, d'Électronique, d'Informatique, d'Hydraulique et des Télécommunications}
+\footnotetext[3]{École Nationale de l'Aviation Civile. This is the place where most of the M2RIT\_RO15 courses took place.}
 \end{foreword}
 
 % Document revision and last updated date
@@ -907,6 +908,8 @@ The following experiments using OMP-PALMTREE have been set such that
 \end{subfigure}
 \caption{Results after using \cref{alg_omppalmtree}. Each support has been cropped to the minimal square that contains all elements; the number under each support gives the width of that square. The smaller the number is, the more gathered the elements are.}\label{fig_test_omppalmtree}
 \end{figure}
+
+\noindent The experiments have been run using MATLAB R2016a on the Cauchy mainframe at \ac{IMT} (64 cores Intel® Xeon® CPU E5-4650 @ 2.70GHz, 512 GB RAM, GPU NVIDIA Quadro 2000 1 GB RAM and SDK Cuda 7.5). Although this server had plenty of cores, PALMTREE has not been parallelized yet, forcing us to run it on a single processor. However, the many available cores have been useful for launching many runs of the algorithm (e.g., for trying many parameters). The MATLAB code base is stored on a git repository on a \ac{IMT} server.
 
 \noindent
 A first result using the original OMP-PALMTREE (\cref{alg_omppalmtree}) is displayed in \Cref{fig_test_omppalmtree}. Note that we cannot distinguish the elements of the supports. A zoom on one of the supports is made in \cref{fig_scattered_support-tree} (section below).
