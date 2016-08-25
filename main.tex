@@ -69,7 +69,7 @@ Finally, I wish to thank my fellows of the M2R “Operations research” 2016 pr
 A sparse signal over some representation means that it can be expressed using only a few elements of the representation – in other words, sparse means with many zero coefficients. Many applications ranging from machine learning to image denoising and image recognition heavily rely on the property that we can summarize (or more exactly approximate) any signal using a proper sparse representation. The job of obtaining the original signal from its sparse counterpart can be written in terms of an operator, often called \emph{dictionary} or \emph{transform}. 
 
 \noindent
-In this introductory chapter, we introduce and review the main existing dictionaries that have been used for sparse representations, from non-adaptive transforms to learned dictionaries via the intermediate over-complete dictionaries. The second part of this chapter provides the general motivations and objectives of this work as well as the related works.
+In this introductory chapter, we introduce and review the main existing dictionaries that have been used for sparse representations, from non-adaptive transforms to learned dictionaries via the intermediate over-complete dictionaries. The second part of this chapter provides the motivations and general objectives of this work as well as the related works.
 
 \section{Basis and redundant dictionaries}
 
@@ -211,7 +211,7 @@ Translation-invariant transforms are known as convolutional dictionaries. Instea
 \noindent
 Many state-of-the-art machine learning techniques are based on trees of convolutions, such as the Convolutional Neural Networks used in Deep learning \cite{lecun_deep_2015}.
 
-\section{Research motivations and objectives}
+\section{Research motivations and general objectives}
 Sparse representations have been used successfully in many applications. The use of these representations is only limited by the performance of their transforms. By performance, we mean that the transform must be
 \begin{enumerate}[label=--,noitemsep,nolistsep]
 \item fast (fast computation of $\D\x$),
@@ -223,7 +223,7 @@ Sparse representations have been used successfully in many applications. The use
 As mentioned, many algorithms are available in the literature. However, they are often fast but not adaptive (such as the Fourier transform) or adaptive and not fast (such as \ac{KSVD}).
 
 \noindent
-The main objective of this work is to develop a multi-resolution dictionary model (allowing large atoms to be considered) that is fast and adaptive, based on the principle of convolutional trees. During his PhD thesis, Olivier Chabiron has been working on a \gls{treemodel}, presented in the paper \citetitle{chabiron_optimization_2016} (\cite{chabiron_optimization_2016}). Our work will focus on this model for \eqref{eq_dl}.
+The main general objective of this work is to develop a multi-resolution dictionary model (allowing large atoms to be considered) that is fast and adaptive, based on the principle of convolutional trees. During his PhD thesis, Olivier Chabiron has been working on a \gls{treemodel}, presented in the paper \citetitle{chabiron_optimization_2016} (\cite{chabiron_optimization_2016}). Our work will focus on this model for \eqref{eq_dl}.
 
 
 \section{Related work}
