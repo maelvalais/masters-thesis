@@ -1304,11 +1304,11 @@ This is because the variance in the $N$-dimensional space can be written as
 \mathbb{E}\left(\lVert \bm{b} \rVert^2 \right) =& \mathbb{E}\left(\sum^N_{i=1} b_i^2 \right) = \sum^N_{i=1} \mathbb{E}(b_i^2)  = N\sigma^2 \\
 \Leftrightarrow \sqrt{\mathbb{E}\left(\lVert \bm{b} \rVert^2 \right)} =& \sigma \sqrt{N}.
 \end{align*}
-The above expected value $\sqrt{\mathbb{E}\left(\lVert \bm{b} \rVert^2 \right)}$ can be roughly\footnote{I didn't work on the proof of this assumption.} seen as the expected value $\mathbb{E}(\|\bm{b}\|)$; with such hypothesis, we can write
-\begin{equation*} \lVert \bm{b} \rVert = \sigma\sqrt{N} \end{equation*}
-When projected onto the $k$-dimensional space, the noise deviation becomes
-\begin{equation*}\lVert \bm{b} \rVert = \sigma\sqrt{k} \end{equation*}
-which is much better than the previous distance, provided that $k \ll N$.
+The expected norm of the noise is
+\begin{equation*} \sqrt{\mathbb{E}\left(\lVert \bm{b} \rVert^2 \right)} = \sigma\sqrt{N} \end{equation*}
+When projected onto the $k$-dimensional space, the expected norm of the noise becomes
+\begin{equation*}\sqrt{\mathbb{E}\left(\lVert \bm{b} \rVert^2 \right)} = \sigma\sqrt{k} \end{equation*}
+which is much better than the previous expected norm, provided that $k \ll N$.
 
 \begin{figure}[!ht]\centering
 \includegraphics[width=0.4\textwidth]{figures/sparse-reduce-noise.pdf}
