@@ -7,23 +7,40 @@
 # while do
 #    ...
 # done < <(find samples/ )
-mvpath=_figures
-imgused=`./included_figures.sh`
 
 mv=false
 stays_display=true
 moves_display=true
 one_display=false
-
+mvpath=_figures
 while [ $# -ne 0 ]; do
-    if [ $1 == "-f" ]; then
+    if [ $1 == "--move" ]; then
+        if [ $# -ge 2 -a -d "$2" ]; then
+            mvpath=$2
+            shift # We must shift $2 in addition to $1
+        fi
         mv=true
-    fi
-    if [ $1 == "-m" ]; then
+    elif [ $1 == "-m" ]; then
         moves_display=false
-    fi
-    if [ $1 == "-s" ]; then
+    elif [ $1 == "-s" ]; then
         stays_display=false
+    elif [ $1 == "-h" -o $1 == "--help" ]; then
+        echo "$0 moves the .pdf, .jpg or .png that are present in your"
+        echo "project but that aren't included in any of your .tex."
+        echo "Usage:"
+        echo "    $0 [-m] [–s] [--move [folder]]"
+        echo "Options:"
+        echo "    -m               Display figures that are going to be moved"
+        echo "    -s               Display figures that are going to stay"
+        echo "    --move [folder]  Launch the move process to the --move folder"
+        echo "                     By default, the moveto folder is $mvpath."
+        echo "By default, lists both moving and staying files."
+        echo "Examples:"
+        echo "1) First, check that the figures that are going to be moved are correct:"
+        echo "    $0 -m"
+        echo "2) Second, you can launch the move process"
+        echo "    $0 --move _figures"
+        exit
     fi
     shift
 done
@@ -31,10 +48,12 @@ if [ $moves_display = false -o $stays_display = false ]; then
     one_display=true
 fi
 
+imgused=`./included_figures.sh`
+
 if [ $mv = false ]; then
-    if [ $one_display = false ]; then echo "dry-run mode"; fi
+    if [ $one_display = false ]; then echo "Dry-run mode"; fi
 else
-    echo "move mode: are you sure? y/n"
+    echo "Are you sure you want to move every unincluded files to $mvpath? y/n"
     read c
     if [ $c != "y" ]; then
         exit
