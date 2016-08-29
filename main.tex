@@ -38,7 +38,7 @@ This master's thesis is the result of a six months internship  at the \ac{IMT} i
 
 A big thanks to the mathematicians of the “Trainee Office”: Timothée Mathieu, Maylis Varvenne, Mickael Albertus and Laurence Denneulin. Special thanks to Timothée, who has excellent teaching skills and to whom I will be eternally grateful!
 
-Finally, I wish to thank my fellows of the M2R “Operations research” (M2RIT\_RO15) 2015 promotion: Miezan Thomas, Luca Mossina, Benjamin Simon and Mustapha Ouaada. This was a tough but so much worth it; I really enjoyed the many week-end spent at ENAC\footnotemark[3] working together (and eating for cheap).
+Finally, I wish to thank my fellows of the M2R “Operations research” (M2RIT\_RO15) 2015 promotion: Miezan Thomas, Luca Mossina, Benjamin Simon and Mustapha Ouaada. This was tough but so much worth it; I really enjoyed the many week-ends spent at ENAC\footnotemark[3] working together (and eating for cheap).
 
 \begin{flushright}Maël Valais\end{flushright}
 
@@ -482,7 +482,7 @@ This chapter reviews our attempts for learning the supports within PALMTREE. Mor
 \begin{enumerate}[label=--,noitemsep,nolistsep]
 	\item \emph{How to decide on which elements to add?} For this problem, we propose a solution based on the gradient and inspired from the \acs{OMP} algorithm;
 	\item \emph{How to solve for one branch?} For this sub-problem, we propose a multi-adding scheme with a partial PALMTREE solution for each \acs{OMP} iteration;
-	\item \emph{How to solve for a tree?} For this sub-problem, which is actually a problem on its own, we introduce a regularization parameter in order to concentrate the supports.
+	\item \emph{How to solve for a tree?} For this sub-problem, which is actually a problem on its own, we compare several strategies together with the introduction of a regularization parameter for localizing the atoms.
 \end{enumerate}
 
 
@@ -491,10 +491,10 @@ This chapter reviews our attempts for learning the supports within PALMTREE. Mor
 We proposed in this work to learn the supports along with the kernels. In this section, we study the possibility of using the gradient defined in \cref{eq_gradient} (\cpageref{eq_gradient}) for locating the best support element (not already in the support) that we might then add. 
 
 \noindent
-The motivation is that the greatest gradient coefficient indicates towards which direction the objective function may decrease; assuming that this direction wasn't in the support, integrating it will lead to a (locally) better solution.
+The motivation is that the direction of largest gradient coefficient indicates the direction of local decrease of the objective function; assuming that this direction wasn't in the support, incorporating it will lead to a (locally) better solution.
 
 \noindent 
-After defining the experimental setup for testing the gradient as a mean for adding a support element, we study the computability of the gradient. We then check that the greatest gradient direction leads to a good support element, comparing the gradient greatest directions to an ad hoc gain matrix. We eventually notice that the greatest gradient direction can be used for adding before the convergence of PALMTREE.
+After defining the experimental setup for testing the gradient as a mean for adding a support element, we study the computability of the gradient. We then check that the position of largest gradient direction leads to a good support element, comparing the gradient greatest directions to an empirical ground truth. We eventually notice that the greatest gradient direction can be used for adding a support element before the convergence of PALMTREE.
 
 \subsection{Experimental setup}
 Every experiment in the first part of this chapter uses a fixed single-branch tree of depth 4 associated with $\y$, $\h^e$, $\s^e$ and $\x^e$ of size $128 \times 128$. The figures only display the central $64 \times 64$ pixels as shown in \cref{fig_xp_explain}.
@@ -772,7 +772,7 @@ Finally, \cref{fig_gain_tilted_n4} presents the same experiment but with a diffe
 \end{subfigure}
 
 \caption{Effect of adding one point to the support $\s^4$. The “before” tree is a converged solution of \ac{PALMTREE}. In the “after” solutions (in \cref{fig_beforeafter-aftergainadd-approx,fig_beforeafter-aftergainadd-grad,fig_beforeafter-aftergainadd-grad_best}), a point has been added where the gain-per-added-point is maximal; in \cref{fig_beforeafter-aftergradadd-approx,fig_beforeafter-aftergradadd-grad,fig_beforeafter-aftergradadd-grad_best}, a point has been added where the gradient (in absolute value) is maximal.}\label{fig_beforeafter}
-\end{figure}
+\end{figure}\todo{}
 
 We want to look at the improvement of the approximation when adding one support element using the gradient, compared to adding a support element using the gain-per-added-point.
 
@@ -781,10 +781,10 @@ The experimental results shown in \cref{fig_beforeafter} are based on the result
 \Cref{fig_beforeafter-aftergainadd-approx,fig_beforeafter-aftergainadd-grad,fig_beforeafter-aftergainadd-grad_best} show what happens if we add the maximum point of gain-per-added-point to $\s^4$ and continue the minimization; in \cref{fig_beforeafter-aftergradadd-approx,fig_beforeafter-aftergradadd-grad,fig_beforeafter-aftergradadd-grad_best}, we do the same using the maximum gradient point (in absolute value). 
 
 \noindent
-We note that wether using the gain or using the gradient, the approximations (respectively in \cref{fig_beforeafter-aftergainadd-approx,fig_beforeafter-aftergradadd-approx}) look visually closer to the target image and that the RMSE is decreased respectively by 16\% and 15\%. However, the gradient indicated an element at the north-east corner of the existing support while the gain indicated a south-west element: although the best values of the gain and the gradient are located in similar places, they resulted in two different solutions.
+We note that wether using the gain or using the gradient, the approximations (respectively in \cref{fig_beforeafter-aftergainadd-approx,fig_beforeafter-aftergradadd-approx}) look visually closer to the target image and that the RMSE is decreased respectively by 20\% and 18\%. However, the gradient indicates an element at the south-west corner of the existing support while the gain indicates a north-east element: although the best values of the gain and the gradient are located in similar places, they resulted in two different solutions.
 
 \noindent
-We also observe that after adding a point to the support using the gradient (materialized by the \nth{10} small square in \cref{fig_beforeafter-aftergradadd-grad_best}), the largest gradient values have “shifted” to the south-west. Thus, adding a point to the support has an effect on the whole neighborhood.
+We also observe that after adding a point to the support (materialized by the \nth{10} small square in \cref{fig_beforeafter-aftergainadd-grad_best,fig_beforeafter-aftergradadd-grad_best}), the largest gradient values have “shifted” away from the location we added an element. Thus, adding a point to the support has an effect on the whole neighborhood.
 
 \FloatBarrier
 \subsubsection{Adding elements before the convergence of \ac{PALMTREE}}\label{sec_add_before_converged}
