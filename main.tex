@@ -772,7 +772,7 @@ Finally, \cref{fig_gain_tilted_n4} presents the same experiment but with a diffe
 \end{subfigure}
 
 \caption{Effect of adding one point to the support $\s^4$. The “before” tree is a converged solution of \ac{PALMTREE}. In the “after” solutions (in \cref{fig_beforeafter-aftergainadd-approx,fig_beforeafter-aftergainadd-grad,fig_beforeafter-aftergainadd-grad_best}), a point has been added where the gain-per-added-point is maximal; in \cref{fig_beforeafter-aftergradadd-approx,fig_beforeafter-aftergradadd-grad,fig_beforeafter-aftergradadd-grad_best}, a point has been added where the gradient (in absolute value) is maximal.}\label{fig_beforeafter}
-\end{figure}\todo{}
+\end{figure}
 
 We want to look at the improvement of the approximation when adding one support element using the gradient, compared to adding a support element using the gain-per-added-point.
 
@@ -1197,12 +1197,15 @@ Finally, \cref{fig_learnsupp_vs_generic} shows the different approximations obta
 % 	I. this and this and this has been done. the result is an algo that…
 % 	II. that and that and that are questions to be studied in the future
 
-During this study, we investigated the use of the gradient for adding support elements in an \ac{OMP} manner. We experimentally showed that we could add multiple elements at each \ac{OMP} iteration, and that it is not necessary to do all the iterations of PALMTREE (until convergence) before going to the next OMP iteration. We proposed an  additive regularization scheme to avoid “scattered” support elements, and modified it to also prevent the “unbalanced” supports problem. We finally compared this regularization to adding sequentially on every supports.
+% You may want to be a bit more informative on the context here and say that you consider a previously existing algo (PALMTREE) for dictionary learning, with the specificity of relying on convolutive trees for constructing atoms, yet with a priori fixed kernel supports. Here, studied: also learning the supports of the kernels from the data.
+
+
+In this study, we consider a previously existing algorithm (PALMTREE) for dictionary learning, with the specificity of relying on convolutional trees for constructing atoms. Yet, this algorithm uses a priori fixed kernel supports; in this work, we studied the possibility of learning the kernel supports from the data. In order to learn the kernel supports, we investigated the use of the gradient for adding support elements in an \ac{OMP} manner. We experimentally showed that we could add multiple elements at each \ac{OMP} iteration, and that it is not necessary to do all the iterations of PALMTREE (until convergence) before going to the next OMP iteration. We proposed an  additive regularization scheme to avoid “scattered” support elements, and modified it to favor balanced support sizes across the tree. We finally compared this regularization to adding the elements sequentially on every supports.
 
 \noindent
 The result is a dictionary update algorithm (OMP-PALMTREE) that alternates between adding support elements and minimizing with PALMTREE, learning the dictionary from a single target image made of simple and well-separated curvelets and fixed codes. This algorithm yields  promising solutions compared to the “fixed supports” used in PALMTREE, with a RMSE drop of 58\% in the last experiment.
 
-In future developments, one might want to test the algorithm on other kinds of atoms (e.g., wavelet packets, cosines; in \cite{chabiron_optimization_2016}, wavelet packets have been tested). The regularization scheme could also be subject to improvements, with for example a multiplicative regularization function or the estimation of the hyper-parameter using the observed data during the algorithm. We might also to be able to remove support elements, and to learn the tree (add and remove edges) along with the supports (in \cite{chabiron_optimization_2016}, a tiling-like tree design has been showed to perform much better, specifically for curvelets).
+In future developments, one might want to test the algorithm on other kinds of atoms (e.g., wavelet packets, cosines; in \cite{chabiron_optimization_2016}, wavelet packets have been tested). The regularization scheme could also be subject to improvements, with for example a multiplicative regularization function or the estimation of the hyper-parameter using the observed data during the algorithm. We might also to be able to remove support elements, and to learn the tree (add and remove edges) along with the supports (in \cite{chabiron_optimization_2016}, a frequency-tiling-like tree design has been showed to perform much better, specifically for curvelets).
 
 \noindent
 In a broader perpective, “real” applications (such as denoising or image recognition) would require this algorithm to be used in conjunction with a sparse coding algorithm (some tests on dictionary learning have been reported in \cite{chabiron_optimization_2016}). Another important necessary development for “real” applications would be to modify the algorithm to use multiple images when learning, as well as make it scalable (like the Online Dictionary Learning algorithm).
