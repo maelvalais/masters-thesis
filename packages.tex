@@ -1,4 +1,4 @@
-\documentclass[11pt, a4paper,onecolumn, twoside,french]{report}
+\documentclass[11pt, a4paper,onecolumn, oneside,french]{report}
 % openany -> for drafts
 \usepackage[a4paper,top=2.5cm,bottom=2.5cm,inner=2.5cm,outer=2.5cm,marginparwidth=2cm,marginparsep=0.05cm]{geometry}
 %showframe -> to show the margins and everything
@@ -13,6 +13,11 @@
 \usepackage{amssymb} % for convolution sign
 %\usepackage{moreverb} % for c, cpp snippets
 \usepackage{enumitem} % \begin{enumerate} for more indent in itemize
+
+
+
+
+
 
 %\usepackage[english,boxed,lined,onelanguage]{algorithm2e}
 %\SetAlCapSkip{1em} % Margin between algo and caption
@@ -104,6 +109,25 @@
     } %\gitAbbrevHash
 }
 
+
+% For better \chapter{} headings
+\usepackage{titlesec}
+\definecolor{gray75}{gray}{0.75}
+\titleformat{\chapter}[hang]{\Huge\bfseries}{\thechapter\hspace{20pt}\textcolor{gray75}{|}\hspace{20pt}}{0pt}{\Huge\bfseries}
+
+% Even with \usepackage{titlesec}, we can't change the chapter heading whitespace. So I reduce the heading whitespaces here:
+\titlespacing*{\chapter}{0pt}{-20pt}{30pt}
+
+% For removing whitespaces from toc (table of contents)
+\usepackage{tocloft}
+\setlength\cftbeforetoctitleskip{15pt}
+\setlength\cftaftertoctitleskip{30pt}
+
+
+% For hiding a section/chapter from the toc
+% Usage: \tocless\chapter{My hidden chapter}
+\newcommand{\nocontentsline}[3]{}
+\newcommand{\tocless}[2]{\bgroup\let\addcontentsline=\nocontentsline#1{#2}\egroup}
 
 \makeglossary
 \makeindex

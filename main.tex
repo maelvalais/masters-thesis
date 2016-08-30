@@ -9,13 +9,12 @@
 \input{macros.tex}    % <-- \x, \y, \D...
 \input{acronyms.tex}  % <-- acronyms (\ac{PALM}...)
 \author{Maël Valais}
-\date{Updated on \today}
+\date{Last revision on \gitAuthorDate{}}
 \title{Optimization of Dictionaries Structured as Convolutional Trees for Sparse Image Representation - Master’s Thesis}
 \begin{document}
 \input{titlepage} % Uncomment to show title page
-\pagestyle{empty} \restoregeometry
-%\cleardoublepage % White until the next even page
-\pagestyle{body}
+\cleardoublepage % White until the next even page (if twoside)
+\pagestyle{empty}
 %{\let\clearpage\relax 
 \begin{abstract}
 This master’s thesis presents the algorithm OMP-PALMTREE for training fast dictionaries based on the convolutional tree model. Inspired by the construction of supports in OMP, this algorithm enhances PALMTREE by learning the supports (instead of fixing them). The  support adding step, as for OMP, is based on the maximum value of the gradient – which is shown to provide convincing indications on the best element that should be added. OMP-PALMTREE constitutes the “dictionary update” step in a standard dictionary learning algorithm, and must be associated with a “sparse coding” step (yet to be developed) for it to be used in applications like denoising or image recognition. Thanks to the convolutional tree model, dictionaries learned using OMP-PALMTREE are faster than dictionaries learned using a standard matrix-vector product (which yields quadratic computational cost), with a linear computational cost with respect to the size of the image.
@@ -36,7 +35,7 @@ This master's thesis is the result of a six months internship  at the \ac{IMT} i
 	\item Herwig, for being so demanding when commenting my manuscrits (I am good at writing vague sentences). I hope I am getting better!
 \end{enumerate}
 
-A big thanks to the mathematicians of the “Trainee Office”: Timothée Mathieu, Maylis Varvenne, Mickael Albertus and Laurence Denneulin. Special thanks to Timothée, who has excellent teaching skills and to whom I will be eternally grateful!
+A big thanks to the mathematicians of the “Trainee Office” at IMT: Timothée Mathieu, Maylis Varvenne, Mickael Albertus and Laurence Denneulin. Special thanks to Timothée, who has excellent teaching skills and to whom I will be eternally grateful!
 
 Finally, I wish to thank my fellows of the M2R “Operations research” (M2RIT\_RO15) 2015 promotion: Miezan Thomas, Luca Mossina, Benjamin Simon and Mustapha Ouaada. This was tough but so much worth it; I really enjoyed the many week-ends spent at ENAC\footnotemark[3] working together (and eating for cheap).
 
@@ -63,8 +62,9 @@ Finally, I wish to thank my fellows of the M2R “Operations research” (M2RIT\
 %{\let\clearpage\relax\listoftables}
 %{\let\clearpage\relax\listofalgorithms}
 
-
-
+\restoregeometry
+\pagestyle{fancy}
+\pagestyle{body}
 \chapter{Introduction}
 
 A sparse signal over some representation means that it can be expressed using only a few elements of the representation – in other words, sparse means with many zero coefficients. Many applications ranging from machine learning to image denoising and image recognition heavily rely on the property that we can summarize (or more exactly approximate) any signal using a proper sparse representation. The job of obtaining the original signal from its sparse counterpart can be written in terms of an operator, often called \emph{dictionary} or \emph{transform}. 
@@ -403,6 +403,8 @@ As described in \cref{sec_tree_model}, the supports $\s^e$ are part of the \gls{
 
 \subsubsection{Still a prototype}
 
+Any actual image processing application requires learning the dictionary on a large set of images (namely the $\Y$ matrix). However, \ac{PALMTREE} is still unable to handle more than one image. Moreover, most experiments on \ac{PALMTREE} have focused on the dictionary update step, while real applications require alternating between the dictionary update step and the sparse coding step.
+
 \begin{figure}[!ht] \centering
 \begin{subfigure}[b]{0.325\textwidth}\centering
 \includegraphics[width=\textwidth]{figures/tree-learn-setup/target.pdf} 
@@ -419,9 +421,8 @@ As described in \cref{sec_tree_model}, the supports $\s^e$ are part of the \gls{
 \caption{Example of PALMTREE solution. Supports are fixed on a simple binary tree. Codes $\x$ are handcrafted Diracs that exactly match the locations of atoms in $\y$.}\label{fig_exple_fixed_tree}
 \end{figure}
 
-Any actual image processing application requires learning the dictionary on a large set of images (namely the $\Y$ matrix). However, \ac{PALMTREE} is still unable to handle more than one image. Moreover, most experiments on \ac{PALMTREE} have focused on the dictionary update step, while real applications require alternating between the dictionary update step and the sparse coding step. In fact, without the sparse coding step, \ac{PALMTREE} is limited to images like the one in \cref{fig_exple_fixed_tree}, where the atoms are well separated and located. Therefore, no “real world” images.
-
-
+\noindent
+In fact, without the sparse coding step, \ac{PALMTREE} is limited to images like the one in \cref{fig_exple_fixed_tree}, where the atoms are well separated and located. Therefore, no “real world” images.
 
 \FloatBarrier
 \section{Objectives of the present work}
@@ -714,6 +715,8 @@ Finally, \cref{fig_gain_tilted_n4} presents the same experiment but with a diffe
 \FloatBarrier
 \subsubsection{Visual gain when adding an element}
 
+We want to look at the improvement of the approximation when adding one support element using the gradient, compared to adding a support element using the gain-per-added-point.
+
 \begin{figure}[!ht]\centering
 \begin{subfigure}[b]{0.28\linewidth}\centering
 \includegraphics[width=\linewidth]{figures/before_after/target.pdf}
@@ -773,8 +776,6 @@ Finally, \cref{fig_gain_tilted_n4} presents the same experiment but with a diffe
 
 \caption{Effect of adding one point to the support $\s^4$. The “before” tree is a converged solution of \ac{PALMTREE}. In the “after” solutions (in \cref{fig_beforeafter-aftergainadd-approx,fig_beforeafter-aftergainadd-grad,fig_beforeafter-aftergainadd-grad_best}), a point has been added where the gain-per-added-point is maximal; in \cref{fig_beforeafter-aftergradadd-approx,fig_beforeafter-aftergradadd-grad,fig_beforeafter-aftergradadd-grad_best}, a point has been added where the gradient (in absolute value) is maximal.}\label{fig_beforeafter}
 \end{figure}
-
-We want to look at the improvement of the approximation when adding one support element using the gradient, compared to adding a support element using the gain-per-added-point.
 
 \noindent 
 The experimental results shown in \cref{fig_beforeafter} are based on the results of \cref{fig_gain_n4-approx}, where \cref{fig_beforeafter-target,fig_beforeafter-before-approx,fig_beforeafter-gain,fig_beforeafter-before-grad,fig_beforeafter-gain_best,fig_beforeafter-before-grad_best} are the as for the previous experiment.
@@ -1212,10 +1213,10 @@ In a broader perpective, “real” applications (such as denoising or image rec
 
 
 \clearpage
-\addcontentsline{toc}{chapter}{Appendix}
 \appendix
 
-\chapter{}
+\addcontentsline{toc}{chapter}{Appendix}
+\tocless\chapter{Appendix}
 
 \section{Detail of the \ac{KSVD} algorithm}\label{sec_ksvd_detail}
 \begin{algorithm}
