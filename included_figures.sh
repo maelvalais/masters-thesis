@@ -45,7 +45,7 @@ while [ $# != 0 ]; do
 done
 
 if [ $mode == "tex" ]; then
-    ack '^[^%]*\\includegraphics' | sed "s/^.*{\(.*\)}/\1/g" | \
+    ack '^[^%]*\\includegraphics' --type=tex | sed "s/^.*{\(.*\)}/\1/g" | \
         sed 's/[\\}]//g' | sed 's/ *$//g' | sed 's/^ *//g' | sort | uniq
     # sed 's/[\\}]//g' -> remove any left "\" and "}" that could be left
     # sed 's/ *\(.*\) *$/\1/g' -> remove before/after whitespace
