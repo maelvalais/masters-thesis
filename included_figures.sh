@@ -3,6 +3,7 @@
 # figure_included.sh
 # Copyright (C) 2016 Maël Valais <mael.valais@gmail.com>
 #
+# vim: set tw=0:
 #
 
 mode=tex
@@ -45,8 +46,9 @@ while [ $# != 0 ]; do
 done
 
 if [ $mode == "tex" ]; then
-    ack '^[^%]*\\includegraphics' --type=tex | sed "s/^.*{\(.*\)}/\1/g" | \
-        sed 's/[\\}]//g' | sed 's/ *$//g' | sed 's/^ *//g' | sort | uniq
+    ack '^[^%]*\\includegraphics(\[[^[:space:]]*\])?\{([^[:space:]\\\}]+)\}.*' --type=tex | \
+        sed -r 's/^[^%]*\\includegraphics(\[[^[:space:]]*\])?\{([^[:space:]\\\}]+)\}.*/\2/' | \
+        sed 's/ *$//g' | sed 's/^ *//g' | sort | uniq
     # sed 's/[\\}]//g' -> remove any left "\" and "}" that could be left
     # sed 's/ *\(.*\) *$/\1/g' -> remove before/after whitespace
 elif [ $mode == "git" ]; then
