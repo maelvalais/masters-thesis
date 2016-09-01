@@ -657,7 +657,7 @@ In this purpose, we designed \cref{alg_gain_per_added_point} for computing what 
 \end{figure}
 
 \noindent
-For a $128 \times 128$ target image and using the tree and codes presented in the \cref{fig_xp_explain}, the execution time of this algorithm is about 3 hours (although being parallelized on 32 threads); moreover, the algorithm must be executed each time we add an element, thus making it practically unusable for choosing the support elements to be added.
+For a $128 \times 128$ target image and using the tree and codes presented in the \cref{fig_xp_explain}, the execution time of this algorithm is about 3 hours (although being parallelized on 32 threads); moreover, the algorithm must be executed each time we add an element and for each edge, thus making it practically unusable for choosing the support elements to be added.
 
 \noindent
 \Cref{fig_gain_n4} compares the gain-per-added-point of $\s^4$ (\cref{fig_gain_n4-gain}) to the absolute value of the partial gradient w.r.t.\@ $\h^4$ after a convergence of \eqref{eq_ftl} (\cref{fig_gain_n4-grad}). It is interesting to see that they share the same direction and shape. \Cref{fig_gain_n4-gain_best,fig_gain_n4-grad_best} show the best values of \cref{fig_gain_n4-gain,fig_gain_n4-grad}. We notice that the two images are reminiscent of each other and share common features: for both, we note two stripes located on the  diagonal; they only vary in that the two stripes are more distant from the center in \cref{fig_gain_n4-grad}, as if they were “dilated”. This similarity reinforces our hypothesis that the gradient could give the right information for support estimation.
